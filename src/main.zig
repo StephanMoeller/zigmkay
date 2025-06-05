@@ -38,5 +38,19 @@ pub fn main() !void {
     std.debug.print("Size is {any}.\n", .{tapOnly.tap});
 }
 
+pub fn LS(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, LSFT); }
+pub fn RS(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, RSFT); }
+pub fn LC(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, LCTL); }
+pub fn RC(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, RCTL); }
+pub fn LA(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, LALT); }
+pub fn RA(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, RALT); }
+pub fn LG(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, LGUI); }
+pub fn RG(key: KeyCodeWithMods) KeyCodeWithMods { return AddMod(key, RGUI); }
+pub fn AddMod(key: KeyCodeWithMods, mod: u8) KeyCodeWithMods
+{
+    var copy = key;
+    copy.mods = copy.mods | mod;
+}
+
 /// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
 const lib = @import("zig_firmware_brainstorming_lib");
