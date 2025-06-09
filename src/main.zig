@@ -34,12 +34,12 @@ const KeyDef = struct {
     HoldMods: u8,
     HoldMomentaryLayer: u4,
     TapKeyCode: u8,
-    TapMods: Mods,
+    _apMods: Mods,
     TapOneShotLayer: u4,
     TapPermanentLayer: u4,
 };
 
-const Foo = struct { field: ?u2 };
+const Foo = packed struct { a: u47, b: u20 };
 
 const HoldDef = union(enum) { LayerChangeMomentarily: LayerWithMods, None: void };
 const TapDef = union(enum) { LayerChangeOneShot: LayerWithMods, LayerChangePermanent: LayerWithMods, FireKeyCode: KeyCodeWithMods, None: void };
@@ -56,9 +56,16 @@ const ComboDef = struct { keyPos1: [2]u8, keyPos2: [2]u8, keyPos3: [2]u8, Action
 //const Test: [2][3]u8 = [2][3]u8{[_]u8{1,2,3},[_]u8{4,5,6}};
 const LayerCount = 4;
 const KeyCount = 36;
-//KeyMap: [LayerCount][KeyCount]TapHoldDef = [LayerCount][KeyCount]TapHoldDef{ [KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F }, [KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F }, [KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F }, [KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F } };
+//KeyMap: [LayerCount][KeyCount]TapHoldDef = [LayerCount]
+//[KeyCount]TapHoldDef{
+//[KeyCount]TapHoldDef{ A, B,  C, D, E,    F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F },
+//[KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F },
+//[KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F },
+//[KeyCount]TapHoldDef{ A, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F, A, B, C, D, B, C, D, E, F, A, B, C, D, A, B, C, D, E, F }
+//};
 
 pub fn main() !void {
+    const d = .{};
     std.log.info("hey", .{});
     //const tapOnly = TapHoldDef{.tap = TapDef.None, .hold = HoldDef{.LayerChangeMomentarily = LayerWithMods{.layer = 1, .mods = RCTL | RSFT}}};
     std.debug.print("Size is {any}.\n", .{@sizeOf(KeyDef)});
