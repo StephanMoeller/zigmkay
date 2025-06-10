@@ -32,16 +32,16 @@ const base_layer =
 const baseLayer = [_][KEYCOUNT]core.KeyDef{
 
     [_]core.KeyDef{  //--------------------- 0 ---------------------
-        Q,      W,   LG(R),      P,     B,           K,     L,   RG(O),    U,   SQ,
-        F,  LA(A), LC(S),  LS(T),     G,           M,    RS(N), RC(E), RA(I),    Y,
-        Z,      X,     C,      D,     V,           J,     H,  COM,  DOT, DASH,
+        Q,      W, LG(R),      P,     B,           K,     L, RG(O),     U,   SQ,
+        F,  LA(A), LC(S),  LS(T),     G,           M, RS(N), RC(E), RA(I),    Y,
+        Z,      X,     C,      D,     V,           J,     H,   COM,   DOT, DASH,
                                 MO(ENTER, 2),  MO(SPC, 1)
     },
 
     [_]core.KeyDef{  //--------------------- 1 ---------------------
-         @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑", end,    @"?",
-         @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓",   @"→", pgdn,
-        @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ,   @".", @"-",
+         @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑",  end, @"?",
+         @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓", @"→", pgdn,
+        @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ, @".", @"-",
                                 MO(ENTER, 2),  MO(SPC, 1)
     },
     
