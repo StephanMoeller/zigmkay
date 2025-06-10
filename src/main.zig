@@ -41,15 +41,15 @@ const baseLayer = [_][KEYCOUNT]core.KeyDef{
     [_]core.KeyDef{  //--------------------- 1 ---------------------
          @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑",  end, @"?",
          @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓", @"→", pgdn,
-        @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ, @".", @"-",
-                                MO(ENTER, 2),  MO(SPC, 1)
+        @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ, ESC, @"-",
+                                MO(ENTER, 2),  none
     },
     
     [_]core.KeyDef{ //--------------------- 2 ---------------------  
          none, none, LGUI, none, none,              none, N7, N8, N9, none,
          none, LALT, LCTL, LSFT, none,              none, N4, N5, N6, none,
          none, none, none, none, none,              none, N1, N2, N3, none,
-                                MO(ENTER, 2),  N0
+                                     none,      MO(N0, 1)
     }
 };
 
@@ -76,94 +76,96 @@ pub fn RG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rg = true; r
 pub fn RA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ra = true; return copy; }
 // zig fmt: on
 
-pub const SQ: core.KeyDef = core.FromKeycode(0x15);
-pub const COM: core.KeyDef = core.FromKeycode(0x15);
-pub const DOT: core.KeyDef = core.FromKeycode(0x15);
-pub const DASH: core.KeyDef = core.FromKeycode(0x15);
-pub const SPC: core.KeyDef = core.FromKeycode(0x15);
-pub const ENT: core.KeyDef = core.FromKeycode(0x15);
+pub const SQ = core.FromKeycode(0x15);
+pub const COM = core.FromKeycode(0x15);
+pub const DO = core.FromKeycode(0x15);
+pub const DASH = core.FromKeycode(0x15);
+pub const DOT = core.FromKeycode(0x15);
+pub const SPC = core.FromKeycode(0x15);
+pub const ENT = core.FromKeycode(0x15);
 
-pub const LCTL: core.KeyDef = core.FromKeycode(0x15);
-pub const RCTL: core.KeyDef = core.FromKeycode(0x15);
-pub const LALT: core.KeyDef = core.FromKeycode(0x15);
-pub const RALT: core.KeyDef = core.FromKeycode(0x15);
-pub const LSFT: core.KeyDef = core.FromKeycode(0x15);
-pub const RSFT: core.KeyDef = core.FromKeycode(0x15);
-pub const LGUI: core.KeyDef = core.FromKeycode(0x15);
-pub const RGUI: core.KeyDef = core.FromKeycode(0x15);
+pub const LCTL = core.FromKeycode(0x15);
+pub const RCTL = core.FromKeycode(0x15);
+pub const LALT = core.FromKeycode(0x15);
+pub const RALT = core.FromKeycode(0x15);
+pub const LSFT = core.FromKeycode(0x15);
+pub const RSFT = core.FromKeycode(0x15);
+pub const LGUI = core.FromKeycode(0x15);
+pub const RGUI = core.FromKeycode(0x15);
 
-pub const A: core.KeyDef = core.FromKeycode(0x15);
-pub const B: core.KeyDef = core.FromKeycode(0x15);
-pub const C: core.KeyDef = core.FromKeycode(0x15);
-pub const D: core.KeyDef = core.FromKeycode(0x15);
-pub const E: core.KeyDef = core.FromKeycode(0x15);
-pub const F: core.KeyDef = core.FromKeycode(0x15);
-pub const G: core.KeyDef = core.FromKeycode(0x15);
-pub const H: core.KeyDef = core.FromKeycode(0x15);
-pub const I: core.KeyDef = core.FromKeycode(0x15);
-pub const J: core.KeyDef = core.FromKeycode(0x15);
-pub const K: core.KeyDef = core.FromKeycode(0x15);
-pub const L: core.KeyDef = core.FromKeycode(0x15);
-pub const M: core.KeyDef = core.FromKeycode(0x15);
-pub const N: core.KeyDef = core.FromKeycode(0x15);
-pub const O: core.KeyDef = core.FromKeycode(0x15);
-pub const P: core.KeyDef = core.FromKeycode(0x15);
-pub const Q: core.KeyDef = core.FromKeycode(0x15);
-pub const R: core.KeyDef = core.FromKeycode(0x15);
-pub const S: core.KeyDef = core.FromKeycode(0x15);
-pub const T: core.KeyDef = core.FromKeycode(0x15);
-pub const U: core.KeyDef = core.FromKeycode(0x15);
-pub const V: core.KeyDef = core.FromKeycode(0x15);
-pub const W: core.KeyDef = core.FromKeycode(0x15);
-pub const X: core.KeyDef = core.FromKeycode(0x15);
-pub const Y: core.KeyDef = core.FromKeycode(0x15);
-pub const Z: core.KeyDef = core.FromKeycode(0x15);
+pub const A = core.FromKeycode(0x15);
+pub const B = core.FromKeycode(0x15);
+pub const C = core.FromKeycode(0x15);
+pub const D = core.FromKeycode(0x15);
+pub const E = core.FromKeycode(0x15);
+pub const F = core.FromKeycode(0x15);
+pub const G = core.FromKeycode(0x15);
+pub const H = core.FromKeycode(0x15);
+pub const I = core.FromKeycode(0x15);
+pub const J = core.FromKeycode(0x15);
+pub const K = core.FromKeycode(0x15);
+pub const L = core.FromKeycode(0x15);
+pub const M = core.FromKeycode(0x15);
+pub const N = core.FromKeycode(0x15);
+pub const O = core.FromKeycode(0x15);
+pub const P = core.FromKeycode(0x15);
+pub const Q = core.FromKeycode(0x15);
+pub const R = core.FromKeycode(0x15);
+pub const S = core.FromKeycode(0x15);
+pub const T = core.FromKeycode(0x15);
+pub const U = core.FromKeycode(0x15);
+pub const V = core.FromKeycode(0x15);
+pub const W = core.FromKeycode(0x15);
+pub const X = core.FromKeycode(0x15);
+pub const Y = core.FromKeycode(0x15);
+pub const Z = core.FromKeycode(0x15);
 
-pub const N1: core.KeyDef = core.FromKeycode(0x15);
-pub const N2: core.KeyDef = core.FromKeycode(0x15);
-pub const N3: core.KeyDef = core.FromKeycode(0x15);
-pub const N4: core.KeyDef = core.FromKeycode(0x15);
-pub const N5: core.KeyDef = core.FromKeycode(0x15);
-pub const N6: core.KeyDef = core.FromKeycode(0x15);
-pub const N7: core.KeyDef = core.FromKeycode(0x15);
-pub const N8: core.KeyDef = core.FromKeycode(0x15);
-pub const N9: core.KeyDef = core.FromKeycode(0x15);
-pub const N0: core.KeyDef = core.FromKeycode(0x15);
+pub const N1 = core.FromKeycode(0x15);
+pub const N2 = core.FromKeycode(0x15);
+pub const N3 = core.FromKeycode(0x15);
+pub const N4 = core.FromKeycode(0x15);
+pub const N5 = core.FromKeycode(0x15);
+pub const N6 = core.FromKeycode(0x15);
+pub const N7 = core.FromKeycode(0x15);
+pub const N8 = core.FromKeycode(0x15);
+pub const N9 = core.FromKeycode(0x15);
+pub const N0 = core.FromKeycode(0x15);
 
-pub const Ae: core.KeyDef = core.FromKeycode(0x15);
-pub const Oe: core.KeyDef = core.FromKeycode(0x15);
-pub const Aa: core.KeyDef = core.FromKeycode(0x15);
+pub const Ae = core.FromKeycode(0x15);
+pub const Oe = core.FromKeycode(0x15);
+pub const Aa = core.FromKeycode(0x15);
 
-pub const @"!": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"<": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"=": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @">": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"%": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"/": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const home: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"↑": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const end: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"?": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"@": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"{": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"(": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @")": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"}": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const pgup: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"←": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"↓": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"→": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const pgdn: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"\\": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"#": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"[": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"]": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"&": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"|": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const tab: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const DQ: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @".": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const @"-": core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const ENTER: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const SPACE: core.KeyDef = core.FromKeycodeAndShift(N1.keycode);
-pub const none: core.KeyDef = core.FromKeycode(0);
+pub const @"!" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"<" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"=" = core.FromKeycodeAndShift(N1.keycode);
+pub const @">" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"%" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"/" = core.FromKeycodeAndShift(N1.keycode);
+pub const home = core.FromKeycodeAndShift(N1.keycode);
+pub const @"↑" = core.FromKeycodeAndShift(N1.keycode);
+pub const end = core.FromKeycodeAndShift(N1.keycode);
+pub const @"?" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"@" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"{" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"(" = core.FromKeycodeAndShift(N1.keycode);
+pub const @")" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"}" = core.FromKeycodeAndShift(N1.keycode);
+pub const pgup = core.FromKeycodeAndShift(N1.keycode);
+pub const @"←" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"↓" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"→" = core.FromKeycodeAndShift(N1.keycode);
+pub const pgdn = core.FromKeycodeAndShift(N1.keycode);
+pub const @"\\" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"#" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"[" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"]" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"&" = core.FromKeycodeAndShift(N1.keycode);
+pub const @"|" = core.FromKeycodeAndShift(N1.keycode);
+pub const tab = core.FromKeycodeAndShift(N1.keycode);
+pub const DQ = core.FromKeycodeAndShift(N1.keycode);
+pub const ESC = core.FromKeycodeAndShift(N1.keycode);
+pub const @"." = core.FromKeycodeAndShift(N1.keycode);
+pub const @"-" = core.FromKeycodeAndShift(N1.keycode);
+pub const ENTER = core.FromKeycodeAndShift(N1.keycode);
+pub const SPACE = core.FromKeycodeAndShift(N1.keycode);
+pub const none = core.FromKeycode(0);

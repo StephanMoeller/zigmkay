@@ -1,3 +1,4 @@
 - combo syntax 
 - tri-layer functionality
 - eksempel på special-tab-funktionalitet
+- angivelse af ugyldigt layer index i MO-funktionen skal give en compile error
