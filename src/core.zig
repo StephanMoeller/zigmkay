@@ -2,12 +2,26 @@ pub const Mods = packed struct { ls: bool = false, rs: bool = false, lc: bool = 
 pub const KeyCodeWithMods = struct { keycode: u8, mods: Mods = Mods{} };
 pub const LayerWithMods = struct { layer: u8, mods: Mods = Mods{} };
 
+// TapEnter
+// TapExit
+// HoldEnter
+// HoldExit
+
+pub fn FromKeycodeAndShift(keycode: u8) KeyDef {
+    return KeyDef{ .keycode = keycode };
+}
+pub fn FromKeycodeAndRAlt(keycode: u8) KeyDef {
+    return KeyDef{ .keycode = keycode };
+}
+pub fn FromKeycode(keycode: u8) KeyDef {
+    return KeyDef{ .keycode = keycode };
+}
+
 pub const KeyDef = struct {
-    onTapEnter: u8, //function
-    onTapExit: u8,
-    onHoldEnter: u8,
-    onHoldExit: u8,
+    keycode: u8,
+    mods: Mods = Mods{},
+    //onTap: u8, //function
+    //onHoldEnter: u8,
+    //onHoldExit: u8,
 };
 pub const KeyCode_A = 0x15;
-pub const Mod_LALT = Mods{ .la = true };
-pub const Mod_LCTL_LALT = Mods{ .la = true };
