@@ -1,2 +1,3 @@
 - combo syntax 
 - tri-layer functionality
+- eksempel på special-tab-funktionalitet

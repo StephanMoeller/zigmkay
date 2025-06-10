@@ -30,28 +30,29 @@ const base_layer =
 ;
 // zig fmt: off
 const baseLayer = [_][KEYCOUNT]core.KeyDef{
-    // 0
-    [_]core.KeyDef{ 
+
+    [_]core.KeyDef{  //--------------------- 0 ---------------------
         Q,      W,   LG(R),      P,     B,           K,     L,   RG(O),    U,   SQ,
         F,  LA(A), LC(S),  LS(T),     G,           M,    RS(N), RC(E), RA(I),    Y,
         Z,      X,     C,      D,     V,           J,     H,  COM,  DOT, DASH,
                                 MO(ENTER, 2),  MO(SPC, 1)
     },
-    // 1
-    [_]core.KeyDef{ 
+
+    [_]core.KeyDef{  //--------------------- 1 ---------------------
          @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑", end,    @"?",
          @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓",   @"→", pgdn,
         @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ,   @".", @"-",
                                 MO(ENTER, 2),  MO(SPC, 1)
     },
-    // 2
-    [_]core.KeyDef{ 
+    
+    [_]core.KeyDef{ //--------------------- 2 ---------------------  
          none, none, LGUI, none, none,              none, N7, N8, N9, none,
          none, LALT, LCTL, LSFT, none,              none, N4, N5, N6, none,
          none, none, none, none, none,              none, N1, N2, N3, none,
                                 MO(ENTER, 2),  N0
     }
 };
+
 // zig fmt: on
 
 pub fn main() !void {
@@ -60,50 +61,20 @@ pub fn main() !void {
 
 pub fn MO(key: core.KeyDef, _: u4) core.KeyDef {
     var copy = key;
-    copy.mods.ls = true; // fix this - does not yet have option of hold functionality
-    return copy;
-}
-pub fn LS(key: core.KeyDef) core.KeyDef {
-    var copy = key;
     copy.mods.ls = true;
-    return copy;
-}
-pub fn LC(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.lc = true;
-    return copy;
-}
-pub fn LG(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.lg = true;
-    return copy;
-}
-pub fn LA(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.la = true;
     return copy;
 }
 
-pub fn RS(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.ls = true;
-    return copy;
-}
-pub fn RC(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.lc = true;
-    return copy;
-}
-pub fn RG(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.lg = true;
-    return copy;
-}
-pub fn RA(key: core.KeyDef) core.KeyDef {
-    var copy = key;
-    copy.mods.la = true;
-    return copy;
-}
+// zig fmt: off
+pub fn LS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
+pub fn LC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lc = true; return copy; }
+pub fn LG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lg = true; return copy; }
+pub fn LA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.la = true; return copy; }
+pub fn RS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rs = true; return copy; }
+pub fn RC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rc = true; return copy; }
+pub fn RG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rg = true; return copy; }
+pub fn RA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ra = true; return copy; }
+// zig fmt: on
 
 pub const SQ: core.KeyDef = core.FromKeycode(0x15);
 pub const COM: core.KeyDef = core.FromKeycode(0x15);
