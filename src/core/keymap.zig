@@ -12,8 +12,15 @@ const base_layer =
 ;
 pub const LayerCount: usize = 3;
 pub const KeyCount: usize = 32;
-pub fn createLayers(comptime layerCount: usize, comptime keyCount: usize) [layerCount][keyCount]core.KeyDef {
-    return [layerCount][keyCount]core.KeyDef{
+pub fn createKeymap() [LayerCount][0]core.KeyDef {
+    return [LayerCount][0]core.KeyDef{
+        [_]core.KeyDef{},
+        [_]core.KeyDef{},
+        [_]core.KeyDef{},
+    };
+}
+pub fn createKeymap5() [LayerCount][KeyCount]core.KeyDef {
+    return [LayerCount][KeyCount]core.KeyDef{
         // zig fmt: off
         [_]core.KeyDef{  //--------------------- 0 ---------------------
             Q,     W, LG(R),       P,     B,           K,     L, RG(O),     U,   SQ,
