@@ -1,4 +1,12 @@
 - Understandable error messages. Zmk lags this, qmk is a little better in this regard
 - Flexibility to do simple thing as eg Tap for RALT+Key, Hold for mod/layerhold. Qmk does not allow this combo.
 - Understandable keymap definition: qmk relies on custom code for semi advanced stuff, zmk has a nice way of defining a behavior and then pass arguments to that in the keymap.
-
+- tri-layer where one of the holds does shift itself. In qmk this goes to entirely custom code instantly. in zmk not sure, but an entire uppercase layer does not cut it as the key cannot be used as a standalone shift key for shortcuts then. Also, every alpha combo must be duplicated.
+- Simple extra stuff should be isolatable to a single keys logic
+-   examples:
+-     special tab button while hold layer:
+-     1. Layer hold should have an extra snippet for onHoldExit (when layer is exited) that will simply fire an alt-released code if it is currently held
+-     2. The special tab key should have an extra snippet for onBeforeTapEnter which should fire an alt-pressed in case it is not already held
+-     special nvim jump keys:
+-       Hold down a number layer that will fire Up when released, allowing line jumps using just: Press hold key, type number, release hold key - now nvim jumps up.
+-       The same functionality for jumping down
