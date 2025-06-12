@@ -1,23 +1,7 @@
 const std = @import("std");
 
 /// This imports the separate Gmodule containing `root.zig`. Take a look in `build.zig` for details.
-const lib = @import("zig_firmware_brainstorming_lib");
-
 const core = @import("core/types.zig");
-
-// Tap:
-//  None
-//  Fire Key + Mod
-//  One shot layer shift + Mod
-//  Permanent layer shift + Mod
-//
-// Hold:
-//  None
-//  Mod
-//  Momentary layer + mod
-//  => layer: ?u8, => enienienien-nmods: Mods
-//
-//
 
 const KEYCOUNT = 32;
 const base_layer =
