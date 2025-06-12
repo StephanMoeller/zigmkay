@@ -10,14 +10,18 @@ pub const KeyDef = struct {
     //onHoldExit: u8,
     layer: u8 = 0x0,
 };
-pub fn PinConfig(comptime length: usize, arr: [length]u8) type {
-    return struct { pins: @TypeOf(arr) };
+pub fn PinConfig(comptime colCount: usize, comptime rowCount: usize) type {
+    return struct {
+        colPins: [colCount]u8,
+        rowPins: [rowCount]u8,
+    };
 }
 
-pub fn KeyboardType(comptime layerCount: usize, comptime keyCount: usize) type {
+pub fn KeyboardType(comptime layerCount: usize, comptime keyCount: usize, comptime colCount: usize, comptime rowCount: usize) type {
     return struct {
         keymap: [layerCount][keyCount]KeyDef,
         layerCount: usize = layerCount,
         keyCount: usize = keyCount,
+        pinConfig: PinConfig(colCount, rowCount),
     };
 }

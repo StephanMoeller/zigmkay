@@ -7,8 +7,8 @@ const KeyCount: usize = 32;
 const ColPins = [_]u8{ 1, 2, 3 };
 const RowPins = [_]u8{ 4, 5, 6 };
 
-pub fn getKeyboardDefinition() core.KeyboardType(LayerCount, KeyCount) {
-    return core.KeyboardType(LayerCount, KeyCount){
+pub fn getKeyboardDefinition() core.KeyboardType(LayerCount, KeyCount, ColPins.len, RowPins.len) {
+    return core.KeyboardType(LayerCount, KeyCount, ColPins.len, RowPins.len){
         .keymap = [LayerCount][KeyCount]core.KeyDef{
             // zig fmt: off
             [_]core.KeyDef{ //--------------------- 0 ---------------------
@@ -33,7 +33,10 @@ pub fn getKeyboardDefinition() core.KeyboardType(LayerCount, KeyCount) {
             },
             // zig fmt: on
         },
-
+        .pinConfig = core.PinConfig(ColPins.len, RowPins.len){
+            .colPins = ColPins,
+            .rowPins = RowPins
+        }
     };
 }
 // zig fmt: off
