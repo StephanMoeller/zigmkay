@@ -8,7 +8,7 @@ pub const LayerWithMods = struct { layer: u8, mods: Mods = Mods{} };
 // HoldExit
 
 pub fn FromKeycodeAndShift(keycode: u8) KeyDef {
-    return KeyDef{ .keycode = keycode };
+    return KeyDef{ .keycode = keycode, .mods = Mods{ .ls = true } };
 }
 pub fn FromKeycodeAndRAlt(keycode: u8) KeyDef {
     return KeyDef{ .keycode = keycode };
