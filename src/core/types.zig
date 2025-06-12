@@ -13,5 +13,6 @@ pub const KeyDef = struct {
     //onTap: u8, //function
     //onHoldEnter: u8,
     //onHoldExit: u8,
+    layer: u8 = 0x0,
 };
 pub const KeyCode_A = 0x15;

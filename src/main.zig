@@ -18,34 +18,28 @@ const baseLayer = [_][KEYCOUNT]core.KeyDef{
         Q,     W, LG(R),       P,     B,           K,     L, RG(O),     U,   SQ,
         F,  LA(A),LC(S),   LS(T),     G,           M, RS(N), RC(E), RA(I),    Y,
         Z,     X,     C,       D,     V,           J,     H,   COM,   DOT, DASH,
-                               L1(ENTER),    L2(SPC)
+                            HL(ENTER, 1),    HL(SPC, 2)
     },
 
     [_]core.KeyDef{  //--------------------- 1 ---------------------
          @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑",  end, @"?",
          @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓", @"→", pgdn,
         @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ, ESC, @"-",
-                                MO(ENTER, 2),  none
+                                HL(ENTER, 2),  none
     },
     
     [_]core.KeyDef{ //--------------------- 2 ---------------------  
          none, none, LGUI, none, none,              none, N7, N8, N9, none,
          none, LALT, LCTL, LSFT, none,              none, N4, N5, N6, none,
          none, none, none, none, none,              none, N1, N2, N3, none,
-                                     none,      MO(N0, 1)
+                                     none,      HL(N0, 1)
     }
 };
 
 // zig fmt: on
 
 pub fn main() !void {
-    std.log.info("hey {any}", .{baseLayer});
-}
-
-pub fn MO(key: core.KeyDef, _: u4) core.KeyDef {
-    var copy = key;
-    copy.mods.ls = true;
-    return copy;
+    std.log.info("hey {any}", .{baseLayer[0][0]});
 }
 
 // zig fmt: off
@@ -61,108 +55,115 @@ pub fn RA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ra = true; r
 pub fn L1(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 pub fn L2(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 pub fn L3(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
+
 // zig fmt: on
+pub fn HL(key: core.KeyDef, layer: u8) core.KeyDef {
+    var copy = key;
+    copy.mods.ls = true;
+    copy.layer = layer;
+    return copy;
+}
 
-pub const SQ = FromKeycode(0x15);
-pub const COM = FromKeycode(0x15);
-pub const DO = FromKeycode(0x15);
-pub const DASH = FromKeycode(0x15);
-pub const DOT = FromKeycode(0x15);
-pub const SPC = FromKeycode(0x15);
-pub const ENT = FromKeycode(0x15);
+pub const SQ = FromKey(0x15);
+pub const COM = FromKey(0x15);
+pub const DO = FromKey(0x15);
+pub const DASH = FromKey(0x15);
+pub const DOT = FromKey(0x15);
+pub const SPC = FromKey(0x15);
+pub const ENT = FromKey(0x15);
 
-pub const LCTL = FromKeycode(0x15);
-pub const RCTL = FromKeycode(0x15);
-pub const LALT = FromKeycode(0x15);
-pub const RALT = FromKeycode(0x15);
-pub const LSFT = FromKeycode(0x15);
-pub const RSFT = FromKeycode(0x15);
-pub const LGUI = FromKeycode(0x15);
-pub const RGUI = FromKeycode(0x15);
+pub const LCTL = FromKey(0x15);
+pub const RCTL = FromKey(0x15);
+pub const LALT = FromKey(0x15);
+pub const RALT = FromKey(0x15);
+pub const LSFT = FromKey(0x15);
+pub const RSFT = FromKey(0x15);
+pub const LGUI = FromKey(0x15);
+pub const RGUI = FromKey(0x15);
 
-pub const A = FromKeycode(0x15);
-pub const B = FromKeycode(0x15);
-pub const C = FromKeycode(0x15);
-pub const D = FromKeycode(0x15);
-pub const E = FromKeycode(0x15);
-pub const F = FromKeycode(0x15);
-pub const G = FromKeycode(0x15);
-pub const H = FromKeycode(0x15);
-pub const I = FromKeycode(0x65);
-pub const J = FromKeycode(0x15);
-pub const K = FromKeycode(0x15);
-pub const L = FromKeycode(0x15);
-pub const M = FromKeycode(0x15);
-pub const N = FromKeycode(0x15);
-pub const O = FromKeycode(0x15);
-pub const P = FromKeycode(0x15);
-pub const Q = FromKeycode(0x15);
-pub const R = FromKeycode(0x15);
-pub const S = FromKeycode(0x15);
-pub const T = FromKeycode(0x15);
-pub const U = FromKeycode(0x15);
-pub const V = FromKeycode(0x15);
-pub const W = FromKeycode(0x15);
-pub const X = FromKeycode(0x15);
-pub const Y = FromKeycode(0x15);
-pub const Z = FromKeycode(0x15);
+pub const A = FromKey(0x15);
+pub const B = FromKey(0x15);
+pub const C = FromKey(0x15);
+pub const D = FromKey(0x15);
+pub const E = FromKey(0x15);
+pub const F = FromKey(0x15);
+pub const G = FromKey(0x15);
+pub const H = FromKey(0x15);
+pub const I = FromKey(0x65);
+pub const J = FromKey(0x15);
+pub const K = FromKey(0x15);
+pub const L = FromKey(0x15);
+pub const M = FromKey(0x15);
+pub const N = FromKey(0x15);
+pub const O = FromKey(0x15);
+pub const P = FromKey(0x15);
+pub const Q = FromKey(0x15);
+pub const R = FromKey(0x15);
+pub const S = FromKey(0x15);
+pub const T = FromKey(0x15);
+pub const U = FromKey(0x15);
+pub const V = FromKey(0x15);
+pub const W = FromKey(0x15);
+pub const X = FromKey(0x15);
+pub const Y = FromKey(0x15);
+pub const Z = FromKey(0x15);
 
-pub const N1 = FromKeycode(0x15);
-pub const N2 = FromKeycode(0x15);
-pub const N3 = FromKeycode(0x15);
-pub const N4 = FromKeycode(0x15);
-pub const N5 = FromKeycode(0x15);
-pub const N6 = FromKeycode(0x15);
-pub const N7 = FromKeycode(0x15);
-pub const N8 = FromKeycode(0x15);
-pub const N9 = FromKeycode(0x15);
-pub const N0 = FromKeycode(0x15);
+pub const N1 = FromKey(0x15);
+pub const N2 = FromKey(0x15);
+pub const N3 = FromKey(0x15);
+pub const N4 = FromKey(0x15);
+pub const N5 = FromKey(0x15);
+pub const N6 = FromKey(0x15);
+pub const N7 = FromKey(0x15);
+pub const N8 = FromKey(0x15);
+pub const N9 = FromKey(0x15);
+pub const N0 = FromKey(0x15);
 
-pub const Ae = FromKeycode(0x15);
-pub const Oe = FromKeycode(0x15);
-pub const Aa = FromKeycode(0x15);
+pub const Ae = FromKey(0x15);
+pub const Oe = FromKey(0x15);
+pub const Aa = FromKey(0x15);
 
-pub const @"!" = FromKeycodeAndShift(N1.keycode);
-pub const @"<" = FromKeycodeAndShift(N1.keycode);
-pub const @"=" = FromKeycodeAndShift(N1.keycode);
-pub const @">" = FromKeycodeAndShift(N1.keycode);
-pub const @"%" = FromKeycodeAndShift(N1.keycode);
-pub const @"/" = FromKeycodeAndShift(N1.keycode);
-pub const home = FromKeycodeAndShift(N1.keycode);
-pub const @"↑" = FromKeycodeAndShift(N1.keycode);
-pub const end = FromKeycodeAndShift(N1.keycode);
-pub const @"?" = FromKeycodeAndShift(N1.keycode);
-pub const @"@" = FromKeycodeAndShift(N1.keycode);
-pub const @"{" = FromKeycodeAndShift(N1.keycode);
-pub const @"(" = FromKeycodeAndShift(N1.keycode);
-pub const @")" = FromKeycodeAndShift(N1.keycode);
-pub const @"}" = FromKeycodeAndShift(N1.keycode);
-pub const pgup = FromKeycodeAndShift(N1.keycode);
-pub const @"←" = FromKeycodeAndShift(N1.keycode);
-pub const @"↓" = FromKeycodeAndShift(N1.keycode);
-pub const @"→" = FromKeycodeAndShift(N1.keycode);
-pub const pgdn = FromKeycodeAndShift(N1.keycode);
-pub const @"\\" = FromKeycodeAndShift(N1.keycode);
-pub const @"#" = FromKeycodeAndShift(N1.keycode);
-pub const @"[" = FromKeycodeAndShift(N1.keycode);
-pub const @"]" = FromKeycodeAndShift(N1.keycode);
-pub const @"&" = FromKeycodeAndShift(N1.keycode);
-pub const @"|" = FromKeycodeAndShift(N1.keycode);
-pub const tab = FromKeycodeAndShift(N1.keycode);
-pub const DQ = FromKeycodeAndShift(N1.keycode);
-pub const ESC = FromKeycodeAndShift(N1.keycode);
-pub const @"." = FromKeycodeAndShift(N1.keycode);
-pub const @"-" = FromKeycodeAndShift(N1.keycode);
-pub const ENTER = FromKeycodeAndShift(N1.keycode);
-pub const SPACE = FromKeycodeAndShift(N1.keycode);
-pub const none = FromKeycode(0);
+pub const @"!" = FromKey_LSFT(N1.keycode);
+pub const @"<" = FromKey_LSFT(N1.keycode);
+pub const @"=" = FromKey_LSFT(N1.keycode);
+pub const @">" = FromKey_LSFT(N1.keycode);
+pub const @"%" = FromKey_LSFT(N1.keycode);
+pub const @"/" = FromKey_LSFT(N1.keycode);
+pub const home = FromKey_LSFT(N1.keycode);
+pub const @"↑" = FromKey_LSFT(N1.keycode);
+pub const end = FromKey_LSFT(N1.keycode);
+pub const @"?" = FromKey_LSFT(N1.keycode);
+pub const @"@" = FromKey_LSFT(N1.keycode);
+pub const @"{" = FromKey_LSFT(N1.keycode);
+pub const @"(" = FromKey_LSFT(N1.keycode);
+pub const @")" = FromKey_LSFT(N1.keycode);
+pub const @"}" = FromKey_LSFT(N1.keycode);
+pub const pgup = FromKey_LSFT(N1.keycode);
+pub const @"←" = FromKey_LSFT(N1.keycode);
+pub const @"↓" = FromKey_LSFT(N1.keycode);
+pub const @"→" = FromKey_LSFT(N1.keycode);
+pub const pgdn = FromKey_LSFT(N1.keycode);
+pub const @"\\" = FromKey_LSFT(N1.keycode);
+pub const @"#" = FromKey_LSFT(N1.keycode);
+pub const @"[" = FromKey_LSFT(N1.keycode);
+pub const @"]" = FromKey_LSFT(N1.keycode);
+pub const @"&" = FromKey_LSFT(N1.keycode);
+pub const @"|" = FromKey_LSFT(N1.keycode);
+pub const tab = FromKey_LSFT(N1.keycode);
+pub const DQ = FromKey_LSFT(N1.keycode);
+pub const ESC = FromKey_LSFT(N1.keycode);
+pub const @"." = FromKey_LSFT(N1.keycode);
+pub const @"-" = FromKey_LSFT(N1.keycode);
+pub const ENTER = FromKey_LSFT(N1.keycode);
+pub const SPACE = FromKey_LSFT(N1.keycode);
+pub const none = FromKey(0);
 
-pub fn FromKeycodeAndShift(keycode: u8) core.KeyDef {
+pub fn FromKey_LSFT(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode, .mods = core.Mods{ .ls = true } };
 }
-pub fn FromKeycodeAndRAlt(keycode: u8) core.KeyDef {
+pub fn FromKey_RAlt(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode };
 }
-pub fn FromKeycode(keycode: u8) core.KeyDef {
+pub fn FromKey(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode };
 }
