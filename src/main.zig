@@ -1,4 +1,4 @@
-const keyboard = @import("keymap.zig");
+const keyboard = @import("wilson26/keymap.zig");
 const keymap = keyboard.createKeymap();
 
 comptime {

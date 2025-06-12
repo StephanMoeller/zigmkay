@@ -1,7 +1,7 @@
 const std = @import("std");
 
 /// This imports the separate Gmodule containing `root.zig`. Take a look in `build.zig` for details.
-const core = @import("core/types.zig");
+const core = @import("../core/types.zig");
 
 const base_layer =
     \\ Q     W <J> lg:R        P   B            k   l <æ> o <å> u   '
@@ -12,14 +12,8 @@ const base_layer =
 ;
 pub const LayerCount: usize = 3;
 pub const KeyCount: usize = 32;
-pub fn createKeymap() [LayerCount][0]core.KeyDef {
-    return [LayerCount][0]core.KeyDef{
-        [_]core.KeyDef{},
-        [_]core.KeyDef{},
-        [_]core.KeyDef{},
-    };
-}
-pub fn createKeymap5() [LayerCount][KeyCount]core.KeyDef {
+
+pub fn createKeymap() [LayerCount][KeyCount]core.KeyDef {
     return [LayerCount][KeyCount]core.KeyDef{
         // zig fmt: off
         [_]core.KeyDef{  //--------------------- 0 ---------------------
