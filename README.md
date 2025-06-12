@@ -8,5 +8,5 @@
     - 1. Layer hold should have an extra snippet for onHoldExit (when layer is exited) that will simply fire an alt-released code if it is currently held
     - 2. The special tab key should have an extra snippet for onBeforeTapEnter which should fire an alt-pressed in case it is not already held
     - special nvim jump keys:
-    - Hold down a number layer that will fire Up when released, allowing line jumps using just: Press hold key, type number, release hold key - now nvim jumps up.
-    - The same functionality for jumping down
+    - 1. Hold down a number layer that will fire Up when released, allowing line jumps using just: Press hold key, type number, release hold key - now nvim jumps up.
+    - 2. The same functionality for jumping down
