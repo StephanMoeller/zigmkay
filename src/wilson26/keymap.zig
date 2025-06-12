@@ -4,37 +4,39 @@ const core = @import("../core/types.zig");
 const LayerCount: usize = 3;
 const KeyCount: usize = 32;
 
-pub const keymap = [LayerCount][KeyCount]core.KeyDef{
-    // zig fmt: off
-        [_]core.KeyDef{  //--------------------- 0 ---------------------
-            Q,     W, LG(R),       P,     B,           K,     L, RG(O),     U,   SQ,
-            F,  LA(A),LC(S),   LS(T),     G,           M, RS(N), RC(E), RA(I),    Y,
-            Z,     X,     C,       D,     V,           J,     H,   COM,   DOT, DASH,
-                                HL(ENTER, 1),    HL(SPC, 2)
+const ColPins = [_]u8{ 1, 2, 3 };
+const RowPins = [_]u8{ 4, 5, 6 };
+
+pub fn getKeyboardDefinition() core.KeyboardType(LayerCount, KeyCount) {
+    return core.KeyboardType(LayerCount, KeyCount){
+        .keymap = [LayerCount][KeyCount]core.KeyDef{
+            // zig fmt: off
+            [_]core.KeyDef{ //--------------------- 0 ---------------------
+                Q,            W,          LG(R), P,     B, K, L,     RG(O), U,     SQ,
+                F,            LA(A),      LC(S), LS(T), G, M, RS(N), RC(E), RA(I), Y,
+                Z,            X,          C,     D,     V, J, H,     COM,   DOT,   DASH,
+                HL(ENTER, 1), HL(SPC, 2),
+            },
+
+            [_]core.KeyDef{ //--------------------- 1 ---------------------
+                @"!",         @"<",     @"=", @">", @"%", @"/", home,   @"↑", end,    @"?",
+                @"@",         LA(@"{"), @"(", @")", @"}", pgup, @"←", @"↓", @"→", pgdn,
+                @"\\",        @"#",     @"[", @"]", @"&", @"|", tab,    DQ,     ESC,    @"-",
+                HL(ENTER, 2), none,
+            },
+
+            [_]core.KeyDef{ //--------------------- 2 ---------------------
+                none, none,      LGUI, none, none, none, N7, N8, N9, none,
+                none, LALT,      LCTL, LSFT, none, none, N4, N5, N6, none,
+                none, none,      none, none, none, none, N1, N2, N3, none,
+                none, HL(N0, 1),
+            },
+            // zig fmt: on
         },
 
-        [_]core.KeyDef{  //--------------------- 1 ---------------------
-            @"!",     @"<", @"=",  @">",  @"%",              @"/", home, @"↑",  end, @"?",
-            @"@", LA(@"{"), @"(",  @")",  @"}",              pgup, @"←", @"↓", @"→", pgdn,
-            @"\\",     @"#", @"[",  @"]",  @"&",              @"|",  tab,   DQ, ESC, @"-",
-                                    HL(ENTER, 2),  none
-        },
-     
-        [_]core.KeyDef{ //--------------------- 2 ---------------------  
-            none, none, LGUI, none, none,              none, N7, N8, N9, none,
-            none, LALT, LCTL, LSFT, none,              none, N4, N5, N6, none,
-            none, none, none, none, none,              none, N1, N2, N3, none,
-                                         none,      HL(N0, 1)
-        }
-        // zig fmt: off
-};
-
-pub fn getKeyboardDefinition() core.KeyboardDefinition(LayerCount, KeyCount) {
-    return core.KeyboardDefinition(LayerCount, KeyCount){
-        .keymap = keymap
     };
 }
-
+// zig fmt: off
 fn LS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 fn LC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lc = true; return copy; }
 fn LG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lg = true; return copy; }
@@ -43,7 +45,6 @@ fn RS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rs = true; retur
 fn RC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rc = true; return copy; }
 fn RG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rg = true; return copy; }
 fn RA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ra = true; return copy; }
-
 fn L1(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 fn L2(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 fn L3(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
