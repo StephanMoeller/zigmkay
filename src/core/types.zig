@@ -15,3 +15,11 @@ pub const KeyDef = struct {
     //onHoldExit: u8,
     layer: u8 = 0x0,
 };
+
+pub fn KeyboardDefinition(comptime layerCount: usize, comptime keyCount: usize) type {
+    return struct {
+        keymap: [layerCount][keyCount]KeyDef,
+        layerCount: usize = layerCount,
+        keyCount: usize = keyCount,
+    };
+}
