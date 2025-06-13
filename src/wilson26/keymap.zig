@@ -1,44 +1,37 @@
 const std = @import("std");
 const core = @import("../core/types.zig");
 
-const LayerCount: usize = 3;
-const KeyCount: usize = 32;
+pub const LayerCount: usize = 3;
+pub const KeyCount: usize = 32;
 
-const ColPins = [_]u8{ 1, 2, 3 };
-const RowPins = [_]u8{ 4, 5, 6 };
-
-pub fn getKeyboardDefinition() core.KeyboardType(LayerCount, KeyCount, ColPins.len, RowPins.len) {
-    return core.KeyboardType(LayerCount, KeyCount, ColPins.len, RowPins.len){
-        .keymap = [LayerCount][KeyCount]core.KeyDef{
-            // zig fmt: off
-            [_]core.KeyDef{ //--------------------- 0 ---------------------
-                Q,            W,          LG(R), P,     B, K, L,     RG(O), U,     SQ,
-                F,            LA(A),      LC(S), LS(T), G, M, RS(N), RC(E), RA(I), Y,
-                Z,            X,          C,     D,     V, J, H,     COM,   DOT,   DASH,
-                HL(ENTER, 1), HL(SPC, 2),
+pub const KeyboardConfig = struct {
+    pub const colPins = [_]u8{ 1, 2, 3 };
+    pub const rowPins = [_]u8{ 4, 5, 6, 7 };
+    pub const keymap = [LayerCount][KeyCount]core.KeyDef{
+        // zig fmt: off
+            [KeyCount]core.KeyDef{ //--------------------- 0 ---------------------
+                Q,     W, LG(R),     P, B,          K,     L, RG(O),     U,   SQ,
+                F, LA(A), LC(S), LS(T), G,          M, RS(N), RC(E), RA(I),    Y,
+                Z,     X,     C,     D, V,          J,     H,   COM,   DOT, DASH,
+                                        HL(ENTER, 1), HL(SPC, 2),
             },
 
-            [_]core.KeyDef{ //--------------------- 1 ---------------------
-                @"!",         @"<",     @"=", @">", @"%", @"/", home,   @"↑", end,    @"?",
-                @"@",         LA(@"{"), @"(", @")", @"}", pgup, @"←", @"↓", @"→", pgdn,
-                @"\\",        @"#",     @"[", @"]", @"&", @"|", tab,    DQ,     ESC,    @"-",
-                HL(ENTER, 2), none,
+            [KeyCount]core.KeyDef{ //--------------------- 1 ---------------------
+                 @"!",     @"<", @"=", @">", @"%",      @"/", home, @"↑",  end, @"?",
+                 @"@", LA(@"{"), @"(", @")", @"}",      pgup, @"←", @"↓", @"→", pgdn,
+                @"\\",     @"#", @"[", @"]", @"&",      @"|",  tab,   DQ,  ESC, @"-",
+                                        HL(ENTER, 2), ____,
             },
 
-            [_]core.KeyDef{ //--------------------- 2 ---------------------
-                none, none,      LGUI, none, none, none, N7, N8, N9, none,
-                none, LALT,      LCTL, LSFT, none, none, N4, N5, N6, none,
-                none, none,      none, none, none, none, N1, N2, N3, none,
-                none, HL(N0, 1),
+            [KeyCount]core.KeyDef{ //--------------------- 2 ---------------------
+                ____, ____, LGUI, ____, ____,           ____, N7, N8, N9, ____,
+                ____, LALT, LCTL, LSFT, ____,           ____, N4, N5, N6, ____,
+                ____, ____, ____, ____, ____,           ____, N1, N2, N3, ____,
+                                                ____, HL(N0, 1),
             },
             // zig fmt: on
-        },
-        .pinConfig = core.PinConfig(ColPins.len, RowPins.len){
-            .colPins = ColPins,
-            .rowPins = RowPins
-        }
-    };
-}
+        };
+};
 // zig fmt: off
 fn LS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
 fn LC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lc = true; return copy; }
@@ -152,7 +145,7 @@ const @"." = FromKey_LSFT(N1.keycode);
 const @"-" = FromKey_LSFT(N1.keycode);
 const ENTER = FromKey_LSFT(N1.keycode);
 const SPACE = FromKey_LSFT(N1.keycode);
-const none = FromKey(0);
+const ____ = FromKey(0);
 
 fn FromKey_LSFT(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode, .mods = core.Mods{ .ls = true } };
