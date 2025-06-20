@@ -1,3 +1,5 @@
+
+# Why a new firmware? Current missing in qmk/zmk:
 - Understandable error messages. Zmk lags this, qmk is a little better in this regard
 - Flexibility to do simple thing as eg Tap for RALT+Key, Hold for mod/layerhold. Qmk does not allow this combo.
 - Understandable keymap definition: qmk relies on custom code for semi advanced stuff, zmk has a nice way of defining a behavior and then pass arguments to that in the keymap.
@@ -10,3 +12,8 @@
     - special nvim jump keys:
     - 1. Hold down a number layer that will fire Up when released, allowing line jumps using just: Press hold key, type number, release hold key - now nvim jumps up.
     - 2. The same functionality for jumping down
+
+# TODO
+- Configure the Wilson26 on one side and make it actually blink the led when a certain key is pressed
+- Make the firmware a module that is imported into main to used for an actual keyboard configuration
+
