@@ -1,30 +1,23 @@
 const std = @import("std");
+const microzig = @import("microzig");
 
-// Although this function looks imperative, note that its job is to
-// declaratively construct a build graph that will be executed by an external
-// runner.
+const MicroBuild = microzig.MicroBuild(.{
+    .rp2xxx = true,
+});
+
 pub fn build(b: *std.Build) void {
-    // This *creates* a Run step in the build graph, to be executed when another
-    // step is evaluated that depends on it. The next line below will establish
-    // such a dependency.
-    const run_cmd = b.addRunArtifact(b.addExecutable(.{
-        .name = "zig_firmware_brainstorming",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
-            .target = b.standardTargetOptions(.{}),
-            .optimize = b.standardOptimizeOption(.{}),
-        }),
-    }));
+    const mz_dep = b.dependency("microzig", .{});
+    const mb = MicroBuild.init(b, mz_dep) orelse return;
 
-    // This allows the user to pass arguments to the application in the build
-    // command itself, like this: `zig build run -- arg1 arg2 etc`
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    const firmware = mb.add_firmware(.{
+        .name = "blinky",
+        .target = mb.ports.rp2xxx.boards.raspberrypi.pico,
+        .optimize = .ReleaseSmall,
+        .root_source_file = b.path("src/main.zig"),
+    });
 
-    // This creates a build step. It will be visible in the `zig build --help` menu,
-    // and can be selected like this: `zig build run`
-    // This will evaluate the `run` step rather than the default, which is "install".
-    const run_step = b.step("run", "Run the app");
-    run_step.dependOn(&run_cmd.step);
+    // We call this twice to demonstrate that the default binary output for
+    // RP2040 is UF2, but we can also output other formats easily
+    mb.install_firmware(firmware, .{});
+    mb.install_firmware(firmware, .{ .format = .elf });
 }
