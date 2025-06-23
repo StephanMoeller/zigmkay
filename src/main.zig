@@ -57,27 +57,29 @@ const pins = pin_config.pins();
 pub fn main() !void {
 
     // First we initialize the USB clock
-    usb_if.init(usb_dev);
 
     pin_config.apply();
     pins.row0.put(1);
+
+    usb_if.init(usb_dev);
+
     var a_pressed = [6]u8{ 0x00, 0x00, 0x04, 0x00, 0x00, 0x00 };
     var a_released = [6]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    var current_val: u1 = 0;
     while (true) {
-        time.sleep_us(1_000_000);
         // Process pending USB housekeeping
         usb_dev.task(false) catch unreachable;
-
-        time.sleep_us(1_000_000);
-
-        usb_if.send_keyboard_report(usb_dev, &a_pressed);
-
-        time.sleep_us(1_000_000);
-        usb_if.send_keyboard_report(usb_dev, &a_released);
-
-        const val: u1 = pins.col0.read();
-        pins.led_red.put(val);
-        pins.led_green.put(val);
-        pins.led_blue.put(val);
+        const new_val: u1 = pins.col0.read();
+        if (new_val != current_val) {
+            current_val = new_val;
+            if (current_val == 0) {
+                usb_if.send_keyboard_report(usb_dev, &a_pressed);
+            } else {
+                usb_if.send_keyboard_report(usb_dev, &a_released);
+            }
+            pins.led_red.put(new_val);
+            pins.led_green.put(new_val);
+            pins.led_blue.put(new_val);
+        }
     }
 }
