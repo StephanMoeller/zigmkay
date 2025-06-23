@@ -61,9 +61,19 @@ pub fn main() !void {
 
     pin_config.apply();
     pins.row0.put(1);
+    var a_pressed = [6]u8{ 0x00, 0x00, 0x04, 0x00, 0x00, 0x00 };
+    var a_released = [6]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     while (true) {
-        var keycodes: [6]u8 = [6]u8{ 4, 0, 0, 0, 0, 0 };
-        usb_if.send_keyboard_report(usb_dev, &keycodes);
+        time.sleep_us(1_000_000);
+        // Process pending USB housekeeping
+        usb_dev.task(false) catch unreachable;
+
+        time.sleep_us(1_000_000);
+
+        usb_if.send_keyboard_report(usb_dev, &a_pressed);
+
+        time.sleep_us(1_000_000);
+        usb_if.send_keyboard_report(usb_dev, &a_released);
 
         const val: u1 = pins.col0.read();
         pins.led_red.put(val);
