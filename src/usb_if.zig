@@ -43,8 +43,6 @@ const KeyboardReportDescriptor = hid.hid_usage_page(1, hid.UsageTable.desktop) +
     hid.hid_collection_end();
 
 // HID report buffer
-var keyboardReportBuf: [7]u8 = @splat(0);
-
 const keyboardEpAddr = rp2xxx.usb.Endpoint.to_address(1, .In);
 
 const usb_packet_size = 7;
@@ -124,19 +122,6 @@ pub fn init(usb_dev: type) void {
     std.log.debug("USB configured", .{});
 }
 
-pub fn send_keyboard_report(usb_dev: type, keycodes: []const u8) void {
-    keyboardReportBuf = @splat(0);
-    for (keycodes, 1..) |keycode, index| {
-        if (index == 7) {
-            std.log.warn("keybuf overflow", .{});
-            break;
-        }
-        keyboardReportBuf[index] = keycode;
-    }
-
-    std.log.debug("sending kbd {s} to {d}", .{
-        std.fmt.fmtSliceHexLower(&keyboardReportBuf),
-        usb.Endpoint.num_from_address(keyboardEpAddr),
-    });
-    usb_dev.callbacks.usb_start_tx(keyboardEpAddr, &keyboardReportBuf);
+pub fn send_keyboard_report(usb_dev: type, keycodes: *[7]u8) void {
+    usb_dev.callbacks.usb_start_tx(keyboardEpAddr, &keycodes);
 }
