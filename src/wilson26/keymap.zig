@@ -1,19 +1,18 @@
 const std = @import("std");
 const core = @import("../core/types.zig");
 
-pub const LayerCount: usize = 3;
 pub const KeyCount: usize = 32;
 
 pub const KeyboardConfig = struct {
     pub const colPins = [_]u8{ 1, 2, 3 };
     pub const rowPins = [_]u8{ 4, 5, 6, 7 };
-    pub const keymap = [LayerCount][KeyCount]core.KeyDef{
+    pub const keymap = [_][KeyCount]core.KeyDef{
         // zig fmt: off
             [KeyCount]core.KeyDef{ //--------------------- 0 ---------------------
                 Q,     W, LG(R),     P, B,          K,     L, RG(O),     U,   SQ,
                 F, LA(A), LC(S), LS(T), G,          M, RS(N), RC(E), RA(I),    Y,
                 Z,     X,     C,     D, V,          J,     H,   COM,   DOT, DASH,
-                                        HL(ENTER, 1), HL(SPC, 2),
+                                        HL(ENTER, 1), HL(SPC, 2), D
             },
 
             [KeyCount]core.KeyDef{ //--------------------- 1 ---------------------

@@ -1,5 +1,6 @@
 const std = @import("std");
 const microzig = @import("microzig");
+const keymap = @import("wilson26/keymap.zig");
 const usb_if = @import("usb_if.zig");
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
@@ -24,7 +25,7 @@ pub fn main() !void {
 
     usb_if.init(usb_dev);
 
-    var a_pressed = [7]u8{ 0b00001000, 6, 7, 8, 9, 10, 11 };
+    var a_pressed = [7]u8{ 0b00001000, 6, 7, 8, 9, 10, keymap.KeyboardConfig.colPins.len };
     var a_released = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     var current_val: u1 = 0;
     while (true) {

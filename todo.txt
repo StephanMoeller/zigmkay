@@ -1,0 +1,1 @@
+- make the usb part work with 8 byte data (with place [1] being reserved bytes) to follow standard and hence make it work in bios
