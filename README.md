@@ -13,6 +13,8 @@
     - 1. Hold down a number layer that will fire Up when released, allowing line jumps using just: Press hold key, type number, release hold key - now nvim jumps up.
     - 2. The same functionality for jumping down
 
+- Possibility to hook into "on tap decided". In qmk you can only hook into "key pressed" and then have to handle tap/hold logic yourself 
+
 # TODO
 - Configure the Wilson26 on one side and make it actually blink the led when a certain key is pressed
 - Make the firmware a module that is imported into main to used for an actual keyboard configuration
