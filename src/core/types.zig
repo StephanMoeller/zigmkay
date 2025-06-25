@@ -13,6 +13,7 @@ pub const KeyDef = struct {
 pub fn PinConfig(comptime colCount: usize, comptime rowCount: usize) type {
     return struct {
         colPins: [colCount]u8,
+
         rowPins: [rowCount]u8,
     };
 }

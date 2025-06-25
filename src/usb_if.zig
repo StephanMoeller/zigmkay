@@ -10,6 +10,17 @@ const usb = rp2xxx.usb;
 
 const hid = usb.hid;
 
+pub const HID_ModifierMasks = enum(u8) {
+    left_control = 0x01,
+    left_shift = 0x02,
+    left_alt = 0x04,
+    left_meta = 0x08,
+    right_control = 0x10,
+    right_shift = 0x20,
+    right_alt = 0x40,
+    right_meta = 0x80,
+};
+
 pub const HID_KeymodifierCodes = enum(u8) {
     left_control = 0xe0,
     left_shift,
