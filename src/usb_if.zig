@@ -10,7 +10,7 @@ const usb = rp2xxx.usb;
 
 const hid = usb.hid;
 
-const HID_KeymodifierCodes = enum(u8) {
+pub const HID_KeymodifierCodes = enum(u8) {
     left_control = 0xe0,
     left_shift,
     left_alt,
@@ -123,5 +123,5 @@ pub fn init(usb_dev: type) void {
 }
 
 pub fn send_keyboard_report(usb_dev: type, keycodes: *[7]u8) void {
-    usb_dev.callbacks.usb_start_tx(keyboardEpAddr, &keycodes);
+    usb_dev.callbacks.usb_start_tx(keyboardEpAddr, keycodes);
 }
