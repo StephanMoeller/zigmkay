@@ -18,8 +18,5 @@ test "tapping - single layer, only tapping defined" {
 
     const actions = core.Process(KeyCount, LayerCount, &keymap, &input_ev[0..]);
     try std.testing.expectEqual(1, actions.len);
-    switch (actions[0]) {
-        .KeyCodePress => |keycode| try std.testing.expectEqual(keycode, b),
-        else => unreachable,
-    }
+    try std.testing.expectEqual(b, actions[0].KeyCodePress);
 }
