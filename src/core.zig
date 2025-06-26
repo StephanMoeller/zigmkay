@@ -1,3 +1,4 @@
+const generic_queue = @import("generic_queue.zig");
 pub const KeyDef = struct { keycode: u8 };
 pub fn TapOnly(keycode: u8) KeyDef {
     return KeyDef{ .keycode = keycode };
@@ -20,13 +21,7 @@ pub const InputEvent = union(enum) {
 };
 
 const std = @import("std");
-pub const InputEventQueue = struct {
-    count: u8 = 0,
-    data: [8]InputEvent = [8]InputEvent{ InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1) },
-    pub fn add(this: *InputEventQueue, event: InputEvent) void {
-        this.data[0] = event;
-    }
-};
+pub const InputEventQueue = generic_queue.GenericQueue(InputEvent, 100);
 
 pub fn Process(
     comptime KeyCount: usize,

@@ -4,8 +4,8 @@ test "tapping - single layer, only tapping defined" {
     const KeyCount = 4;
     const LayerCount = 1;
 
-    var input_events = core.InputEventQueue{};
-    input_events.add(.{ .key_pressed = 1 });
+    var input_events = core.InputEventQueue;
+    input_events.enqueue(.{ .key_pressed = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
     const actions = core.Process(KeyCount, LayerCount, &keymap, &input_events);
