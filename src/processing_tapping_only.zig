@@ -1,5 +1,5 @@
 const std = @import("std");
-const core = @import("../core.zig");
+const core = @import("core.zig");
 
 test "tapping - single layer, only tapping defined" {
     const a = 0x04;
