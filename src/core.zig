@@ -3,7 +3,7 @@ pub fn TapOnly(keycode: u8) KeyDef {
     return KeyDef{ .keycode = keycode };
 }
 
-pub const Action = union {
+pub const Action = union(enum) {
     KeyCodePress: u8, //this should be extended with some sort of mod information
     KeyCodeRelease: u8, //-,,-
 };
@@ -19,10 +19,16 @@ pub const InputEvent = union(enum) {
     }
 };
 
-pub fn Process(input: []InputEvent) []Action {
-    const actions = [1]Action{Action{ .KeyCodePress = 0x05 }};
+pub fn Process(
+    comptime KeyCount: usize,
+    comptime LayerCount: usize,
+    keymap: *const [LayerCount][KeyCount]KeyDef,
+    input: *const []InputEvent,
+) []Action {
+    var actions = [_]Action{Action{ .KeyCodePress = 0x05 }};
     _ = input;
-    return actions;
+    _ = keymap;
+    return actions[0..];
 }
 
 // pub const ScanSettings = struct { debounce_ms: u8 };

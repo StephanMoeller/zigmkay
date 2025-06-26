@@ -12,9 +12,14 @@ test "tapping - single layer, only tapping defined" {
     const D = core.TapOnly(d);
 
     const KeyCount = 4;
-    const input_ev = [_]core.InputEvent{.{ .key_pressed = 1 }};
-    const keymap = [_][KeyCount]core.KeyDef{.{ A, B, C, D }};
+    const LayerCount = 1;
+    var input_ev = [_]core.InputEvent{.{ .key_pressed = 1 }};
+    const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const actions = core.Process(input_ev, keymap);
-    try std.testing.expectEqual(actions.len, 1);
+    const actions = core.Process(KeyCount, LayerCount, &keymap, &input_ev[0..]);
+    try std.testing.expectEqual(1, actions.len);
+    switch (actions[0]) {
+        .KeyCodePress => |keycode| try std.testing.expectEqual(keycode, b),
+        else => unreachable,
+    }
 }
