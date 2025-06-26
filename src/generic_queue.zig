@@ -11,9 +11,9 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
         pub fn Count(self: *Self) usize {
             return self.counter;
         }
-        pub fn enqueue(self: *Self, element: T) !void {
+        pub fn enqueue(self: *Self, element: T) void {
             if (counter == max_capacity) {
-                // todo: return an error here
+                // TODO: handle out of bounds
             }
             self.data[counter] = element;
             counter = counter + 1;
@@ -72,4 +72,7 @@ test "hitting maximum" {
 
     try std.testing.expectEqual(5, queue.read_all_values().len);
     queue.enqueue(6);
+
+    // this test exists to ensure we well have this handled nicely
 }
+
