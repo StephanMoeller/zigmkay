@@ -4,7 +4,7 @@ test "tapping - single layer, only tapping defined" {
     const KeyCount = 4;
     const LayerCount = 1;
 
-    var input_events = core.InputEventQueue;
+    var input_events = core.InputEventQueue.Create();
     input_events.enqueue(.{ .key_pressed = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
@@ -15,7 +15,7 @@ test "tapping - single layer, only tapping defined" {
     try std.testing.expectEqual(b, actions[0].KeyCodePress);
 
     // expect event removed from input_events
-    try std.testing.expectEqual(0, input_events.count);
+    try std.testing.expectEqual(0, input_events.read_all_values().len);
 }
 
 const a = 0x04;

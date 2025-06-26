@@ -1,4 +1,5 @@
 const generic_queue = @import("generic_queue.zig");
+
 pub const KeyDef = struct { keycode: u8 };
 pub fn TapOnly(keycode: u8) KeyDef {
     return KeyDef{ .keycode = keycode };
@@ -30,8 +31,8 @@ pub fn Process(
     input: *InputEventQueue,
 ) []Action {
     var actions = [_]Action{Action{ .KeyCodePress = 0x05 }};
-    _ = input;
     _ = keymap;
+    input.dequeue_count(1);
     return actions[0..];
 }
 
