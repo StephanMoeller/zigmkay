@@ -1,5 +1,5 @@
 const std = @import("std");
-const core = @import("../core/types.zig");
+const core = @import("../core/core.zig");
 
 pub const KeyCount: usize = 32;
 

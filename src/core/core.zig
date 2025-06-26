@@ -26,3 +26,6 @@ pub fn KeyboardType(comptime layerCount: usize, comptime keyCount: usize, compti
         pinConfig: PinConfig(colCount, rowCount),
     };
 }
+
+pub const ScanSettings = struct { debounce_ms: u8 };
+pub fn scan(settings: ScanSettings) u8 {}

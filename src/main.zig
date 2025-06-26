@@ -1,7 +1,7 @@
 const std = @import("std");
 const microzig = @import("microzig");
 const keymap = @import("wilson26/keymap.zig");
-const usb_if = @import("usb_if.zig");
+const usb_if = @import("microzig/usb_if.zig");
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
 const usb = rp2xxx.usb;
@@ -20,6 +20,9 @@ pub fn main() !void {
 
     // First we initialize the USB clock
 
+}
+
+pub fn to_be_saved() !void {
     pin_config.apply();
     pins.row0.put(1);
 
