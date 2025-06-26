@@ -19,11 +19,20 @@ pub const InputEvent = union(enum) {
     }
 };
 
+const std = @import("std");
+pub const InputEventQueue = struct {
+    count: u8 = 0,
+    data: [8]InputEvent = [8]InputEvent{ InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1), InputEvent.KeyPress(1) },
+    pub fn add(this: *InputEventQueue, event: InputEvent) void {
+        this.data[0] = event;
+    }
+};
+
 pub fn Process(
     comptime KeyCount: usize,
     comptime LayerCount: usize,
     keymap: *const [LayerCount][KeyCount]KeyDef,
-    input: *const []InputEvent,
+    input: *InputEventQueue,
 ) []Action {
     var actions = [_]Action{Action{ .KeyCodePress = 0x05 }};
     _ = input;
