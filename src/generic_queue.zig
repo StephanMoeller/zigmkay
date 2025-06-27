@@ -1,5 +1,6 @@
 const std = @import("std");
 
+const EnqueueError = error{CapacityExceeded};
 pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
     return struct {
         const Self = @This();
@@ -11,9 +12,9 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
         pub fn Count(self: *Self) usize {
             return self.counter;
         }
-        pub fn enqueue(self: *Self, element: T) void {
+        pub fn enqueue(self: *Self, element: T) EnqueueError!void {
             if (counter == max_capacity) {
-                // TODO: handle out of bounds
+                return EnqueueError.CapacityExceeded;
             }
             self.data[counter] = element;
             counter = counter + 1;
@@ -33,9 +34,9 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
 test "queue" {
     var queue = GenericQueue(i32, 10).Create();
     try std.testing.expectEqual(0, queue.read_all_values().len);
-    queue.enqueue(10);
-    queue.enqueue(11);
-    queue.enqueue(12);
+    try queue.enqueue(10);
+    try queue.enqueue(11);
+    try queue.enqueue(12);
 
     var all_values = queue.read_all_values();
     try std.testing.expectEqual(3, all_values.len);
@@ -52,8 +53,8 @@ test "queue" {
     all_values = queue.read_all_values();
     try std.testing.expectEqual(0, all_values.len);
 
-    queue.enqueue(20);
-    queue.enqueue(21);
+    try queue.enqueue(20);
+    try queue.enqueue(21);
 
     all_values = queue.read_all_values();
     try std.testing.expectEqual(2, all_values.len);
@@ -64,15 +65,15 @@ test "queue" {
 test "hitting maximum" {
     var queue = GenericQueue(i32, 5).Create();
     try std.testing.expectEqual(0, queue.read_all_values().len);
-    queue.enqueue(1);
-    queue.enqueue(2);
-    queue.enqueue(3);
-    queue.enqueue(4);
-    queue.enqueue(5);
+    try queue.enqueue(1);
+    try queue.enqueue(2);
+    try queue.enqueue(3);
+    try queue.enqueue(4);
+    try queue.enqueue(5);
 
     try std.testing.expectEqual(5, queue.read_all_values().len);
-    queue.enqueue(6);
+    const result = queue.enqueue(6);
+    try std.testing.expectEqual(EnqueueError.CapacityExceeded, result);
 
     // this test exists to ensure we well have this handled nicely
 }
-
