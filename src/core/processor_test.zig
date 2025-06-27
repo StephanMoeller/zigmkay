@@ -16,7 +16,8 @@ test "tapping - single key press" {
     });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    const processor = firmware.processing.Processor{};
+    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
@@ -37,7 +38,8 @@ test "tapping - single key release" {
     try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    const processor = firmware.processing.Processor{};
+    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
@@ -63,7 +65,8 @@ test "tapping - multiple simple tap events" {
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    const processor = firmware.processing.Processor{};
+    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, actions_queue.Count());

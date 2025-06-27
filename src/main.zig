@@ -18,9 +18,13 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO29 = .{ .name = "row0", .direction = .out },
     .GPIO4 = .{ .name = "col0", .direction = .in },
 };
+
 const pins = pin_config.pins();
 pub fn main() !void {
-
+    const scanner = firmware.scanning.Scanner{};
+    const processor = firmware.processing.Processor{};
+    _ = scanner;
+    _ = processor;
     // First we initialize the USB clock
     try to_be_saved();
 }
