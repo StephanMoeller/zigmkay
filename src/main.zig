@@ -33,7 +33,7 @@ pub fn to_be_saved() !void {
     var current_val: u1 = 0;
 
     while (true) {
-        const current_time = core.Time{ .time_us_since_boot = time.get_time_since_boot().to_us() };
+        const current_time = core.TimeStamp{ .time_us_since_boot = time.get_time_since_boot().to_us() };
 
         // Process pending USB housekeeping
         usb_dev.task(false) catch unreachable;

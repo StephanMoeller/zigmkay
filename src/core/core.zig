@@ -10,13 +10,13 @@ pub const Action = union(enum) {
 };
 const KeyIndex = usize;
 pub const InputEvent = union(enum) {
-    key_pressed: KeyIndex,
+    key_pressed: struct { key_index: KeyIndex, time: TimeStamp },
     key_released: KeyIndex,
 };
 
-pub const Time = struct {
+pub const TimeStamp = struct {
     time_us_since_boot: u64,
-    pub fn as_ns(self: Time) u64 {
+    pub fn as_ns(self: TimeStamp) u64 {
         return self.time_us_since_boot / 1000;
     }
 };
