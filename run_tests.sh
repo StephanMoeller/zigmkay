@@ -1,2 +1,2 @@
 zig test src/core/generic_queue.zig
-zig test src/core/processor.zig
+zig test src/core/processor_test.zig
