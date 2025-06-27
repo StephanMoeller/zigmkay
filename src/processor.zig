@@ -1,5 +1,36 @@
 const std = @import("std");
 const core = @import("core.zig");
+
+pub fn Process(
+    comptime KeyCount: usize,
+    comptime LayerCount: usize,
+    keymap: *const [LayerCount][KeyCount]core.KeyDef,
+    input: *core.InputEventQueue,
+    output_queue: *core.ActionQueue,
+) !void {
+
+    // todo: hold-support
+    // todo: take layouts into concideration here
+    // todo: combo support
+
+    while (input.Count() > 0) {
+        const next_event = input.*.read_all_values()[0];
+        const current_layer_index: usize = 0;
+        switch (next_event) {
+            .key_pressed => |idx| {
+                const pressed_key_def = keymap[current_layer_index][idx];
+                try output_queue.enqueue(core.Action{ .KeyCodePress = pressed_key_def.keycode });
+            },
+            .key_released => |idx| {
+                const released_key_def = keymap[current_layer_index][idx];
+                try output_queue.enqueue(core.Action{ .KeyCodeRelease = released_key_def.keycode });
+            },
+        }
+        try input.dequeue_count(1);
+    }
+}
+
+// test stuff
 test "tapping - single key press" {
     const KeyCount = 4;
     const LayerCount = 1;
@@ -11,7 +42,7 @@ test "tapping - single key press" {
     try input_event_queue.enqueue(.{ .key_pressed = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try core.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
@@ -32,7 +63,7 @@ test "tapping - single key release" {
     try input_event_queue.enqueue(.{ .key_released = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try core.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
@@ -58,7 +89,7 @@ test "tapping - multiple simple tap events" {
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try core.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, actions_queue.Count());
