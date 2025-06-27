@@ -19,3 +19,24 @@
 - Configure the Wilson26 on one side and make it actually blink the led when a certain key is pressed
 - Make the firmware a module that is imported into main to used for an actual keyboard configuration
 
+Scanning
+- Make a scanner that will write events to a queue
+- Make the scanner testable
+- Test the scanner
+
+Processor
+- Support for mods applied to key presses
+- Holds to switch layer
+- "Tap+hold for layer switch" on same keys
+- "Tap+hold for modifiers switch" on same keys
+- Combos
+- Tri-layer functionality for two layers => 3rd layer
+- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
+- Ensure special-tab case is covered
+
+Hardware
+- Support trrs connections
+
+Low priority: pleasing general use cases that I currently dont use myself: 
+- Support for tap dances? not needed by myself though.
+- support for multiple boards
