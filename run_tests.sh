@@ -1,2 +1,2 @@
-zig test src/generic_queue.zig
-zig test src/test_processing_tapping_only.zig
+zig test src/core/generic_queue.zig
+zig test src/core/processor.zig
