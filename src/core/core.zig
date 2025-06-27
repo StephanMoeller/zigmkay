@@ -4,26 +4,23 @@ pub const KeyDef = struct { keycode: u8 };
 
 // a key definition that only has a tap functionality
 
-pub const Action = union(enum) {
-    KeyCodePress: u8, //this should be extended with some sort of mod information
-    KeyCodeRelease: u8, //-,,-
+pub const OutputCommand = union(enum) {
+    KeyCodePress: u8,
+    KeyCodeRelease: u8,
+    LayerActivation: LayerIndex,
+    LayerDeactivation: LayerIndex,
 };
 const KeyIndex = usize;
+const LayerIndex = usize;
 pub const KeyboardEvent = union(enum) {
     key_pressed: struct { key_index: KeyIndex, time: TimeStamp },
     key_released: struct { key_index: KeyIndex, time: TimeStamp },
 };
-
 pub const TimeStamp = struct {
     time_us_since_boot: u64,
     pub fn as_ns(self: TimeStamp) u64 {
         return self.time_us_since_boot / 1000;
     }
 };
-
-const std = @import("std");
 pub const KeyboardEventQueue = generic_queue.GenericQueue(KeyboardEvent, 100);
-pub const ActionQueue = generic_queue.GenericQueue(Action, 100);
-
-// pub const ScanSettings = struct { debounce_ms: u8 };
-// pub fn scan(settings: ScanSettings) u8 {}
+pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 100);

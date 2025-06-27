@@ -6,7 +6,7 @@ pub fn Process(
     comptime LayerCount: usize,
     keymap: *const [LayerCount][KeyCount]core.KeyDef,
     input: *core.KeyboardEventQueue,
-    output_queue: *core.ActionQueue,
+    output_queue: *core.OutputCommandQueue,
 ) !void {
 
     // todo: hold-support
@@ -19,11 +19,11 @@ pub fn Process(
         switch (next_event) {
             .key_pressed => |event| {
                 const pressed_key_def = keymap[current_layer_index][event.key_index];
-                try output_queue.enqueue(core.Action{ .KeyCodePress = pressed_key_def.keycode });
+                try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = pressed_key_def.keycode });
             },
             .key_released => |event| {
                 const released_key_def = keymap[current_layer_index][event.key_index];
-                try output_queue.enqueue(core.Action{ .KeyCodeRelease = released_key_def.keycode });
+                try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key_def.keycode });
             },
         }
         try input.dequeue_count(1);

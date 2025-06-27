@@ -1,7 +1,10 @@
 const std = @import("std");
 const microzig = @import("microzig");
 const usb_if = @import("microzig/usb_if.zig");
-const core = @import("core/core.zig");
+
+const firmware = @import("core/firmware.zig");
+const core = firmware.core;
+
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
 const usb = rp2xxx.usb;

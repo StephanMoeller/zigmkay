@@ -1,6 +1,7 @@
 const std = @import("std");
-const processor = @import("processor.zig");
-const core = @import("core.zig");
+const firmware = @import("firmware.zig");
+const core = firmware.core;
+
 // test stuff
 test "tapping - single key press" {
     const KeyCount = 4;
@@ -8,18 +9,18 @@ test "tapping - single key press" {
 
     // define some input events
     var input_event_queue = core.KeyboardEventQueue.Create();
-    var actions_queue = core.ActionQueue.Create();
+    var actions_queue = core.OutputCommandQueue.Create();
 
     try input_event_queue.enqueue(.{
         .key_pressed = .{ .time = dummy_time, .key_index = 1 },
     });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
-    try std.testing.expectEqual(core.Action{ .KeyCodePress = b }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, input_event_queue.read_all_values().len);
@@ -31,16 +32,16 @@ test "tapping - single key release" {
 
     // define some input events
     var input_event_queue = core.KeyboardEventQueue.Create();
-    var actions_queue = core.ActionQueue.Create();
+    var actions_queue = core.OutputCommandQueue.Create();
 
     try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, actions_queue.Count());
-    try std.testing.expectEqual(core.Action{ .KeyCodeRelease = b }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, input_event_queue.read_all_values().len);
@@ -52,7 +53,7 @@ test "tapping - multiple simple tap events" {
 
     // define some input events
     var input_event_queue = core.KeyboardEventQueue.Create();
-    var actions_queue = core.ActionQueue.Create();
+    var actions_queue = core.OutputCommandQueue.Create();
 
     try input_event_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 1 } });
     try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
@@ -62,15 +63,15 @@ test "tapping - multiple simple tap events" {
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
+    try firmware.processing.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, actions_queue.Count());
-    try std.testing.expectEqual(core.Action{ .KeyCodePress = b }, try actions_queue.dequeue());
-    try std.testing.expectEqual(core.Action{ .KeyCodeRelease = b }, try actions_queue.dequeue());
-    try std.testing.expectEqual(core.Action{ .KeyCodePress = c }, try actions_queue.dequeue());
-    try std.testing.expectEqual(core.Action{ .KeyCodePress = a }, try actions_queue.dequeue());
-    try std.testing.expectEqual(core.Action{ .KeyCodeRelease = a }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, input_event_queue.Count());
