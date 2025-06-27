@@ -7,7 +7,7 @@ test "tapping - single key press" {
     const LayerCount = 1;
 
     // define some input events
-    var input_event_queue = core.InputEventQueue.Create();
+    var input_event_queue = core.KeyboardEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
     try input_event_queue.enqueue(.{
@@ -30,7 +30,7 @@ test "tapping - single key release" {
     const LayerCount = 1;
 
     // define some input events
-    var input_event_queue = core.InputEventQueue.Create();
+    var input_event_queue = core.KeyboardEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
     try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
@@ -51,7 +51,7 @@ test "tapping - multiple simple tap events" {
     const LayerCount = 1;
 
     // define some input events
-    var input_event_queue = core.InputEventQueue.Create();
+    var input_event_queue = core.KeyboardEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
     try input_event_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 1 } });

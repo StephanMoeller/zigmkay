@@ -9,7 +9,7 @@ pub const Action = union(enum) {
     KeyCodeRelease: u8, //-,,-
 };
 const KeyIndex = usize;
-pub const InputEvent = union(enum) {
+pub const KeyboardEvent = union(enum) {
     key_pressed: struct { key_index: KeyIndex, time: TimeStamp },
     key_released: struct { key_index: KeyIndex, time: TimeStamp },
 };
@@ -22,7 +22,7 @@ pub const TimeStamp = struct {
 };
 
 const std = @import("std");
-pub const InputEventQueue = generic_queue.GenericQueue(InputEvent, 100);
+pub const KeyboardEventQueue = generic_queue.GenericQueue(KeyboardEvent, 100);
 pub const ActionQueue = generic_queue.GenericQueue(Action, 100);
 
 // pub const ScanSettings = struct { debounce_ms: u8 };

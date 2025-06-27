@@ -5,7 +5,7 @@ pub fn Process(
     comptime KeyCount: usize,
     comptime LayerCount: usize,
     keymap: *const [LayerCount][KeyCount]core.KeyDef,
-    input: *core.InputEventQueue,
+    input: *core.KeyboardEventQueue,
     output_queue: *core.ActionQueue,
 ) !void {
 
