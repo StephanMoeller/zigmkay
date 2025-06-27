@@ -25,11 +25,11 @@ pub fn main() !void {
     const processor = zigmkay.processing.Processor{};
 
     var keyboard_event_queue = core.KeyboardEventQueue.Create();
-    const actions_queue = core.OutputCommandQueue.Create();
+    const output_command_queue = core.OutputCommandQueue.Create();
 
     while (true) {
         try scanner.Scan(&keyboard_event_queue);
-        try processor.Process(&keyboard_event_queue, &actions_queue);
+        try processor.Process(&keyboard_event_queue, &output_command_queue);
     }
 
     // First we initialize the USB clock
