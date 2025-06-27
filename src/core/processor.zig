@@ -17,12 +17,12 @@ pub fn Process(
         const next_event = input.*.read_all_values()[0];
         const current_layer_index: usize = 0;
         switch (next_event) {
-            .key_pressed => |idx| {
-                const pressed_key_def = keymap[current_layer_index][idx];
+            .key_pressed => |event| {
+                const pressed_key_def = keymap[current_layer_index][event.key_index];
                 try output_queue.enqueue(core.Action{ .KeyCodePress = pressed_key_def.keycode });
             },
-            .key_released => |idx| {
-                const released_key_def = keymap[current_layer_index][idx];
+            .key_released => |event| {
+                const released_key_def = keymap[current_layer_index][event.key_index];
                 try output_queue.enqueue(core.Action{ .KeyCodeRelease = released_key_def.keycode });
             },
         }

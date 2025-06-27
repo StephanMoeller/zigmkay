@@ -11,7 +11,7 @@ pub const Action = union(enum) {
 const KeyIndex = usize;
 pub const InputEvent = union(enum) {
     key_pressed: struct { key_index: KeyIndex, time: TimeStamp },
-    key_released: KeyIndex,
+    key_released: struct { key_index: KeyIndex, time: TimeStamp },
 };
 
 pub const TimeStamp = struct {

@@ -10,7 +10,9 @@ test "tapping - single key press" {
     var input_event_queue = core.InputEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
-    try input_event_queue.enqueue(.{ .key_pressed = 1 });
+    try input_event_queue.enqueue(.{
+        .key_pressed = .{ .time = dummy_time, .key_index = 1 },
+    });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
     try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
@@ -31,7 +33,7 @@ test "tapping - single key release" {
     var input_event_queue = core.InputEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
-    try input_event_queue.enqueue(.{ .key_released = 1 });
+    try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
     try processor.Process(KeyCount, LayerCount, &keymap, &input_event_queue, &actions_queue);
@@ -52,11 +54,11 @@ test "tapping - multiple simple tap events" {
     var input_event_queue = core.InputEventQueue.Create();
     var actions_queue = core.ActionQueue.Create();
 
-    try input_event_queue.enqueue(.{ .key_pressed = 1 });
-    try input_event_queue.enqueue(.{ .key_released = 1 });
-    try input_event_queue.enqueue(.{ .key_pressed = 2 });
-    try input_event_queue.enqueue(.{ .key_pressed = 0 });
-    try input_event_queue.enqueue(.{ .key_released = 0 });
+    try input_event_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 1 } });
+    try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
+    try input_event_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 2 } });
+    try input_event_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 0 } });
+    try input_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 0 } });
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
@@ -85,3 +87,4 @@ const D = TapOnly(d);
 pub fn TapOnly(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode };
 }
+const dummy_time = core.TimeStamp{ .time_us_since_boot = 0 };
