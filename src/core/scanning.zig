@@ -2,8 +2,9 @@ const std = @import("std");
 const core = @import("core.zig");
 
 pub const Scanner = struct {
-    pub fn Scan(self: Scanner, output_queue: core.KeyboardEventQueue) !void {
+    pub fn Scan(self: Scanner, output_queue: *core.KeyboardEventQueue) !void {
         _ = self;
-        output_queue.Count();
+        var v = output_queue.*;
+        _ = v.Count();
     }
 };

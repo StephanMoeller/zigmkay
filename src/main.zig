@@ -23,8 +23,15 @@ const pins = pin_config.pins();
 pub fn main() !void {
     const scanner = zigmkay.scanning.Scanner{};
     const processor = zigmkay.processing.Processor{};
-    _ = scanner;
-    _ = processor;
+
+    var keyboard_event_queue = core.KeyboardEventQueue.Create();
+    const actions_queue = core.OutputCommandQueue.Create();
+
+    while (true) {
+        try scanner.Scan(&keyboard_event_queue);
+        try processor.Process(&keyboard_event_queue, &actions_queue);
+    }
+
     // First we initialize the USB clock
     try to_be_saved();
 }
