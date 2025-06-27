@@ -1,8 +1,0 @@
-- combo syntax 
-- tri-layer functionality
-- eksempel på special-tab-funktionalitet
-- angivelse af ugyldigt layer index i MO-funktionen skal give en compile error
-
-
-- a shortcoming in the reflection-solution is, that there can be more pins in the microZig configuration than the ones needed for matrix scanning and we must not change the values of these. This will require extra meta data, increasing the complexity even more.
-- another thing is, that even though reflection is used, it is not a general logic as other frameworks may work in different ways, not exposing

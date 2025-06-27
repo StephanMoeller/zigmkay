@@ -1,0 +1,18 @@
+Scanning
+- Make a scanner that will write events to a queue
+- Make the scanner testable
+- Test the scanner
+
+Keymap features
+- Support for mods applied to key presses
+- Holds to switch layer
+- "Tap+hold for layer switch" on same keys
+- "Tap+hold for modifiers switch" on same keys
+- Combos
+- Tri-layer functionality for two layers => 3rd layer
+- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
+
+- Ensure special-tab case is covered
+
+Low priority: pleasing general use cases that I currently dont use myself: 
+- Support for tap dances? not needed by myself though.
