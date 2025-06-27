@@ -9,7 +9,17 @@ pub const Action = union(enum) {
     KeyCodeRelease: u8, //-,,-
 };
 const KeyIndex = usize;
-pub const InputEvent = union(enum) { key_pressed: KeyIndex, key_released: KeyIndex };
+pub const InputEvent = union(enum) {
+    key_pressed: KeyIndex,
+    key_released: KeyIndex,
+};
+
+pub const Time = struct {
+    time_us_since_boot: u64,
+    pub fn as_ns(self: Time) u64 {
+        return self.time_us_since_boot / 1000;
+    }
+};
 
 const std = @import("std");
 pub const InputEventQueue = generic_queue.GenericQueue(InputEvent, 100);
