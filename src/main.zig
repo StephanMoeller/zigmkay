@@ -28,8 +28,15 @@ pub fn main() !void {
     const output_command_queue = core.OutputCommandQueue.Create();
 
     while (true) {
+        // Read pin states and add keyboard events (what swithes changed state since last tick) to the event queue
+        // Debounce logic will happen inside this scanner
         try scanner.Scan(&keyboard_event_queue);
+
+        // Read keyboard events and produce output commands (what hid keycodes should be fired, what layer changes should be applied
+        // Tap/Hold timings will be handled inhere.
         try processor.Process(&keyboard_event_queue, &output_command_queue);
+
+        // TODO: Loop through the output commands and execute key strokes and apply layer changes
     }
 
     // First we initialize the USB clock
