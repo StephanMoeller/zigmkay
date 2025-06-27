@@ -23,6 +23,17 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
         pub fn read_all_values(self: *Self) []const T {
             return self.data[0..self.counter];
         }
+        pub fn dequeue(self: *Self) DequeueError!T {
+            if (self.counter == 0) {
+                return DequeueError.CannotDequeueAmount;
+            }
+
+            const head_element = self.data[0];
+            for (self.data[1..self.counter], 0..self.counter - 1) |item, index| {
+                self.data[index] = item;
+            }
+            return head_element;
+        }
         pub fn dequeue_count(self: *Self, count: usize) DequeueError!void {
             if (count > self.counter) {
                 return DequeueError.CannotDequeueAmount;
