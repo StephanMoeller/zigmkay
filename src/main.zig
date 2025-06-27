@@ -2,8 +2,8 @@ const std = @import("std");
 const microzig = @import("microzig");
 const usb_if = @import("microzig/usb_if.zig");
 
-const firmware = @import("core/firmware.zig");
-const core = firmware.core;
+const zigmkay = @import("core/zigmkay.zig");
+const core = zigmkay.core;
 
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
@@ -21,8 +21,8 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
 
 const pins = pin_config.pins();
 pub fn main() !void {
-    const scanner = firmware.scanning.Scanner{};
-    const processor = firmware.processing.Processor{};
+    const scanner = zigmkay.scanning.Scanner{};
+    const processor = zigmkay.processing.Processor{};
     _ = scanner;
     _ = processor;
     // First we initialize the USB clock
