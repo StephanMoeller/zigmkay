@@ -40,3 +40,5 @@ Low priority: pleasing general use cases that I currently dont use myself:
 - Support for tap dances? not needed by myself though.
 - support for multiple boards
 - Make the firmware a module that is imported into main to used for an actual keyboard configuration
+- Support for nkro
+- blue tooth - this might not be possible with the design choices taken - but at least it may take some real effort to get working depending on what microzig offers to help

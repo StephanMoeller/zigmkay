@@ -10,23 +10,12 @@ pub fn main() !void {
     var output_command_queue = zigmkay.OutputCommandQueue.Create();
 
     while (true) {
-        // TODO: setup pins
-        //   define what row and col pins are used
-        //   define which ones are out and which ones are input (dictates if we are doing rowToCol or colToRow)
-        // TODO: create scanner and mapping from scanning to keymap positions
-        // TODO: create some sort of key state to be fired with usb
 
         // Detect keyboard changes and handle debouncing as part of this
         // Write to: keyboard_state_change_queue
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
 
-        // Read keyboard events and produce output commands eg what hid keycodes should be fired, what layer changes should be applied
-        // Tap/Hold timings will be handled inhere.
-        // Note: Only keyboard events that were conclusive are removed at this tick. if a tap/hold key was recently pressed,
-        // we may need to wait for more time to pass or other keypresses/releases to happen before we can determine what should happen.
-        // Of this reason, it is important that the same queue is continuesly used between loop ticks
-
-        // Read from: board_state_change_queue
+        // Read from: keyboard_state_change_queue
         // Process
         // Write to: output_command_queue
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
