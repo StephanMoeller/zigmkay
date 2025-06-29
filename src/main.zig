@@ -11,13 +11,10 @@ pub fn main() !void {
 
     while (true) {
 
-        // Detect keyboard changes and handle debouncing as part of this
-        // Write to: keyboard_state_change_queue
+        // Changes => keyboard_state_change_queue
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
 
-        // Read from: keyboard_state_change_queue
-        // Process
-        // Write to: output_command_queue
+        // keyboard_state_change_queue => Process => output_command_queue
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
 
         // TODO: Loop through the output commands and execute key strokes and apply layer changes
