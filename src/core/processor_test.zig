@@ -16,7 +16,7 @@ test "tapping - single key press" {
     });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const processor = zigmkay.processing.Processor{};
+    const processor = zigmkay.Processor{};
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_event_queue, &actions_queue);
 
     // expect B to be fired as press
@@ -38,7 +38,7 @@ test "tapping - single key release" {
     try keyboard_event_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const processor = zigmkay.processing.Processor{};
+    const processor = zigmkay.Processor{};
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_event_queue, &actions_queue);
 
     // expect B to be fired as press
@@ -65,7 +65,7 @@ test "tapping - multiple simple tap events" {
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const processor = zigmkay.processing.Processor{};
+    const processor = zigmkay.Processor{};
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_event_queue, &actions_queue);
 
     // expect B to be fired as press

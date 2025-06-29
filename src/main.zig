@@ -3,11 +3,11 @@ const zigmkay = @import("core/zigmkay.zig");
 const keyboard = @import("wilson26/wilson26.zig");
 
 pub fn main() !void {
-    const scanner = zigmkay.scanning.Scanner{};
-    const processor = zigmkay.processing.Processor{};
+    const scanner = zigmkay.Scanner{};
+    const processor = zigmkay.Processor{};
 
-    var keyboard_event_queue = zigmkay.core.KeyboardEventQueue.Create();
-    var output_command_queue = zigmkay.core.OutputCommandQueue.Create();
+    var keyboard_event_queue = zigmkay.KeyboardEventQueue.Create();
+    var output_command_queue = zigmkay.OutputCommandQueue.Create();
 
     while (true) {
         // TODO: setup pins
