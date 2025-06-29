@@ -1,5 +1,5 @@
 const std = @import("std");
-const zigmkay = @import("zigmkay.zig");
+const zigmkay = @import("bundle.zig");
 const core = zigmkay.core;
 
 // test stuff

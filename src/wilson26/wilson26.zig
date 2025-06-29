@@ -1,11 +1,11 @@
 const std = @import("std");
-const core = @import("../core/core.zig");
+const core = @import("../zigmkay/core.zig");
 
 pub const KeyCount: usize = 32;
 pub const LayerCount: usize = 3;
 
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
-        // zig fmt: off
+    // zig fmt: off
             .{ //--------------------- 0 ---------------------
                 Q,     W, LG(R),     P, B,          K,     L, RG(O),     U,   SQ,
                 F, LA(A), LC(S), LS(T), G,          M, RS(N), RC(E), RA(I),    Y,
@@ -42,7 +42,10 @@ fn L2(key: core.KeyDef) core.KeyDef { return key; }
 fn L3(key: core.KeyDef) core.KeyDef { return key; }
 // zig fmt: on
 
-fn HL(key: core.KeyDef, layer: u8) core.KeyDef { _ = layer; return key; }
+fn HL(key: core.KeyDef, layer: u8) core.KeyDef {
+    _ = layer;
+    return key;
+}
 
 const SQ = FromKey(0x15);
 const COM = FromKey(0x15);

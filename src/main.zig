@@ -1,5 +1,5 @@
 const std = @import("std");
-const zigmkay = @import("core/zigmkay.zig");
+const zigmkay = @import("zigmkay/bundle.zig");
 const keyboard = @import("wilson26/wilson26.zig");
 
 pub fn main() !void {
