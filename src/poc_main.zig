@@ -11,8 +11,16 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO17 = .{ .name = "led_red", .direction = .out },
     .GPIO16 = .{ .name = "led_green", .direction = .out },
     .GPIO25 = .{ .name = "led_blue", .direction = .out },
-    .GPIO29 = .{ .name = "row0", .direction = .out },
-    .GPIO4 = .{ .name = "col0", .direction = .in },
+
+    .GPIO6 = .{ .name = "col_inner", .direction = .out },
+    .GPIO29 = .{ .name = "col_index", .direction = .out },
+    .GPIO28 = .{ .name = "col_mid", .direction = .out },
+    .GPIO27 = .{ .name = "col_ring", .direction = .out },
+    .GPIO26 = .{ .name = "col_pinky", .direction = .out },
+
+    .GPIO2 = .{ .name = "row_top", .direction = .in },
+    .GPIO4 = .{ .name = "row_home", .direction = .in },
+    .GPIO3 = .{ .name = "row_bottom", .direction = .in },
 };
 const pins = pin_config.pins();
 pub fn main() !void {
@@ -23,7 +31,7 @@ pub fn main() !void {
 
 pub fn to_be_saved() !void {
     pin_config.apply();
-    pins.row0.put(1);
+    pins.col_index.put(1);
 
     usb_if.init(usb_dev);
 
@@ -33,7 +41,7 @@ pub fn to_be_saved() !void {
     while (true) {
         // Process pending USB housekeeping
         usb_dev.task(false) catch unreachable;
-        const new_val: u1 = pins.col0.read();
+        const new_val: u1 = pins.row_home.read();
         if (new_val != current_val) {
             current_val = new_val;
             if (current_val == 1) {
