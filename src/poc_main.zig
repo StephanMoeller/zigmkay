@@ -18,7 +18,7 @@ const pins = pin_config.pins();
 pub fn main() !void {
 
     // First we initialize the USB clock
-
+    try to_be_saved();
 }
 
 pub fn to_be_saved() !void {
