@@ -12,7 +12,7 @@ pub const OutputCommand = union(enum) {
 };
 const KeyIndex = usize;
 const LayerIndex = usize;
-pub const KeyboardEvent = union(enum) {
+pub const KeyboardStateChange = union(enum) {
     key_pressed: struct { key_index: KeyIndex, time: TimeStamp },
     key_released: struct { key_index: KeyIndex, time: TimeStamp },
 };
@@ -22,5 +22,5 @@ pub const TimeStamp = struct {
         return self.time_us_since_boot / 1000;
     }
 };
-pub const KeyboardEventQueue = generic_queue.GenericQueue(KeyboardEvent, 100);
+pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 100);
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 100);

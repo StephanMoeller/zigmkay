@@ -7,7 +7,7 @@ pub const Processor = struct {
         comptime KeyCount: usize,
         comptime LayerCount: usize,
         keymap: *const [LayerCount][KeyCount]core.KeyDef,
-        input: *core.KeyboardEventQueue,
+        input: *core.KeyboardStateChangeQueue,
         output_queue: *core.OutputCommandQueue,
     ) !void {
         _ = self;

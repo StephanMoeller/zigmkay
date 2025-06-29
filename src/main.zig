@@ -6,7 +6,7 @@ pub fn main() !void {
     const scanner = zigmkay.Scanner{};
     const processor = zigmkay.Processor{};
 
-    var keyboard_event_queue = zigmkay.KeyboardEventQueue.Create();
+    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
     var output_command_queue = zigmkay.OutputCommandQueue.Create();
 
     while (true) {
@@ -18,12 +18,12 @@ pub fn main() !void {
 
         // Read pin states and add keyboard events (what swithes changed state since last tick) to the event queue
         // Debounce logic will happen inside this scanner
-        try scanner.DetectKeyboardChanges(&keyboard_event_queue);
+        try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
 
         // Read keyboard events and produce output commands eg what hid keycodes should be fired, what layer changes should be applied
         // Tap/Hold timings will be handled inhere.
         // Note: Only keyboard events that were conclusive are removed at this tick. if a tap/hold key was recently pressed, we may need to wait for more time to pass or other keypresses/releases to happen before we can determine what should happen. Of this reason, it is important that the same queue is continuesly used between loop ticks
-        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_event_queue, &output_command_queue);
+        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
 
         // TODO: Loop through the output commands and execute key strokes and apply layer changes
     }
