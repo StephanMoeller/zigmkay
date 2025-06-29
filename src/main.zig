@@ -1,5 +1,5 @@
 const std = @import("std");
-const microzig = @import("microzig");
+
 const usb_if = @import("microzig/usb_if.zig");
 
 const zigmkay = @import("core/zigmkay.zig");
@@ -7,21 +7,6 @@ const core = zigmkay.core;
 
 const wilson26 = @import("wilson26/wilson26.zig");
 
-const rp2xxx = microzig.hal;
-const time = rp2xxx.time;
-const usb = rp2xxx.usb;
-const usb_dev = rp2xxx.usb.Usb(.{});
-
-// Compile-time pin configuration
-const pin_config = rp2xxx.pins.GlobalConfiguration{
-    .GPIO17 = .{ .name = "led_red", .direction = .out },
-    .GPIO16 = .{ .name = "led_green", .direction = .out },
-    .GPIO25 = .{ .name = "led_blue", .direction = .out },
-    .GPIO29 = .{ .name = "row0", .direction = .out },
-    .GPIO4 = .{ .name = "col0", .direction = .in },
-};
-
-const pins = pin_config.pins();
 pub fn main() !void {
     const scanner = zigmkay.scanning.Scanner{};
     const processor = zigmkay.processing.Processor{};
