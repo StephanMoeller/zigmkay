@@ -1,18 +1,13 @@
 const std = @import("std");
-
-const usb_if = @import("microzig/usb_if.zig");
-
 const zigmkay = @import("core/zigmkay.zig");
-const core = zigmkay.core;
-
 const keyboard = @import("wilson26/wilson26.zig");
 
 pub fn main() !void {
     const scanner = zigmkay.scanning.Scanner{};
     const processor = zigmkay.processing.Processor{};
 
-    var keyboard_event_queue = core.KeyboardEventQueue.Create();
-    var output_command_queue = core.OutputCommandQueue.Create();
+    var keyboard_event_queue = zigmkay.core.KeyboardEventQueue.Create();
+    var output_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     while (true) {
         // TODO: setup pins
