@@ -2,11 +2,9 @@ const std = @import("std");
 const core = @import("../core/core.zig");
 
 pub const KeyCount: usize = 32;
+pub const LayerCount: usize = 3;
 
-pub const KeyboardConfig = struct {
-    pub const colPins = [_]u8{ 1, 2, 3 };
-    pub const rowPins = [_]u8{ 4, 5, 6, 7 };
-    pub const keymap = [_][KeyCount]core.KeyDef{
+pub const keymap = [LayerCount][KeyCount]core.KeyDef{
         // zig fmt: off
             .{ //--------------------- 0 ---------------------
                 Q,     W, LG(R),     P, B,          K,     L, RG(O),     U,   SQ,
@@ -30,27 +28,21 @@ pub const KeyboardConfig = struct {
             },
             // zig fmt: on
         };
-};
 // zig fmt: off
-fn LS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
-fn LC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lc = true; return copy; }
-fn LG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.lg = true; return copy; }
-fn LA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.la = true; return copy; }
-fn RS(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rs = true; return copy; }
-fn RC(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rc = true; return copy; }
-fn RG(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.rg = true; return copy; }
-fn RA(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ra = true; return copy; }
-fn L1(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
-fn L2(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
-fn L3(key: core.KeyDef) core.KeyDef { var copy = key; copy.mods.ls = true; return copy; }
+fn LS(key: core.KeyDef) core.KeyDef { return key; }
+fn LC(key: core.KeyDef) core.KeyDef { return key; }
+fn LG(key: core.KeyDef) core.KeyDef { return key; }
+fn LA(key: core.KeyDef) core.KeyDef { return key; }
+fn RS(key: core.KeyDef) core.KeyDef { return key; }
+fn RC(key: core.KeyDef) core.KeyDef { return key; }
+fn RG(key: core.KeyDef) core.KeyDef { return key; }
+fn RA(key: core.KeyDef) core.KeyDef { return key; }
+fn L1(key: core.KeyDef) core.KeyDef { return key; }
+fn L2(key: core.KeyDef) core.KeyDef { return key; }
+fn L3(key: core.KeyDef) core.KeyDef { return key; }
 // zig fmt: on
 
-fn HL(key: core.KeyDef, layer: u8) core.KeyDef {
-    var copy = key;
-    copy.mods.ls = true;
-    copy.layer = layer;
-    return copy;
-}
+fn HL(key: core.KeyDef, layer: u8) core.KeyDef { _ = layer; return key; }
 
 const SQ = FromKey(0x15);
 const COM = FromKey(0x15);
@@ -147,7 +139,7 @@ const SPACE = FromKey_LSFT(N1.keycode);
 const ____ = FromKey(0);
 
 fn FromKey_LSFT(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .keycode = keycode, .mods = core.Mods{ .ls = true } };
+    return core.KeyDef{ .keycode = keycode };
 }
 fn FromKey_RAlt(keycode: u8) core.KeyDef {
     return core.KeyDef{ .keycode = keycode };
