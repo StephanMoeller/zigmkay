@@ -2,29 +2,21 @@ const std = @import("std");
 const core = @import("../zigmkay/core.zig");
 
 pub const KeyCount: usize = 32;
-pub const LayerCount: usize = 3;
+pub const LayerCount: usize = 2;
 
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
-                Q,     W, LG(R),     P, B,          K,     L, RG(O),     U,   SQ,
-                F, LA(A), LC(S), LS(T), G,          M, RS(N), RC(E), RA(I),    Y,
-                Z,     X,     C,     D, V,          J,     H,   COM,   DOT, DASH,
-                                        HL(ENTER, 1), HL(SPC, 2)
+                     W, LG(R),     P, B,          
+              F,   LA(A), LC(S), LS(T), G,         
+                  X,     C,     D,      
+                                HL(ENTER, 1)
             },
-
             .{ //--------------------- 1 ---------------------
-                 @"!",     @"<", @"=", @">", @"%",      @"/", home, @"↑",  end, @"?",
-                 @"@", LA(@"{"), @"(", @")", @"}",      pgup, @"←", @"↓", @"→", pgdn,
-                @"\\",     @"#", @"[", @"]", @"&",      @"|",  tab,   DQ,  ESC, @"-",
-                                        HL(ENTER, 2), ____,
-            },
-
-            .{ //--------------------- 2 ---------------------
-                ____, ____, LGUI, ____, ____,           ____, N7, N8, N9, ____,
-                ____, LALT, LCTL, LSFT, ____,           ____, N4, N5, N6, ____,
-                ____, ____, ____, ____, ____,           ____, N1, N2, N3, ____,
-                                                ____, HL(N0, 1),
+                N7, N8, N9, ____,
+          ____, N4, N5, N6, ____,
+                N1, N2, N3, ____,
+                               ____, 
             },
             // zig fmt: on
         };

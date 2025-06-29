@@ -34,8 +34,10 @@ pub fn main() !void {
     // PIN CONFIGURATION: map all col/row pair to a specific index in the interface (and good luck to me making split work)
     //
      const pinsToKeysMapping = [keyboard.KeyCount]{
-        [0,1], [0,2], [0,3], [0,4], [0,5],   X, X, X, X, X,
-        [0,1], [0,2], [0,3], [0,4], [0,5],   X, X, X, X, X,
+               [0,1], [0,2], [0,3], [0,4],   
+         [0,1],[0,2], [0,3], [0,4], [0,5],   
+               [0,2], [0,3], [0,4],   
+                                [0,4]
     }
 
     _ = PinConfigType;
