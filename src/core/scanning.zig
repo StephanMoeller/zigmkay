@@ -21,7 +21,7 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
 };
 
 pub const Scanner = struct {
-    pub fn Scan(self: Scanner, output_queue: *core.KeyboardEventQueue) !void {
+    pub fn DetectKeyboardChanges(self: Scanner, output_queue: *core.KeyboardEventQueue) !void {
         _ = self;
         var v = output_queue.*;
         _ = v.Count();

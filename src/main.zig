@@ -18,7 +18,7 @@ pub fn main() !void {
 
         // Read pin states and add keyboard events (what swithes changed state since last tick) to the event queue
         // Debounce logic will happen inside this scanner
-        try scanner.Scan(&keyboard_event_queue);
+        try scanner.DetectKeyboardChanges(&keyboard_event_queue);
 
         // Read keyboard events and produce output commands eg what hid keycodes should be fired, what layer changes should be applied
         // Tap/Hold timings will be handled inhere.
