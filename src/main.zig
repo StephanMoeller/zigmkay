@@ -30,11 +30,11 @@ pub fn main() !void {
     var output_command_queue = core.OutputCommandQueue.Create();
 
     while (true) {
-        // todo: setup pins
+        // TODO: setup pins
         //   define what row and col pins are used
         //   define which ones are out and which ones are input (dictates if we are doing rowToCol or colToRow)
-        // todo: create scanner and mapping from scanning to keymap positions
-        // todo: create some sort of key state to be fired with usb
+        // TODO: create scanner and mapping from scanning to keymap positions
+        // TODO: create some sort of key state to be fired with usb
 
         // Read pin states and add keyboard events (what swithes changed state since last tick) to the event queue
         // Debounce logic will happen inside this scanner
