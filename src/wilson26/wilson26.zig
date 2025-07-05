@@ -1,7 +1,7 @@
 const std = @import("std");
 const core = @import("../zigmkay/core.zig");
 
-pub const KeyCount: usize = 32;
+pub const KeyCount: usize = 13;
 pub const LayerCount: usize = 2;
 
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
@@ -15,7 +15,7 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
             .{ //--------------------- 1 ---------------------
                 N7, N8, N9, ____,
           ____, N4, N5, N6, ____,
-                N1, N2, N3, ____,
+                N1, N2, N3, 
                                ____, 
             },
             // zig fmt: on

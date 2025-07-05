@@ -31,17 +31,20 @@ pub fn main() !void {
         const direction = "Col2Row";
     };
 
-    // PIN CONFIGURATION: map all col/row pair to a specific index in the interface (and good luck to me making split work)
-    //
-     const pinsToKeysMapping = [keyboard.KeyCount]{
-               [0,1], [0,2], [0,3], [0,4],   
-         [1,0],[1,1], [1,2], [1,3], [1,4],   
-               [2,1], [2,2], [2,3],   ,
-                                [2,4]
-    }
+    const Point = [2]u8;
+
+    // zig fmt: off
+    const pinsToKeysMapping = [keyboard.KeyCount]Point{
+                .{0,1}, .{0,2}, .{0,3}, .{0,4},   
+         .{1,0},.{1,1}, .{1,2}, .{1,3}, .{1,4},   
+                .{2,1}, .{2,2}, .{2,3},
+                                .{2,4}
+    };
+    // zig fmt: on
 
     _ = PinConfigType;
     _ = pins;
+    _ = pinsToKeysMapping;
 
     // PIN CONFIGURATION: feed this whole config to the scanner
 
