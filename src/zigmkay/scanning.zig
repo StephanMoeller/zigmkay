@@ -18,6 +18,7 @@ pub fn CreateScanner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]
         };
     }
 }
+
 fn CreateScanner_inner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]u8, err_msg: *[]const u8) ScannerCreationError!Scanner {
     // Ensure same position not present multiple times in mappings
     for (pin_mappings, 0..) |e, idx| {
