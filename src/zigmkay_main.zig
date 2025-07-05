@@ -31,10 +31,8 @@ pub fn main() !void {
         const direction = "Col2Row";
     };
 
-    const Point = [2]u8;
-
     // zig fmt: off
-    const pinsToKeysMapping = [keyboard.KeyCount]Point{
+    const pinsToKeysMapping = [keyboard.KeyCount][2]u8{
                 .{0,1}, .{0,2}, .{0,3}, .{0,4},   
          .{1,0},.{1,1}, .{1,2}, .{1,3}, .{1,4},   
                 .{2,1}, .{2,2}, .{2,3},
@@ -44,11 +42,10 @@ pub fn main() !void {
 
     _ = PinConfigType;
     _ = pins;
-    _ = pinsToKeysMapping;
 
     // PIN CONFIGURATION: feed this whole config to the scanner
 
-    const scanner = zigmkay.CreateScanner();
+    const scanner = comptime zigmkay.CreateScanner(keyboard.KeyCount, pinsToKeysMapping);
     const processor = zigmkay.Processor{};
 
     var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
