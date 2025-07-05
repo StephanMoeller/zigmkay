@@ -48,7 +48,7 @@ pub fn main() !void {
 
     // PIN CONFIGURATION: feed this whole config to the scanner
 
-    const scanner = zigmkay.Scanner{};
+    const scanner = zigmkay.CreateScanner();
     const processor = zigmkay.Processor{};
 
     var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();

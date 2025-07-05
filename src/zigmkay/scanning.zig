@@ -20,6 +20,9 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO3 = .{ .name = "row_bottom", .direction = .out },
 };
 
+pub fn CreateScanner() Scanner {
+    return Scanner{};
+}
 pub const Scanner = struct {
     pub fn DetectKeyboardChanges(self: Scanner, output_queue: *core.KeyboardStateChangeQueue) !void {
         _ = self;
