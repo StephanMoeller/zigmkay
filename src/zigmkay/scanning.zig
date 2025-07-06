@@ -9,18 +9,24 @@ pub const Scanner = struct {
         _ = v.Count();
     }
 };
+
+// PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
+
+const PinDirection = enum { Col2Row, Row2Col };
 const ScannerCreationError = error{DublicateCoordinates};
-pub fn CreateScanner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]u8) Scanner {
+
+pub fn CreateScanner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]u8, direction: PinDirection) Scanner {
     comptime {
         var err_msg: []const u8 = undefined;
-        return CreateScanner_inner(keyCount, pin_mappings, &err_msg) catch {
+        return CreateScanner_inner(keyCount, pin_mappings, direction, &err_msg) catch {
             @compileError(err_msg);
         };
     }
 }
 
-fn CreateScanner_inner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]u8, err_msg: *[]const u8) ScannerCreationError!Scanner {
+fn CreateScanner_inner(comptime keyCount: u8, comptime pin_mappings: [keyCount][2]u8, direction: PinDirection, err_msg: *[]const u8) ScannerCreationError!Scanner {
     // Ensure same position not present multiple times in mappings
+    _ = direction;
     for (pin_mappings, 0..) |e, idx| {
         for (pin_mappings, 0..) |e_inner, idx_inner| {
             if (idx != idx_inner) {

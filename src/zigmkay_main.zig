@@ -24,13 +24,6 @@ pub fn main() !void {
     };
     const pins = pin_config.pins();
 
-    // PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
-    const PinConfigType = struct {
-        //        const rowPins = [pins.row_top, pins.row_home, pins.row_bottom];
-        //        const colPins = [pins.col_inner, pins.col_index, pins.col_mid, pins.col_ring, pins.col_pinky];
-        const direction = "Col2Row";
-    };
-
     // zig fmt: off
     const pinsToKeysMapping = [keyboard.KeyCount][2]u8{
                 .{0,1}, .{0,2}, .{0,3}, .{0,4},   
@@ -40,12 +33,11 @@ pub fn main() !void {
     };
     // zig fmt: on
 
-    _ = PinConfigType;
     _ = pins;
 
     // PIN CONFIGURATION: feed this whole config to the scanner
 
-    const scanner = comptime zigmkay.CreateScanner(keyboard.KeyCount, pinsToKeysMapping);
+    const scanner = comptime zigmkay.CreateScanner(keyboard.KeyCount, pinsToKeysMapping, .Col2Row);
     const processor = zigmkay.Processor{};
 
     var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
