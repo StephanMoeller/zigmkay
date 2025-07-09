@@ -6,45 +6,76 @@ const rp2xxx = microzig.hal;
 
 const usb_if = @import("microzig/usb_if.zig");
 const usb_dev = rp2xxx.usb.Usb(.{});
+
+// Compile-time pin configuration
+const pin_config = rp2xxx.pins.GlobalConfiguration{
+    .GPIO17 = .{ .name = "led_red", .direction = .out },
+    .GPIO16 = .{ .name = "led_green", .direction = .out },
+    .GPIO25 = .{ .name = "led_blue", .direction = .out },
+
+    .GPIO6 = .{ .name = "col_inner", .direction = .out },
+    .GPIO29 = .{ .name = "col_index", .direction = .out },
+    .GPIO28 = .{ .name = "col_mid", .direction = .out },
+    .GPIO27 = .{ .name = "col_ring", .direction = .out },
+    .GPIO26 = .{ .name = "col_pinky", .direction = .out },
+
+    .GPIO2 = .{ .name = "row_top", .direction = .in },
+    .GPIO4 = .{ .name = "row_home", .direction = .in },
+    .GPIO3 = .{ .name = "row_bottom", .direction = .in },
+};
+const pins = pin_config.pins();
+
 pub fn main() !void {
 
-    // zig fmt: on
+    // First we initialize the USB clock
+    pin_config.apply();
+    pins.col_index.put(1);
+
+    usb_if.init(usb_dev);
 
     // PIN CONFIGURATION: feed this whole config to the scanner
 
     const scanner = zigmkay.CreateScanner();
-    _ = scanner;
     //const processor = zigmkay.Processor{};
 
-    //var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
-    var output_command_queue = zigmkay.OutputCommandQueue.Create();
-    var usb_data = [7]u8{ 0b00001000, 6, 7, 0, 0, 0, 0 };
-    usb_if.init(usb_dev);
-    usb_data[1] = 6;
-    usb_data[2] = 6;
+    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
+    //var output_command_queue = zigmkay.OutputCommandQueue.Create();
+    var data = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
     while (true) {
-        usb_dev.task(false) catch unreachable;
-        usb_if.send_keyboard_report(usb_dev, &usb_data);
         //usb_if.send_keyboard_report(usb_dev, &usb_data);
         // Changes => keyboard_state_change_queue
-        //try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
+        try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
+
+        // Process pending USB housekeeping
+        usb_dev.task(false) catch unreachable;
+        const result = keyboard_state_change_queue.dequeue() catch {
+            continue; // continue if no state changes
+        };
+
+        if (result.pressed == 1) {
+            data[2] = @intCast(result.key_index);
+            pins.led_red.put(0);
+            pins.led_green.put(1);
+            pins.led_blue.put(0);
+        } else {
+            data[2] = 0;
+            pins.led_red.put(1);
+            pins.led_green.put(0);
+            pins.led_blue.put(0);
+        }
+        usb_if.send_keyboard_report(usb_dev, &data);
 
         // keyboard_state_change_queue => Process => output_command_queue
         //try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
-        while (output_command_queue.Count() > 10) {
-            const next_command = try output_command_queue.dequeue();
-            switch (next_command) {
-                .KeyCodePress => |_| {
-                    usb_data[1] = 6;
-                    usb_data[2] = 6;
-                },
-                .KeyCodeRelease => |_| {
-                    usb_data[1] = 0;
-                    usb_data[2] = 0;
-                },
-                else => {},
-            }
-        }
+        //while (output_command_queue.Count() > 10) {
+        //    const next_command = try output_command_queue.dequeue();
+        //    switch (next_command) {
+        //       .KeyCodePress => |_| {},
+        //       .KeyCodeRelease => |_| {},
+        //       else => {},
+        //   }
+        //}
 
         // TODO: Loop through the output commands and execute key strokes and apply layer changes
 

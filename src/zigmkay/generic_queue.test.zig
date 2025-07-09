@@ -9,6 +9,7 @@ test "queue" {
     try queue.enqueue(12);
 
     var all_values = queue.read_all_values();
+    try std.testing.expectEqual(3, queue.Count());
     try std.testing.expectEqual(3, all_values.len);
     try std.testing.expectEqual(10, all_values[0]);
     try std.testing.expectEqual(11, all_values[1]);
@@ -17,11 +18,13 @@ test "queue" {
     try queue.dequeue_count(2);
     all_values = queue.read_all_values();
     try std.testing.expectEqual(1, all_values.len);
+    try std.testing.expectEqual(1, queue.Count());
     try std.testing.expectEqual(12, all_values[0]);
 
-    try queue.dequeue_count(1);
+    _ = try queue.dequeue();
     all_values = queue.read_all_values();
     try std.testing.expectEqual(0, all_values.len);
+    try std.testing.expectEqual(0, queue.Count());
 
     try queue.enqueue(20);
     try queue.enqueue(21);

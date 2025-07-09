@@ -32,6 +32,7 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
             for (self.data[1..self.counter], 0..self.counter - 1) |item, index| {
                 self.data[index] = item;
             }
+            self.counter = self.counter - 1;
             return head_element;
         }
         pub fn dequeue_count(self: *Self, count: usize) DequeueError!void {
