@@ -27,6 +27,7 @@ pub fn main() !void {
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
         // TODO: extract this logic into seperate class and unit test it
+        // TODO: support for modifiers: both stand-alone presses and keycaps with modifiers activated
         while (output_command_queue.Count() > 0) {
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
