@@ -8,7 +8,7 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
     W, R, P, B,             K, L, O, U,
- F, A, S, T, G,             M, N, E, I, Y,
+ LS, A, S, T, G,             M, N, E, I, Y,
     X, C, D,                   H, COMM, DOT,
           ENTER, ENTER, SPACE, SPACE
     },
@@ -45,6 +45,15 @@ const ENTER = FromKey(0x0028);
 const SPACE = FromKey(0x002C);
 const COMM = FromKey(0x0036);
 const DOT = FromKey(0x0037);
+
+const LC = FromKey(0x00E0);
+const LS = FromKey(0x00E1);
+const LA = FromKey(0x00E2);
+const LG = FromKey(0x00E3);
+const RC = FromKey(0x00E4);
+const RS = FromKey(0x00E5);
+const RA = FromKey(0x00E6);
+const RG = FromKey(0x00E7);
 
 const N1 = FromKey(0x001E);
 const N2 = FromKey(0x001F);
