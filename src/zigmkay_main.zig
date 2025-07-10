@@ -26,25 +26,26 @@ pub fn main() !void {
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
-
         // TODO: extract this logic into seperate class and unit test it
         while (output_command_queue.Count() > 0) {
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
                 .KeyCodePress => |keycode| {
-                    for (data[1..], 1..) |val, idx| {
-                        if (val == 0) {
-                            // empty spot found
-                            data[idx] = keycode;
-                        }
+                    var idx: usize = 1;
+                    while (idx < data.len and data[idx] != 0) {
+                        idx += 1;
+                    }
+                    if (idx < data.len) {
+                        data[idx] = keycode;
                     }
                 },
                 .KeyCodeRelease => |keycode| {
-                    for (data[1..], 1..) |val, idx| {
-                        if (val == keycode) {
-                            data[idx] = 0;
-                            continue;
-                        }
+                    var idx: usize = 1;
+                    while (idx < data.len and data[idx] != keycode) {
+                        idx += 1;
+                    }
+                    if (idx < data.len) {
+                        data[idx] = 0;
                     }
                 },
                 .LayerActivation => |_| {},
