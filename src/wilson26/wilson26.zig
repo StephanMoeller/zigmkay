@@ -1,25 +1,18 @@
 const std = @import("std");
 const core = @import("../zigmkay/core.zig");
 
-pub const KeyCount: usize = 13;
-pub const LayerCount: usize = 2;
+pub const KeyCount: usize = 28;
+pub const LayerCount: usize = 1;
 
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
-                     W, LG(R),     P, B,          
-              F,   LA(A), LC(S), LS(T), G,         
-                  X,     C,     D,      
-                                HL(ENTER, 1)
-            },
-            .{ //--------------------- 1 ---------------------
-                N7, N8, N9, ____,
-          ____, N4, N5, N6, ____,
-                N1, N2, N3, 
-                               ____, 
-            },
-            // zig fmt: on
-        };
+    W, R, P, B,             K, L, O, U,
+ F, A, S, T, G,             M, N, E, I, Y,
+    X, C, D,                   H, H, H,
+          ENTER, ENTER, SPACE, SPACE
+    },
+};
 // zig fmt: off
 fn LS(key: core.KeyDef) core.KeyDef { return key; }
 fn LC(key: core.KeyDef) core.KeyDef { return key; }
@@ -56,32 +49,32 @@ const RSFT = FromKey(0x15);
 const LGUI = FromKey(0x15);
 const RGUI = FromKey(0x15);
 
-const A = FromKey(0x15);
-const B = FromKey(0x15);
-const C = FromKey(0x15);
-const D = FromKey(0x15);
-const E = FromKey(0x15);
-const F = FromKey(0x15);
-const G = FromKey(0x15);
-const H = FromKey(0x15);
-const I = FromKey(0x65);
-const J = FromKey(0x15);
-const K = FromKey(0x15);
-const L = FromKey(0x15);
-const M = FromKey(0x15);
-const N = FromKey(0x15);
-const O = FromKey(0x15);
-const P = FromKey(0x15);
-const Q = FromKey(0x15);
-const R = FromKey(0x15);
-const S = FromKey(0x15);
-const T = FromKey(0x15);
-const U = FromKey(0x15);
-const V = FromKey(0x15);
-const W = FromKey(0x15);
-const X = FromKey(0x15);
-const Y = FromKey(0x15);
-const Z = FromKey(0x15);
+const A = FromKey(4);
+const B = FromKey(5);
+const C = FromKey(6);
+const D = FromKey(7);
+const E = FromKey(8);
+const F = FromKey(9);
+const G = FromKey(10);
+const H = FromKey(11);
+const I = FromKey(12);
+const J = FromKey(13);
+const K = FromKey(14);
+const L = FromKey(15);
+const M = FromKey(16);
+const N = FromKey(17);
+const O = FromKey(18);
+const P = FromKey(19);
+const Q = FromKey(20);
+const R = FromKey(21);
+const S = FromKey(22);
+const T = FromKey(23);
+const U = FromKey(24);
+const V = FromKey(25);
+const W = FromKey(26);
+const X = FromKey(27);
+const Y = FromKey(28);
+const Z = FromKey(29);
 
 const N1 = FromKey(0x15);
 const N2 = FromKey(0x15);

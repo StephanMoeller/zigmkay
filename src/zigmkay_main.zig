@@ -15,38 +15,37 @@ pub fn main() !void {
     // PIN CONFIGURATION: feed this whole config to the scanner
 
     const scanner = zigmkay.CreateScanner();
-    //const processor = zigmkay.Processor{};
+    const processor = zigmkay.Processor{};
 
     var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
-    //var output_command_queue = zigmkay.OutputCommandQueue.Create();
+    var output_command_queue = zigmkay.OutputCommandQueue.Create();
+
     var data = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     while (true) {
-        //usb_if.send_keyboard_report(usb_dev, &usb_data);
-        // Changes => keyboard_state_change_queue
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
+        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
 
         // Process pending USB housekeeping
         usb_dev.task(false) catch unreachable;
-        const result = keyboard_state_change_queue.dequeue() catch {
+        const command = output_command_queue.dequeue() catch {
             continue; // continue if no state changes
         };
 
-        if (result.pressed == 1) {
-            data[2] = 10;
-            //pins.led_red.put(0);
-            //pins.led_green.put(1);
-            //pins.led_blue.put(0);
-        } else {
-            data[2] = 0;
-            //pins.led_red.put(1);
-            //pins.led_green.put(0);
-            //pins.led_blue.put(0);
+        switch (command) {
+            .KeyCodePress => |keycode| {
+                data[2] = keycode;
+            },
+            .KeyCodeRelease => |_| {
+                data[2] = 0;
+            },
+            .LayerActivation => |_| {},
+            .LayerDeactivation => |_| {},
         }
+
         usb_if.send_keyboard_report(usb_dev, &data);
 
         // keyboard_state_change_queue => Process => output_command_queue
-        //try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
         //while (output_command_queue.Count() > 10) {
         //    const next_command = try output_command_queue.dequeue();
         //    switch (next_command) {
