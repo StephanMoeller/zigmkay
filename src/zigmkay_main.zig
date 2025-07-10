@@ -7,30 +7,9 @@ const rp2xxx = microzig.hal;
 const usb_if = @import("microzig/usb_if.zig");
 const usb_dev = rp2xxx.usb.Usb(.{});
 
-// Compile-time pin configuration
-const pin_config = rp2xxx.pins.GlobalConfiguration{
-    .GPIO17 = .{ .name = "led_red", .direction = .out },
-    .GPIO16 = .{ .name = "led_green", .direction = .out },
-    .GPIO25 = .{ .name = "led_blue", .direction = .out },
-
-    .GPIO6 = .{ .name = "col_inner", .direction = .out },
-    .GPIO29 = .{ .name = "col_index", .direction = .out },
-    .GPIO28 = .{ .name = "col_mid", .direction = .out },
-    .GPIO27 = .{ .name = "col_ring", .direction = .out },
-    .GPIO26 = .{ .name = "col_pinky", .direction = .out },
-
-    .GPIO2 = .{ .name = "row_top", .direction = .in },
-    .GPIO4 = .{ .name = "row_home", .direction = .in },
-    .GPIO3 = .{ .name = "row_bottom", .direction = .in },
-};
-const pins = pin_config.pins();
-
 pub fn main() !void {
 
     // First we initialize the USB clock
-    pin_config.apply();
-    pins.col_index.put(1);
-
     usb_if.init(usb_dev);
 
     // PIN CONFIGURATION: feed this whole config to the scanner
@@ -55,14 +34,14 @@ pub fn main() !void {
 
         if (result.pressed == 1) {
             data[2] = @intCast(result.key_index);
-            pins.led_red.put(0);
-            pins.led_green.put(1);
-            pins.led_blue.put(0);
+            //pins.led_red.put(0);
+            //pins.led_green.put(1);
+            //pins.led_blue.put(0);
         } else {
             data[2] = 0;
-            pins.led_red.put(1);
-            pins.led_green.put(0);
-            pins.led_blue.put(0);
+            //pins.led_red.put(1);
+            //pins.led_green.put(0);
+            //pins.led_blue.put(0);
         }
         usb_if.send_keyboard_report(usb_dev, &data);
 
