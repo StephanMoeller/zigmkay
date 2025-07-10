@@ -21,3 +21,32 @@ pub const TimeStamp = struct {
 };
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 100);
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 100);
+pub const Modifiers = packed struct {
+    left_ctrl: bool = false,
+    left_shift: bool = false,
+    left_alt: bool = false,
+    left_gui: bool = false,
+    right_ctrl: bool = false,
+    right_shift: bool = false,
+    right_alt: bool = false,
+    right_gui: bool = false,
+
+    /// Convert the struct to a byte (u8) representation.
+    pub fn toByte(self: Modifiers) u8 {
+        return @bitCast(self);
+    }
+
+    //pub fn fromByte(byte_val: u8) Modifiers {
+    //    return @bitCast(byte_val);
+    //}
+};
+pub const HID_ModifierMasks = enum(u8) {
+    left_control = 0x01,
+    left_shift = 0x02,
+    left_alt = 0x04,
+    left_meta = 0x08,
+    right_control = 0x10,
+    right_shift = 0x20,
+    right_alt = 0x40,
+    right_meta = 0x80,
+};

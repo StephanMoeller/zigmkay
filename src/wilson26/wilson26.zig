@@ -8,7 +8,7 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
     W, R, P, B,             K, L, O, U,
- LS, A, S, T, G,             M, N, E, I, Y,
+ LG, A, S, T, G,             M, N, E, I, Y,
     X, C, D,                   H, COMM, DOT,
           ENTER, ENTER, SPACE, SPACE
     },
