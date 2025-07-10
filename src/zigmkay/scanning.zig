@@ -34,8 +34,10 @@ const p = pin_config.pins();
 
 // zig fmt: off
 const pinsToKeysMapping = [_][2]rp2xxx.gpio.Pin{
-
-    .{p.c3,p.r6}
+                 .{p.c0,p.r0},.{p.c1,p.r0},.{p.c2,p.r0},.{p.c3,p.r0},      .{p.c3,p.r6},.{p.c2,p.r6},.{p.c1,p.r6},.{p.c0,p.r6}, 
+                 .{p.c0,p.r1},.{p.c1,p.r1},.{p.c2,p.r1},.{p.c3,p.r1},      .{p.c3,p.r5},.{p.c2,p.r5},.{p.c1,p.r5},.{p.c0,p.r5},
+    .{p.c0,p.r2},.{p.c1,p.r2},.{p.c2,p.r2},.{p.c3,p.r2},                                .{p.c3,p.r4},.{p.c2,p.r4},.{p.c1,p.r4},.{p.c0,p.r4},
+                                           .{p.c1,p.r3},.{p.c3,p.r3},      .{p.c2,p.r3},.{p.c0,p.r3}
 };
 
 // zig fmt: on
