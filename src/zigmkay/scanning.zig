@@ -3,6 +3,7 @@ const core = @import("core.zig");
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 
+const time = rp2xxx.time;
 // PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
 pub fn CreateScanner() Scanner {
     pin_config.apply();
@@ -52,7 +53,7 @@ pub const Scanner = struct {
             var col = mapping[0];
             var row = mapping[1];
             col.put(1);
-            sleep();
+            time.sleep_us(30);
             const pressed = row.read();
             if (pressed != current_states[key_index]) {
                 current_states[key_index] = pressed;
@@ -66,7 +67,4 @@ pub const Scanner = struct {
         // zig fmt: off
     }
 };
-const time = rp2xxx.time;
-fn sleep() void {
-    time.sleep_ms(1); 
-}
+

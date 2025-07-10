@@ -21,44 +21,36 @@ pub fn main() !void {
     var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
     var output_command_queue = zigmkay.OutputCommandQueue.Create();
 
-    var data = [7]u8{ 0x02, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    var data = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     while (true) {
+        usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
         try scanner.DetectKeyboardChanges(&keyboard_state_change_queue);
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_state_change_queue, &output_command_queue);
 
-        // Process pending USB housekeeping
-        usb_dev.task(false) catch unreachable;
-
-        const command = output_command_queue.dequeue() catch {
-            continue; // continue if no state changes
-        };
-
-        switch (command) {
-            .KeyCodePress => |keycode| {
-                data[3] = 0x00E1;
-                data[2] = keycode;
-            },
-            .KeyCodeRelease => |_| {
-                data[2] = 0;
-            },
-            .LayerActivation => |_| {},
-            .LayerDeactivation => |_| {},
+        // TODO: extract this logic into seperate class and unit test it
+        while (output_command_queue.Count() > 0) {
+            const command = output_command_queue.dequeue() catch unreachable;
+            switch (command) {
+                .KeyCodePress => |keycode| {
+                    for (data[1..], 1..) |val, idx| {
+                        if (val == 0) {
+                            // empty spot found
+                            data[idx] = keycode;
+                        }
+                    }
+                },
+                .KeyCodeRelease => |keycode| {
+                    for (data[1..], 1..) |val, idx| {
+                        if (val == keycode) {
+                            data[idx] = 0;
+                            continue;
+                        }
+                    }
+                },
+                .LayerActivation => |_| {},
+                .LayerDeactivation => |_| {},
+            }
         }
-
         usb_if.send_keyboard_report(usb_dev, &data);
-        // keyboard_state_change_queue => Process => output_command_queue
-        //while (output_command_queue.Count() > 10) {
-        //    const next_command = try output_command_queue.dequeue();
-        //    switch (next_command) {
-        //       .KeyCodePress => |_| {},
-        //       .KeyCodeRelease => |_| {},
-        //       else => {},
-        //   }
-        //}
-
-        // TODO: Loop through the output commands and execute key strokes and apply layer changes
-
-        // Read from: output_command_queue
-        // Execute using usb helper
     }
 }

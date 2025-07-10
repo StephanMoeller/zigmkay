@@ -18,7 +18,7 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
                 return EnqueueError.CapacityExceeded;
             }
             self.data[self.counter] = element;
-            self.counter = self.counter + 1;
+            self.counter += 1;
         }
         pub fn read_all_values(self: *Self) []const T {
             return self.data[0..self.counter];
