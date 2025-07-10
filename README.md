@@ -18,9 +18,8 @@
 # TODO
 
 Scanning
-- Make a scanner that will write events to a queue
-- Make the scanner testable
-- Test the scanner
+- Debounce-support
+- Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 Processor
 - Support for mods applied to key presses
