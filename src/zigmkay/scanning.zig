@@ -16,30 +16,30 @@ const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO16 = .{ .name = "led_green", .direction = .out },
     .GPIO25 = .{ .name = "led_blue", .direction = .out },
 
-    .GPIO6 = .{ .name = "col_inner", .direction = .out },
-    .GPIO29 = .{ .name = "col_index", .direction = .out },
-    .GPIO28 = .{ .name = "col_mid", .direction = .out },
-    .GPIO27 = .{ .name = "col_ring", .direction = .out },
-    .GPIO26 = .{ .name = "col_pinky", .direction = .out },
+    .GPIO26 = .{ .name = "c0", .direction = .out },
+    .GPIO27 = .{ .name = "c1", .direction = .out },
+    .GPIO28 = .{ .name = "c2", .direction = .out },
+    .GPIO29 = .{ .name = "c3", .direction = .out },
 
-    .GPIO2 = .{ .name = "row_top", .direction = .in },
-    .GPIO4 = .{ .name = "row_home", .direction = .in },
-    .GPIO3 = .{ .name = "row_bottom", .direction = .in },
+    .GPIO6 = .{ .name = "r0", .direction = .in },
+    .GPIO7 = .{ .name = "r1", .direction = .in },
+    .GPIO0 = .{ .name = "r2", .direction = .in },
+    .GPIO1 = .{ .name = "r3", .direction = .in },
+    .GPIO2 = .{ .name = "r4", .direction = .in },
+    .GPIO4 = .{ .name = "r5", .direction = .in },
+    .GPIO3 = .{ .name = "r6", .direction = .in },
 };
-const pins = pin_config.pins();
-const cols = [_]rp2xxx.gpio.Pin{ pins.col_inner, pins.col_index, pins.col_mid, pins.col_ring, pins.col_pinky };
-const rows = [_]rp2xxx.gpio.Pin{ pins.row_top, pins.row_home, pins.row_bottom };
-const KeyCount = 13;
+
+const p = pin_config.pins();
+
 // zig fmt: off
-const pinsToKeysMapping = [KeyCount][2]u8{
-                .{0,1}, .{0,2}, .{0,3}, .{0,4},   
-         .{1,0},.{1,1}, .{1,2}, .{1,3}, .{1,4},   
-                .{2,1}, .{2,2}, .{2,3},
-                                .{2,4}
-    };
+const pinsToKeysMapping = [_][2]rp2xxx.gpio.Pin{
+
+    .{p.c3,p.r6}
+};
 
 // zig fmt: on
-var current_states: [KeyCount]u2 = [1]u2{0} ** (KeyCount);
+var current_states: [pinsToKeysMapping.len]u2 = [1]u2{0} ** (pinsToKeysMapping.len);
 
 pub const Scanner = struct {
     pub fn DetectKeyboardChanges(self: Scanner, output_queue: *core.KeyboardStateChangeQueue) !void {
@@ -47,27 +47,24 @@ pub const Scanner = struct {
         // if
         for (pinsToKeysMapping, 0..) |mapping, key_index| {
             // todo: dont wait if previous col was the same as this one
-            const col_index = mapping[1];
-            const row_index = mapping[0];
-            var col = cols[col_index];
+            var col = mapping[0];
             col.put(1);
             sleep();
-            var row = rows[row_index];
+            var row = mapping[1];
             const pressed = row.read();
             if (pressed != current_states[key_index]) {
                 current_states[key_index] = pressed;
                 try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index });
-                pins.led_red.put(pressed);
-                pins.led_green.put(1 - pressed);
-                pins.led_blue.put(1);
+                p.led_red.put(pressed);
+                p.led_green.put(1 - pressed);
+                p.led_blue.put(1);
             }
             col.put(0);
         }
-        _ = rows;
         // zig fmt: off
     }
 };
 const time = rp2xxx.time;
 fn sleep() void {
-   time.sleep_ms(1); 
+    time.sleep_ms(1); 
 }

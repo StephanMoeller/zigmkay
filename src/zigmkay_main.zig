@@ -33,7 +33,7 @@ pub fn main() !void {
         };
 
         if (result.pressed == 1) {
-            data[2] = @intCast(result.key_index);
+            data[2] = 10;
             //pins.led_red.put(0);
             //pins.led_green.put(1);
             //pins.led_blue.put(0);
