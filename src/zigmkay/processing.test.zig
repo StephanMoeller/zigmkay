@@ -11,7 +11,7 @@ test "tapping - single key press" {
     var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
 
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
     const processor = zigmkay.CreateProcessor();
@@ -33,7 +33,7 @@ test "tapping - single key release" {
     var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
 
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
     const processor = zigmkay.CreateProcessor();
@@ -55,11 +55,11 @@ test "tapping - multiple simple tap events" {
     const base_layer = [_]core.KeyDef{ A, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 });
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 });
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 2 });
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 });
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 2 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 0 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 0 });
 
     const processor = zigmkay.CreateProcessor();
 
@@ -87,8 +87,8 @@ test "tapping - with modifiers - single key press" {
 
     const shiftedA = core.KeyDef{ .tap_keycode = 0x04, .tap_modifiers = core.Modifiers{ .left_shift = true } };
 
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 });
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 0 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 0 });
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ shiftedA, B, C, D }};
     const processor = zigmkay.CreateProcessor();
@@ -118,10 +118,10 @@ test "tapping - with modifiers - with other key pressed between press and releas
     const normalB = core.KeyDef{ .tap_keycode = B.tap_keycode };
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ shiftedA, normalB, C, D }};
 
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 }); // Press A + shift
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 }); // Press B
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 }); // Release A + shift
-    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 }); // Release B
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 0 }); // Press A + shift
+    try keyboard_state_change_queue.enqueue(.{ .pressed = true, .key_index = 1 }); // Press B
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 0 }); // Release A + shift
+    try keyboard_state_change_queue.enqueue(.{ .pressed = false, .key_index = 1 }); // Release B
 
     const processor = zigmkay.CreateProcessor();
 
