@@ -26,8 +26,8 @@ test "tapping - single key press" {
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
     // expect B to be fired as press
-    try std.testing.expectEqual(1, &o.actions_queue.Count());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try &o.actions_queue.dequeue());
+    try std.testing.expectEqual(1, o.actions_queue.Count());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
@@ -43,7 +43,7 @@ test "tapping - single key release" {
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
-    try std.testing.expectEqual(1, &o.actions_queue.Count()); // expect B to be fired as press
+    try std.testing.expectEqual(1, o.actions_queue.Count()); // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count()); // expect event removed from input_events
 }
