@@ -1,6 +1,6 @@
 const std = @import("std");
 const microzig = @import("microzig");
-const zigmkay = @import("zigmkay/bundle.zig");
+const zigmkay = @import("zigmkay/zigmkay.zig");
 const keyboard = @import("wilson26/wilson26.zig");
 const rp2xxx = microzig.hal;
 
