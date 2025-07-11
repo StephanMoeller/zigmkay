@@ -8,7 +8,7 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
     W, R, P, B,             K, L, O, U,
- LG, A, S, T, G,             M, N, E, I, Y,
+ N2_shifted, A, S, T, G,             M, N, E, I, Y,
     X, C, D,                   H, COMM, DOT,
           ENTER, ENTER, SPACE, SPACE
     },
@@ -65,6 +65,9 @@ const N7 = FromKey(0x0024);
 const N8 = FromKey(0x0025);
 const N9 = FromKey(0x0026);
 const N0 = FromKey(0x0027);
+
+const N2_shifted = core.KeyDef{ .tap_keycode = N2.tap_keycode, .tap_modifiers = .{.left_shift =true } };
+//N2_shifted.tap_modifiers.left_shift = true;
 
 const Ae = FromKey(0x15);
 const Oe = FromKey(0x15);

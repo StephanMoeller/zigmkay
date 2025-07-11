@@ -33,6 +33,9 @@ const Processor = struct {
             const current_layer_index: usize = 0;
             if (next_event.pressed == 1) {
                 const key_def = keymap[current_layer_index][next_event.key_index];
+                if (!key_def.tap_modifiers.Empty()) {
+                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = key_def.tap_modifiers });
+                }
                 if (key_def.tap_keycode != 0) {
                     try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.tap_keycode });
                 }
@@ -43,8 +46,11 @@ const Processor = struct {
                 // key_def should not be read from the layout but be the exact key that was pressed to ensure a layer switch
                 // between press and release will still trigger releasing of the original key and not the one on the new layer
                 const key_def = keymap[current_layer_index][next_event.key_index];
+                if (!key_def.tap_modifiers.Empty()) {
+                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = .{} });
+                }
                 if (key_def.tap_keycode != 0) {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.tap_keycode });
+                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.tap_keycode });
                 }
                 //modifiers.left_shift = false;
                 //try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });

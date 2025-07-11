@@ -35,6 +35,9 @@ pub const Modifiers = packed struct {
     right_gui: bool = false,
 
     /// Convert the struct to a byte (u8) representation.
+    pub fn Empty(self: Modifiers) bool {
+        return self.toByte() == 0;
+    }
     pub fn toByte(self: Modifiers) u8 {
         return @bitCast(self);
     }
