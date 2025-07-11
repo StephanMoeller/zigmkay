@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 set -e  # Exit on any error
 
 echo "Building firmware..."
