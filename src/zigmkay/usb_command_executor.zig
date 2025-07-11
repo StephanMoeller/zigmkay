@@ -54,6 +54,7 @@ pub const UsbCommandExecutor = struct {
                     data[0] = modifiers.toByte();
                 },
             }
+            time.sleep_ms(1);
         }
         usb_if.send_keyboard_report(usb_dev, &data);
     }
