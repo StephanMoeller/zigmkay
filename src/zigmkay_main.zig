@@ -16,10 +16,10 @@ pub fn main() !void {
     // PIN CONFIGURATION: feed this whole config to the scanner
 
     const scanner = zigmkay.CreateScanner();
-    const processor = zigmkay.Processor{};
+    const processor = zigmkay.CreateProcessor();
 
-    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
-    var output_command_queue = zigmkay.OutputCommandQueue.Create();
+    var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
+    var output_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     var data = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     while (true) {

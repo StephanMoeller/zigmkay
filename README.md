@@ -17,6 +17,7 @@
 
 # TODO
 
+
 Scanning
 - Debounce-support
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes

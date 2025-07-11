@@ -1,7 +1,11 @@
 const std = @import("std");
 const core = @import("core.zig");
 
-pub const Processor = struct {
+pub fn CreateProcessor() Processor {
+    return Processor{};
+}
+
+const Processor = struct {
     pub fn Process(
         self: Processor,
         comptime KeyCount: usize,
