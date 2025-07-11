@@ -22,7 +22,7 @@ test "tapping - single key press" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try actions_queue.dequeue());
 
     // expect event removed from input_events
-    try std.testing.expectEqual(0, keyboard_state_change_queue.read_all_values().len);
+    try std.testing.expectEqual(0, keyboard_state_change_queue.Count());
 }
 
 test "tapping - single key release" {
@@ -44,7 +44,7 @@ test "tapping - single key release" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try actions_queue.dequeue());
 
     // expect event removed from input_events
-    try std.testing.expectEqual(0, keyboard_state_change_queue.read_all_values().len);
+    try std.testing.expectEqual(0, keyboard_state_change_queue.Count());
 }
 
 test "tapping - multiple simple tap events" {
