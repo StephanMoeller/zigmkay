@@ -73,5 +73,5 @@ test "dequeue error" {
 
     try queue.dequeue_count(2);
     const result = queue.dequeue_count(3);
-    try std.testing.expectEqual(q.DequeueError.CannotDequeueAmount, result);
+    try std.testing.expectEqual(q.DequeueError.NoElements, result);
 }

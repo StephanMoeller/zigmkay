@@ -1,5 +1,5 @@
 const std = @import("std");
-const zigmkay = @import("bundle.zig");
+const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 // test stuff
@@ -8,15 +8,13 @@ test "tapping - single key press" {
     const LayerCount = 1;
 
     // define some input events
-    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
+    var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
 
-    try keyboard_state_change_queue.enqueue(.{
-        .key_pressed = .{ .time = dummy_time, .key_index = 1 },
-    });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const processor = zigmkay.Processor{};
+    const processor = zigmkay.CreateProcessor();
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_state_change_queue, &actions_queue);
 
     // expect B to be fired as press
@@ -32,13 +30,13 @@ test "tapping - single key release" {
     const LayerCount = 1;
 
     // define some input events
-    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
+    var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
 
-    try keyboard_state_change_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 });
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
 
-    const processor = zigmkay.Processor{};
+    const processor = zigmkay.CreateProcessor();
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_state_change_queue, &actions_queue);
 
     // expect B to be fired as press
@@ -54,18 +52,18 @@ test "tapping - multiple simple tap events" {
     const LayerCount = 1;
 
     // define some input events
-    var keyboard_state_change_queue = zigmkay.KeyboardStateChangeQueue.Create();
+    var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
 
-    try keyboard_state_change_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 1 } });
-    try keyboard_state_change_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 1 } });
-    try keyboard_state_change_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 2 } });
-    try keyboard_state_change_queue.enqueue(.{ .key_pressed = .{ .time = dummy_time, .key_index = 0 } });
-    try keyboard_state_change_queue.enqueue(.{ .key_released = .{ .time = dummy_time, .key_index = 0 } });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 2 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 });
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 });
 
     const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
+    const processor = zigmkay.CreateProcessor();
 
-    const processor = zigmkay.Processor{};
     try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_state_change_queue, &actions_queue);
 
     // expect B to be fired as press
