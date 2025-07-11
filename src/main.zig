@@ -14,13 +14,20 @@ pub fn main() !void {
     const usb_command_executor = zigmkay.CreateAndInitUsbCommandExecutor();
 
     while (true) {
+        // TODO: where does layer state recide?
+        // TODO: where does keyboard hid key state recide?
+
         // Register input
+        // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
+        // TODO: Add rebounce logic to scanner
         try scanner.DetectKeyboardChanges(&keyboard_change_queue);
 
         // Decide actions
+        // TODO: Add all logic needed for own keyboard here
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue);
 
         // Execute actions
+        // TODO: Fix modifiers so that eg shift works when held down
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
     }
 }
