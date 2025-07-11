@@ -15,7 +15,7 @@ pub const OutputCommand = union(enum) {
 };
 const KeyIndex = usize;
 const LayerIndex = usize;
-pub const KeyboardStateChange = struct { pressed: u2, key_index: KeyIndex };
+pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex };
 pub const TimeStamp = struct {
     time_us_since_boot: u64,
     pub fn as_ns(self: TimeStamp) u64 {

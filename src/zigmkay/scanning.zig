@@ -42,7 +42,7 @@ const pinsToKeysMapping = [_][2]rp2xxx.gpio.Pin{
 };
 
 // zig fmt: on
-var current_states: [pinsToKeysMapping.len]u2 = [1]u2{0} ** (pinsToKeysMapping.len);
+var current_states: [pinsToKeysMapping.len]bool = [1]bool{false} ** (pinsToKeysMapping.len);
 
 pub const Scanner = struct {
     pub fn DetectKeyboardChanges(self: Scanner, output_queue: *core.KeyboardStateChangeQueue) !void {
@@ -54,12 +54,13 @@ pub const Scanner = struct {
             var row = mapping[1];
             col.put(1);
             time.sleep_us(30);
-            const pressed = row.read();
+            const read_value = row.read();
+            const pressed = read_value == 1;
             if (pressed != current_states[key_index]) {
                 current_states[key_index] = pressed;
                 try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index });
-                p.led_red.put(pressed);
-                p.led_green.put(1 - pressed);
+                p.led_red.put(read_value);
+                p.led_green.put(1 - read_value);
                 p.led_blue.put(1);
             }
             col.put(0);

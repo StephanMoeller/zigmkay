@@ -31,7 +31,7 @@ const Processor = struct {
         while (input.Count() > 0) {
             const next_event = try input.dequeue();
             const current_layer_index: usize = 0;
-            if (next_event.pressed == 1) {
+            if (next_event.pressed) {
                 const key_def = keymap[current_layer_index][next_event.key_index];
                 if (!key_def.tap_modifiers.Empty()) {
                     try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = key_def.tap_modifiers });
