@@ -14,8 +14,13 @@ pub fn main() !void {
     const usb_command_executor = zigmkay.CreateAndInitUsbCommandExecutor();
 
     while (true) {
+        // Register input
         try scanner.DetectKeyboardChanges(&keyboard_change_queue);
+
+        // Decide actions
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue);
+
+        // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
     }
 }
