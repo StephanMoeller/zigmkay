@@ -66,7 +66,8 @@ const N8 = FromKey(0x0025);
 const N9 = FromKey(0x0026);
 const N0 = FromKey(0x0027);
 
-const N2_shifted = core.KeyDef{ .tap_keycode = N2.tap_keycode, .tap_modifiers = .{.left_shift =true } };
+const N2_shifted = core.KeyDef{ .tap = .{.TapWithMod = .{.key_code = 0x001F, .modifiers = .{.left_shift = true}}}};
+
 //N2_shifted.tap_modifiers.left_shift = true;
 
 const Ae = FromKey(0x15);
@@ -74,5 +75,5 @@ const Oe = FromKey(0x15);
 const Aa = FromKey(0x15);
 
 fn FromKey(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_keycode = keycode };
+    return core.KeyDef{ .tap = .{.TapLetter = keycode} };
 }

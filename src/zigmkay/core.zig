@@ -1,17 +1,35 @@
 const generic_queue = @import("generic_queue.zig");
 
 // Features that must be expressable with KeyDef:
-// Tap for letter
+// - Tap for letter
 // TODO Tap for letter with a modifier on the letter alone
 // TODO Tap for permanent layer switch
 // TODO Tap for one-shot layer switch
 // TODO Hold for Modifiers
 // TODO Hold for momentary layer switch
 // TODO Combine any tap with any hold
+pub const KeyTapFunction = union(enum) {
+    None,
+    TapLetter: HidKeyCode,
+    TapWithMod: struct {
+        key_code: HidKeyCode,
+        modifiers: Modifiers,
+    },
+    LayerPermanent: usize,
+    LayerOneShot: usize,
+};
+pub const KeyHoldFunction = union(enum) {
+    None,
+    Modifier: struct {
+        modifier: Modifiers,
+    },
+    LayerMomentary: struct {
+        LayerIndex: usize,
+    },
+};
 pub const KeyDef = struct {
-    tap_keycode: u8,
-    tap_modifiers: Modifiers = .{},
-    hold_modifiers: Modifiers = .{},
+    tap: KeyTapFunction = .None,
+    hold: KeyHoldFunction = .None,
 };
 
 // a key definition that only has a tap functionality
@@ -21,6 +39,8 @@ pub const OutputCommand = union(enum) {
     KeyCodeRelease: u8,
     ModifiersChanged: Modifiers,
 };
+
+const HidKeyCode = u8;
 const KeyIndex = usize;
 const LayerIndex = usize;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex };
