@@ -12,7 +12,6 @@ pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
 
 pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    var mods: core.Modifiers = .{ .left_shift = true };
     pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
@@ -24,8 +23,6 @@ pub const UsbCommandExecutor = struct {
                 const command = output_command_queue.dequeue() catch unreachable;
                 switch (command) {
                     .KeyCodePress => |keycode| {
-                        mods.left_shift = true;
-
                         var idx: usize = 1;
                         while (idx < data.len and data[idx] != 0) {
                             idx += 1;
@@ -35,7 +32,6 @@ pub const UsbCommandExecutor = struct {
                         }
                     },
                     .KeyCodeRelease => |keycode| {
-                        mods.left_shift = false;
                         var idx: usize = 1;
                         while (idx < data.len and data[idx] != keycode) {
                             idx += 1;
@@ -44,9 +40,14 @@ pub const UsbCommandExecutor = struct {
                             data[idx] = 0;
                         }
                     },
+                    .ModifiersChanged => |modifiers| {
+                        usb_if.send_keyboard_report(usb_dev, &data);
+                        data[0] = modifiers.toByte();
+                        usb_if.send_keyboard_report(usb_dev, &data);
+                    },
                 }
             }
-            data[0] = mods.toByte();
+
             usb_if.send_keyboard_report(usb_dev, &data);
         }
     }

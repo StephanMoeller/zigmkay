@@ -7,6 +7,7 @@ pub const KeyDef = struct { keycode: u8 };
 pub const OutputCommand = union(enum) {
     KeyCodePress: u8,
     KeyCodeRelease: u8,
+    ModifiersChanged: Modifiers,
 };
 const KeyIndex = usize;
 const LayerIndex = usize;

@@ -6,6 +6,7 @@ pub fn CreateProcessor() Processor {
 }
 
 const Processor = struct {
+    var modifiers: core.Modifiers = .{};
     pub fn Process(
         self: Processor,
         comptime KeyCount: usize,
@@ -23,9 +24,13 @@ const Processor = struct {
             const current_layer_index: usize = 0;
             const key_def = keymap[current_layer_index][next_event.key_index];
             if (next_event.pressed == 1) {
+                modifiers.left_shift = true;
+                try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
                 try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.keycode });
             } else {
                 try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.keycode });
+                modifiers.left_shift = false;
+                try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
             }
         }
     }
