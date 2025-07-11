@@ -12,7 +12,7 @@ pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
 
 pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    var mods: u8 = 0b00001000;
+    var mods: u8 = 0b00000010;
     pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping

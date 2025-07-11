@@ -10,17 +10,6 @@ const usb = rp2xxx.usb;
 
 const hid = usb.hid;
 
-pub const HID_ModifierMasks = enum(u8) {
-    left_control = 0x01,
-    left_shift = 0x02,
-    left_alt = 0x04,
-    left_meta = 0x08,
-    right_control = 0x10,
-    right_shift = 0x20,
-    right_alt = 0x40,
-    right_meta = 0x80,
-};
-
 pub const HID_KeymodifierCodes = enum(u8) {
     left_control = 0xe0,
     left_shift,
@@ -38,8 +27,8 @@ const KeyboardReportDescriptor = hid.hid_usage_page(1, hid.UsageTable.desktop) +
     hid.hid_usage(1, hid.DesktopUsage.keyboard) ++
     hid.hid_collection(hid.CollectionItem.Application) ++
     hid.hid_usage_page(1, hid.UsageTable.keyboard) ++
-    hid.hid_usage_min(1, .{@intFromEnum(HID_KeymodifierCodes.left_alt)}) ++
-    hid.hid_usage_max(1, .{@intFromEnum(HID_KeymodifierCodes.right_shift)}) ++
+    hid.hid_usage_min(1, .{@intFromEnum(HID_KeymodifierCodes.left_control)}) ++
+    hid.hid_usage_max(1, .{@intFromEnum(HID_KeymodifierCodes.right_gui)}) ++
     hid.hid_logical_min(1, "\x00".*) ++
     hid.hid_logical_max(1, "\x01".*) ++
     hid.hid_report_size(1, "\x01".*) ++
