@@ -75,5 +75,5 @@ const Oe = FromKey(0x15);
 const Aa = FromKey(0x15);
 
 fn FromKey(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap = .{.TapLetter = keycode} };
+    return core.KeyDef.TAB(keycode);
 }

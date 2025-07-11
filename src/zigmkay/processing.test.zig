@@ -76,7 +76,7 @@ test "tapping - multiple simple tap events" {
 test "tapping - with modifiers - single key press" {
     var o = init_test();
 
-    const shiftedA = core.KeyDef{ .tap_keycode = 0x04, .tap_modifiers = core.Modifiers{ .left_shift = true } };
+    const shiftedA = core.KeyDef.TAP_WITH_MOD(0x04, .{ .left_shift = true });
     const base_layer = [_]core.KeyDef{ shiftedA, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
@@ -100,8 +100,8 @@ test "tapping - with modifiers - single key press" {
 test "tapping - with modifiers - with other key pressed between press and release" {
     var o = init_test();
 
-    const shiftedA = core.KeyDef{ .tap_keycode = 0x04, .tap_modifiers = core.Modifiers{ .left_shift = true } };
-    const normalB = core.KeyDef{ .tap_keycode = B.tap_keycode };
+    const shiftedA = core.KeyDef.TAP_WITH_MOD(0x04, .{ .left_shift = true });
+    const normalB = core.KeyDef.TAP(0x05);
     const base_layer = [_]core.KeyDef{ shiftedA, normalB, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
@@ -129,11 +129,9 @@ const a = 0x04;
 const b = 0x05;
 const c = 0x06;
 const d = 0x07;
-const A = TapOnly(a);
-const B = TapOnly(b);
-const C = TapOnly(c);
-const D = TapOnly(d);
-pub fn TapOnly(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_keycode = keycode };
-}
+const A = core.KeyDef.TAP(a);
+const B = core.KeyDef.TAP(b);
+const C = core.KeyDef.TAP(c);
+const D = core.KeyDef.TAP(d);
+
 const dummy_time = core.TimeStamp{ .time_us_since_boot = 0 };
