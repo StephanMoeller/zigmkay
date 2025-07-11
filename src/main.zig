@@ -1,6 +1,6 @@
 const std = @import("std");
 const zigmkay = @import("zigmkay/zigmkay.zig");
-const keyboard = @import("wilson26/wilson26.zig");
+const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
 
 pub fn main() !void {
