@@ -23,7 +23,7 @@ Scanning
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 Processor
-- Support for mods applied to key presses
+- Support for mods applied to key presses,
 - Holds to switch layer
 - "Tap+hold for layer switch" on same keys
 - "Tap+hold for modifiers switch" on same keys

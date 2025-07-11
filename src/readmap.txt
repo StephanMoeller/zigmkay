@@ -1,5 +1,0 @@
-
-const microzig = @import("microzig");
-const rp2xxx = microzig.hal;
-const time = rp2xxx.time;
-var old: u64 = time.get_time_since_boot().to_us();

@@ -28,7 +28,7 @@ pub const Processor = struct {
         // todo: hold-support
         // todo: take layouts into concideration here
         // todo: combo support
-        while (input.Count() > 0) {
+        if (input.Count() > 0) {
             const next_event = try input.dequeue();
             const current_layer_index: usize = 0;
             if (next_event.pressed) {
