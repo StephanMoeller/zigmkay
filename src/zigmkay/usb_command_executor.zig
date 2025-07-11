@@ -1,7 +1,7 @@
 const std = @import("std");
 const core = @import("core.zig");
 const rp2xxx = @import("microzig").hal;
-const usb_if = @import("../microzig/usb_if.zig");
+const usb_if = @import("usb_if.zig");
 const usb_dev = rp2xxx.usb.Usb(.{});
 
 pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
