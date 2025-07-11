@@ -8,28 +8,26 @@ const generic_queue = @import("generic_queue.zig");
 // TODO Hold for Modifiers
 // TODO Hold for momentary layer switch
 // TODO Combine any tap with any hold
-pub const KeyTapFunction = union(enum) {
-    None,
-    TapLetter: HidKeyCode,
-    TapWithMod: struct {
-        key_code: HidKeyCode,
-        modifiers: Modifiers,
-    },
-    LayerPermanent: usize,
-    LayerOneShot: usize,
-};
-pub const KeyHoldFunction = union(enum) {
-    None,
-    Modifier: struct {
-        modifier: Modifiers,
-    },
-    LayerMomentary: struct {
-        LayerIndex: usize,
-    },
-};
 pub const KeyDef = struct {
-    tap: KeyTapFunction = .None,
-    hold: KeyHoldFunction = .None,
+    tap: union(enum) {
+        None,
+        TapLetter: HidKeyCode,
+        TapWithMod: struct {
+            key_code: HidKeyCode,
+            modifiers: Modifiers,
+        },
+        LayerPermanent: usize,
+        LayerOneShot: usize,
+    } = .None,
+    hold: union(enum) {
+        None,
+        Modifier: struct {
+            modifier: Modifiers,
+        },
+        LayerMomentary: struct {
+            LayerIndex: usize,
+        },
+    } = .None,
 };
 
 // a key definition that only has a tap functionality
