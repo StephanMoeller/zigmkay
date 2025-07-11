@@ -25,7 +25,7 @@ const Processor = struct {
             const key_def = keymap[current_layer_index][next_event.key_index];
             if (next_event.pressed == 1) {
                 if (key_def.keycode == 5) {
-                    modifiers.left_shift = true;
+                    modifiers.left_shift = !modifiers.left_shift;
                     try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
                 }
                 try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.keycode });

@@ -43,8 +43,10 @@ pub const UsbCommandExecutor = struct {
                     },
                     .ModifiersChanged => |modifiers| {
                         usb_if.send_keyboard_report(usb_dev, &data);
+                        time.sleep_ms(50);
                         data[0] = modifiers.toByte();
                         usb_if.send_keyboard_report(usb_dev, &data);
+                        time.sleep_ms(50);
                     },
                 }
             }
