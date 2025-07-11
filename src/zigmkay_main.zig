@@ -9,13 +9,15 @@ const usb_dev = rp2xxx.usb.Usb(.{});
 
 pub fn main() !void {
 
-    // First we initialize the USB clock
-    usb_if.init(usb_dev);
-
     // PIN CONFIGURATION: feed this whole config to the scanner
 
     const scanner = zigmkay.CreateScanner();
     const processor = zigmkay.CreateProcessor();
+    const usb_command_executor = zigmkay.CreateAndInitUsbCommandExecutor();
+    _ = usb_command_executor;
+
+    // First we initialize the USB clock
+    usb_if.init(usb_dev);
 
     var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var output_command_queue = zigmkay.core.OutputCommandQueue.Create();
