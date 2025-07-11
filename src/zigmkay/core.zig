@@ -1,5 +1,13 @@
 const generic_queue = @import("generic_queue.zig");
 
+// Features that must be expressable with KeyDef:
+// Tap for letter
+// TODO Tap for letter with a modifier on the letter alone
+// TODO Tap for permanent layer switch
+// TODO Tap for one-shot layer switch
+// TODO Hold for Modifiers
+// TODO Hold for momentary layer switch
+// TODO Combine any tap with any hold
 pub const KeyDef = struct {
     tap_keycode: u8,
     tap_modifiers: Modifiers = .{},
