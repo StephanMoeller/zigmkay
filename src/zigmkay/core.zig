@@ -1,6 +1,10 @@
 const generic_queue = @import("generic_queue.zig");
 
-pub const KeyDef = struct { keycode: u8 };
+pub const KeyDef = struct {
+    tap_keycode: u8,
+    tap_modifiers: Modifiers = .{},
+    hold_modifiers: Modifiers = .{},
+};
 
 // a key definition that only has a tap functionality
 

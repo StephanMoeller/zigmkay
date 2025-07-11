@@ -5,6 +5,15 @@ pub fn CreateProcessor() Processor {
     return Processor{};
 }
 
+const LC = 0x00E0;
+const LS = 0x00E1;
+const LA = 0x00E2;
+const LG = 0x00E3;
+const RC = 0x00E4;
+const RS = 0x00E5;
+const RA = 0x00E6;
+const RG = 0x00E7;
+
 const Processor = struct {
     var modifiers: core.Modifiers = .{};
     pub fn Process(
@@ -24,20 +33,20 @@ const Processor = struct {
             const current_layer_index: usize = 0;
             const key_def = keymap[current_layer_index][next_event.key_index];
             if (next_event.pressed == 1) {
-                if (key_def.keycode == 4) {
+                if (key_def.tap_keycode == 4) {
                     modifiers.left_shift = true;
                     try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
                 } else {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.keycode });
+                    try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.tap_keycode });
                 }
                 //modifiers.left_shift = true;
                 //try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
             } else {
-                if (key_def.keycode == 4) {
+                if (key_def.tap_keycode == 4) {
                     modifiers.left_shift = false;
                     try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
                 } else {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.keycode });
+                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.tap_keycode });
                 }
 
                 //modifiers.left_shift = false;
