@@ -16,6 +16,7 @@ const RG = 0x00E7;
 
 pub const Processor = struct {
     var modifiers: core.Modifiers = .{};
+    var previous_key: core.KeyDef = .{};
     pub fn Process(
         self: Processor,
         comptime KeyCount: usize,
@@ -45,7 +46,7 @@ pub const Processor = struct {
 
                 try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.tap_keycode });
                 if (!key_def.tap_modifiers.empty()) {
-                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = .{} });
+                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
                 }
             }
         }
