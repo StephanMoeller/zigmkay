@@ -3,6 +3,7 @@ const core = @import("core.zig");
 const rp2xxx = @import("microzig").hal;
 const usb_if = @import("usb_if.zig");
 const usb_dev = rp2xxx.usb.Usb(.{});
+const time = rp2xxx.time;
 
 pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
     // First we initialize the USB clock
@@ -11,7 +12,7 @@ pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
 }
 
 pub const UsbCommandExecutor = struct {
-    var data: [7]u8 = [7]u8{ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
@@ -47,8 +48,8 @@ pub const UsbCommandExecutor = struct {
                     },
                 }
             }
-
             usb_if.send_keyboard_report(usb_dev, &data);
         }
     }
+    fn send_and_sleep() void {}
 };
