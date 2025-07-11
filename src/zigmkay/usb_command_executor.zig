@@ -19,7 +19,11 @@ pub const UsbCommandExecutor = struct {
 
         // TODO: extract this logic into seperate class and unit test it
         // TODO: support for modifiers: both stand-alone presses and keycaps with modifiers activated
-        while (output_command_queue.Count() > 0) {
+        //
+        //
+        // This is an 'if' and not a 'while loop', ensuring not to delay too much before scanning the matrix again by only prossessing one item in the output queue per cycle.
+        // Highest priority is to capture as many changes as possible in the matrix. also if this means slower execution of these
+        if (output_command_queue.Count() > 0) {
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
                 .KeyCodePress => |keycode| {
