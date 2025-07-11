@@ -1,5 +1,4 @@
 const std = @import("std");
-const core = @import("zigmkay/core.zig");
 const microzig = @import("microzig");
 const zigmkay = @import("zigmkay/bundle.zig");
 const keyboard = @import("wilson26/wilson26.zig");
