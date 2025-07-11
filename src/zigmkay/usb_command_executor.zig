@@ -19,39 +19,39 @@ pub const UsbCommandExecutor = struct {
 
         // TODO: extract this logic into seperate class and unit test it
         // TODO: support for modifiers: both stand-alone presses and keycaps with modifiers activated
-        if (output_command_queue.Count() > 0) {
-            while (output_command_queue.Count() > 0) {
-                const command = output_command_queue.dequeue() catch unreachable;
-                switch (command) {
-                    .KeyCodePress => |keycode| {
-                        var idx: usize = 1;
-                        while (idx < data.len and data[idx] != 0) {
-                            idx += 1;
+        while (output_command_queue.Count() > 0) {
+            const command = output_command_queue.dequeue() catch unreachable;
+            switch (command) {
+                .KeyCodePress => |keycode| {
+                    var idx: usize = 1;
+                    while (idx < data.len) {
+                        if (data[idx] == keycode) {
+                            break; // already registered as pressed
                         }
-                        if (idx < data.len) {
-                            data[idx] = keycode;
+                        if (data[idx] == 0) {
+                            data[idx] = keycode; // found empty spot
+                            break;
                         }
-                    },
-                    .KeyCodeRelease => |keycode| {
-                        var idx: usize = 1;
-                        while (idx < data.len and data[idx] != keycode) {
-                            idx += 1;
-                        }
-                        if (idx < data.len) {
+
+                        idx += 1;
+                    }
+                },
+                .KeyCodeRelease => |keycode| {
+                    var idx: usize = 1;
+                    while (idx < data.len) {
+                        if (data[idx] == keycode) {
                             data[idx] = 0;
                         }
-                    },
-                    .ModifiersChanged => |modifiers| {
-                        usb_if.send_keyboard_report(usb_dev, &data);
-                        time.sleep_ms(50);
-                        data[0] = modifiers.toByte();
-                        usb_if.send_keyboard_report(usb_dev, &data);
-                        time.sleep_ms(50);
-                    },
-                }
+
+                        idx += 1;
+                    }
+                },
+                .ModifiersChanged => |modifiers| {
+                    data[0] = modifiers.toByte();
+                },
             }
-            usb_if.send_keyboard_report(usb_dev, &data);
         }
+        usb_if.send_keyboard_report(usb_dev, &data);
     }
     fn send_and_sleep() void {}
 };
