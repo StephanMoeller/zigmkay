@@ -48,12 +48,12 @@ test "tapping - single key release" {
 }
 
 test "tapping - multiple simple tap events" {
-    const KeyCount = 4;
-    const LayerCount = 1;
-
     // define some input events
     var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var actions_queue = core.OutputCommandQueue.Create();
+
+    const base_layer = [_]core.KeyDef{ A, B, C, D };
+    const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
     try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 });
     try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 });
@@ -61,10 +61,9 @@ test "tapping - multiple simple tap events" {
     try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 });
     try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 });
 
-    const keymap = [LayerCount][KeyCount]core.KeyDef{.{ A, B, C, D }};
     const processor = zigmkay.CreateProcessor();
 
-    try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_state_change_queue, &actions_queue);
+    try processor.Process(base_layer.len, keymap.len, &keymap, &keyboard_state_change_queue, &actions_queue);
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, actions_queue.Count());
@@ -78,7 +77,7 @@ test "tapping - multiple simple tap events" {
     try std.testing.expectEqual(0, keyboard_state_change_queue.Count());
 }
 
-test "tapping - with modifiers" {
+test "tapping - with modifiers - single key press" {
     const KeyCount = 4;
     const LayerCount = 1;
 
@@ -102,6 +101,40 @@ test "tapping - with modifiers" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x04 }, try actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 0x04 }, try actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try actions_queue.dequeue());
+
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, keyboard_state_change_queue.Count());
+}
+
+test "tapping - with modifiers - with other key pressed between press and release" {
+    const KeyCount = 4;
+    const LayerCount = 1;
+
+    // define some input events
+    var keyboard_state_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
+    var actions_queue = core.OutputCommandQueue.Create();
+
+    const shiftedA = core.KeyDef{ .tap_keycode = A.tap_keycode, .tap_modifiers = core.Modifiers{ .left_shift = true } };
+    const normalB = core.KeyDef{ .tap_keycode = B.tap_keycode };
+    const keymap = [LayerCount][KeyCount]core.KeyDef{.{ shiftedA, normalB, C, D }};
+
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 0 }); // Press A + shift
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 1, .key_index = 1 }); // Press B
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 0 }); // Release A + shift
+    try keyboard_state_change_queue.enqueue(.{ .pressed = 0, .key_index = 1 }); // Release B
+
+    const processor = zigmkay.CreateProcessor();
+
+    try processor.Process(KeyCount, LayerCount, &keymap, &keyboard_state_change_queue, &actions_queue);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(6, actions_queue.Count());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, keyboard_state_change_queue.Count());
