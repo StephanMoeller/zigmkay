@@ -14,7 +14,7 @@ const RS = 0x00E5;
 const RA = 0x00E6;
 const RG = 0x00E7;
 
-const Processor = struct {
+pub const Processor = struct {
     var modifiers: core.Modifiers = .{};
     pub fn Process(
         self: Processor,

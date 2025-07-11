@@ -9,9 +9,9 @@ pub fn main() !void {
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     // logic
-    const scanner = zigmkay.CreateScanner();
-    const processor = zigmkay.CreateProcessor();
-    const usb_command_executor = zigmkay.CreateAndInitUsbCommandExecutor();
+    const scanner = zigmkay.scanning.CreateScanner();
+    const processor = zigmkay.processing.CreateProcessor();
+    const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {
         // TODO: where does layer state recide?
