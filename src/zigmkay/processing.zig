@@ -36,22 +36,35 @@ pub const Processor = struct {
             const current_layer_index: usize = 0;
             if (next_event.pressed) {
                 const pressed_key_def = keymap[current_layer_index][next_event.key_index];
-                const uses_modifiers = !pressed_key_def.tap_modifiers.empty();
-                if (uses_modifiers) {
-                    // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
-                    try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers });
-                    try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = pressed_key_def.tap_keycode });
-                    try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
-                } else {
+                if (pressed_key_def.has_tap()) {
+                    const uses_modifiers = pressed_key_def.tap_modifiers != null;
+                    if (uses_modifiers) {
+                        // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
+                        try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers.? });
+                        try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
+                        try output_queue.enqueue(.{ .KeyCodeRelease = pressed_key_def.tap_keycode });
+                        try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+                    } else {
+                        release_map[next_event.key_index] = pressed_key_def;
+                        try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
+                    }
+                }
+                if (pressed_key_def.has_hold()) {
+                    modifiers = modifiers.add(pressed_key_def.hold_modifiers.?);
                     release_map[next_event.key_index] = pressed_key_def;
-                    try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
+                    try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                 }
             } else {
                 const released_key = release_map[next_event.key_index];
                 if (released_key != null) {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.?.tap_keycode });
                     release_map[next_event.key_index] = null;
+                    if (released_key.?.has_tap()) {
+                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.?.tap_keycode });
+                    }
+                    if (released_key.?.has_hold()) {
+                        modifiers = modifiers.remove(released_key.?.hold_modifiers.?);
+                        try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+                    }
                 }
                 // TODO:
                 // key_def should not be read from the layout but be the exact key that was pressed to ensure a layer switch

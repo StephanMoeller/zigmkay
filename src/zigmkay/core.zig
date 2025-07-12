@@ -21,12 +21,15 @@ pub const KeyDef = struct {
         return KeyDef{ .hold_modifiers = modifiers };
     }
 
+    pub fn has_tap(self: KeyDef) bool {
+        return self.tap_keycode != 0;
+    }
+    pub fn has_hold(self: KeyDef) bool {
+        return self.hold_modifiers != null;
+    }
     tap_keycode: u8 = 0,
-    tap_modifiers: Modifiers = .{},
-    tap_layers_permanent: LayerIndex = 0,
-    tap_layers_one_shot: LayerIndex = 0,
-    hold_layer: LayerIndex = 0, // no one shot available at the moment
-    hold_modifiers: Modifiers = .{},
+    tap_modifiers: ?Modifiers = null,
+    hold_modifiers: ?Modifiers = null,
 };
 
 // A key definition that only has a tap functionality
