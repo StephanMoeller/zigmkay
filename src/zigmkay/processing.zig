@@ -31,6 +31,8 @@ pub const Processor = struct {
         // todo: hold-support
         // todo: take layouts into concideration here
         // todo: combo support
+        //
+        // idea: decide tap / hold / undecisive (wait some more)
         while (input.Count() > 0) {
             const next_event = try input.dequeue();
             const current_layer_index: usize = 0;
@@ -50,7 +52,11 @@ pub const Processor = struct {
                     }
                 }
                 if (pressed_key_def.has_hold()) {
-                    modifiers = modifiers.add(pressed_key_def.hold_modifiers.?);
+                    if (pressed_key_def.hold_modifiers != null) {
+                        // Apply the hold modifier(s)
+                        modifiers = modifiers.add(pressed_key_def.hold_modifiers.?);
+                    }
+
                     release_map[next_event.key_index] = pressed_key_def;
                     try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                 }
@@ -62,8 +68,11 @@ pub const Processor = struct {
                         try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.?.tap_keycode });
                     }
                     if (released_key.?.has_hold()) {
-                        modifiers = modifiers.remove(released_key.?.hold_modifiers.?);
-                        try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+                        if (released_key.?.hold_modifiers != null) {
+                            // Cancel the hold modifier(s)
+                            modifiers = modifiers.remove(released_key.?.hold_modifiers.?);
+                            try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+                        }
                     }
                 }
                 // TODO:

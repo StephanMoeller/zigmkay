@@ -20,6 +20,10 @@ pub const KeyDef = struct {
     pub fn HOLD_MOD(modifiers: Modifiers) KeyDef {
         return KeyDef{ .hold_modifiers = modifiers };
     }
+    pub fn MO(layer: LayerIndex) KeyDef {
+        _ = layer;
+        return .{};
+    }
 
     pub fn has_tap(self: KeyDef) bool {
         return self.tap_keycode != 0;

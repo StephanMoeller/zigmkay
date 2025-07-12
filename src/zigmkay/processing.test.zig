@@ -27,7 +27,7 @@ test "tapping - single key press" {
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, o.actions_queue.Count());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
@@ -44,7 +44,7 @@ test "tapping - single key release" {
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
     try std.testing.expectEqual(1, o.actions_queue.Count()); // expect B to be fired as press
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count()); // expect event removed from input_events
 }
 
@@ -63,11 +63,11 @@ test "tapping - multiple simple tap events" {
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, o.actions_queue.Count());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = C.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
@@ -225,15 +225,88 @@ test "hold mod - combined with modified taps - ensure tap mods will be applied t
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-const a = 0x04;
-const b = 0x05;
-const c = 0x06;
-const d = 0x07;
-const e = 0x08;
-const A = core.KeyDef.TAP(a);
-const B = core.KeyDef.TAP(b);
-const C = core.KeyDef.TAP(c);
-const D = core.KeyDef.TAP(d);
-const E = core.KeyDef.TAP(e);
+test "Layers - simple switch" {
+    var o = init_test();
+
+    const mo_key = core.KeyDef.MO(1);
+    const base_layer = [_]core.KeyDef{ A, B, mo_key, D };
+    const other_layer = [_]core.KeyDef{ E, F, C, D };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
+
+    // Tap B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+
+    // Tap A
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    // Hold for layer switch
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+
+    // Tap F
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+
+    // Tap E
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    // Release layer switch again
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key released
+
+    // Tap B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+
+    // Tap A
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // Expect B tapped
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect A
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
+
+    // At this point, layer 1 is expected to be activated
+
+    // Expect F
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = F.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = F.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect E
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = E.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = E.tap_keycode }, try o.actions_queue.dequeue());
+
+    // At this point, layer 1 is expected to be deactivated again
+
+    // Expect B tapped
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect A
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect no more actions
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+}
+
+// todos:
+test "Layers - transparent key defs" {}
+test "Layers - multiple layer switches" {}
+test "Layers - specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release" {}
+
+const A = core.KeyDef.TAP(0x04);
+const B = core.KeyDef.TAP(0x05);
+const C = core.KeyDef.TAP(0x06);
+const D = core.KeyDef.TAP(0x07);
+const E = core.KeyDef.TAP(0x08);
+const F = core.KeyDef.TAP(0x09);
 
 const dummy_time = core.TimeStamp{ .time_us_since_boot = 0 };
