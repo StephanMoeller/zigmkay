@@ -21,8 +21,7 @@ pub const KeyDef = struct {
         return KeyDef{ .hold_modifiers = modifiers };
     }
     pub fn MO(layer: LayerIndex) KeyDef {
-        _ = layer;
-        return .{};
+        return .{ .hold_layer = layer };
     }
 
     pub fn has_tap(self: KeyDef) bool {
@@ -34,6 +33,7 @@ pub const KeyDef = struct {
     tap_keycode: u8 = 0,
     tap_modifiers: ?Modifiers = null,
     hold_modifiers: ?Modifiers = null,
+    hold_layer: ?LayerIndex = null,
 };
 
 // A key definition that only has a tap functionality
