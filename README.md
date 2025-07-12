@@ -1,3 +1,5 @@
+# License
+GPL2: The idea is: use this for whatever you want, but if you do, other must be able to use your customizations as well, hence your forks will be gpl2 as well
 
 # Getting started
 1. Download zig version 14.1
@@ -9,22 +11,22 @@
 - Possibility to hook into "on tap entered", "on tap exited", "on hold entered" and "on hold exited". In qmk you can only hook into "key pressed/released" and then have to handle tap/hold logic yourself but then one cannot use all the standard tapping/holding logic already built into qmk. 
 
 # Tasks
-Scanning
- done  Debounce-support
-(TODO) Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
-Processor
- done Support for mods applied to key presses,
-(TODO) Holds to switch layer
-(TODO) "Tap+hold for layer switch" on same keys
-(TODO) "Tap+hold for modifiers switch" on same keys
-(TODO) Combos
-(TODO) Tri-layer functionality for two layers => 3rd layer
-(TODO) Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
-(TODO) Ensure special-tab case is covered
-(TODO) Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
+## Scanning
+- done  Debounce-support
+-(TODO) Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
+## Processor
+- done Support for mods applied to key presses,
+- (TODO) Holds to switch layer
+- (TODO) "Tap+hold for layer switch" on same keys
+- (TODO) "Tap+hold for modifiers switch" on same keys
+- (TODO) Combos
+- (TODO) Tri-layer functionality for two layers => 3rd layer
+- (TODO) Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
+- (TODO) Ensure special-tab case is covered
+- (TODO) Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
 
-Hardware
-(TODO) Support trrs connections
+## Hardware
+- (TODO) Support trrs connections
 
 # Highligthed features
 - Written in zig.
