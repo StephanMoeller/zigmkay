@@ -10,7 +10,6 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 # TODO
 ## Scanning
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
-
 ## Processor
 - Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
 - One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
@@ -24,6 +23,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 
 ## Hardware
 - Support trrs connections
+
 
 # Highligthed features
 - Written in zig.
