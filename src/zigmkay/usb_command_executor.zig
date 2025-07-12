@@ -71,5 +71,4 @@ pub const UsbCommandExecutor = struct {
         }
         usb_if.send_keyboard_report(usb_dev, &data);
     }
-    fn send_and_sleep() void {}
 };

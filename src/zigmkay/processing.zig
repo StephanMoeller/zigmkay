@@ -36,6 +36,33 @@ pub const Processor = struct {
             const current_layer_index: usize = 0;
             if (next_event.pressed) {
                 const pressed_key_def = keymap[current_layer_index][next_event.key_index];
+                if (pressed_key_def.tap_keycode == 1) {
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 4 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 4 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 5 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 4 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 4 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 5 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 4 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 4 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 5 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 4 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 4 });
+                    try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
+                    try output_queue.enqueue(.{ .KeyCodePress = 5 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
+                    continue;
+                }
                 const uses_modifiers = !pressed_key_def.tap_modifiers.empty();
                 if (uses_modifiers) {
                     try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers });

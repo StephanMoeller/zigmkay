@@ -10,10 +10,11 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     W, R, P, B,             K, L, O, U,
  N2_shifted, A, S, T, G,             M, N, E, I, Y,
     X, C, D,                   H, COMM, DOT,
-          ENTER, ENTER, SPACE, SPACE
+          ENTER, ENTER, MAGIC, SPACE
     },
 };
 
+const MAGIC = FromKey(1);
 const A = FromKey(4);
 const B = FromKey(5);
 const C = FromKey(6);
