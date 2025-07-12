@@ -42,3 +42,22 @@ Low priority: pleasing general use cases that I currently dont use myself:
 - Make the firmware a module that is imported into main to used for an actual keyboard configuration
 - Support for nkro
 - blue tooth - this might not be possible with the design choices taken - but at least it may take some real effort to get working depending on what microzig offers to help
+
+
+
+# Highligthed features
+- Written in zig.
+- Everything is up for editing - you are not hooking into predefined events or defining methods with specific names to allow your logic to run at a specific place.
+- Easy to setup and compile locally (in opposition to qmk where python is now annoying, you must git pull with -recursive flag, you must run a qmk setup command etc). The "etc" is mainly because I personally always feel there are more cases, but I could not come up with any at the time of writing :D 
+- Option to define mods to be applied to a single key tap and also have a tap/hold combination on the same key (not possible in qmk)
+- Option of defining that a given key should be fired without any modifiers (ctrl, shift etc) even though shift or other modifiers are currently being held. 
+- The users code is the top level of orchestration. In qmk you hook into existing land and by magic everything is compiled. The zigmkay way makes it more obvious how the whole code is running and custom IO stuff will be implemented at the top level (the main.zig)
+- Nice 3-legged logic in terms of A:scanning, B:processing, C:send keycodes to the host using usb. Leg A and C are small, oneoffs and needs to be tested by hand. Leg B is the complex part an because queues are used for comminution between these 3, it is possible to test step B in isolation. And there are lots of tests of this part guarding against regression.
+- No compile flags or defines and limited comptime type building - all allowing the IDE to understand what is going on.
+- Readable pin mapping definition
+
+# When not to choose zigmkay
+- zigmkay is not planned to be wireless ever.
+- zigmkay will only support the mcu types that microzig supports.
+- zigmkay does not currently support tap dances - only tap/hold is supported as I don't need tap dances myself. 
+
