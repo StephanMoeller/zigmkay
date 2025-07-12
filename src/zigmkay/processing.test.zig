@@ -161,8 +161,8 @@ test "hold mod - multiple hold mods at the same time" {
     try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press left alt
     try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); // Press C
     try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); // Release C
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left alt
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left shift
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift first (to mix things up)
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -171,7 +171,7 @@ test "hold mod - multiple hold mods at the same time" {
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = C.tap_keycode }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = C.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
