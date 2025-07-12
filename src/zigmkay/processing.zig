@@ -16,20 +16,19 @@ const RG = 0x00E7;
 
 pub const Processor = struct {
     KeyCount: usize = 0,
+    layers: core.LayerActivations = .{},
     var release_map: [28]?core.KeyDef = [_]?core.KeyDef{null} ** 28;
     var modifiers: core.Modifiers = .{};
-    var layers: core.LayerActivations = .{};
     var previous_key: core.KeyDef = .{};
 
     pub fn Process(
-        self: Processor,
+        self: *Processor,
         comptime KeyCount: usize,
         comptime LayerCount: usize,
         keymap: *const [LayerCount][KeyCount]core.KeyDef,
         input: *core.KeyboardStateChangeQueue,
         output_queue: *core.OutputCommandQueue,
     ) !void {
-        _ = self;
         // todo: hold-support
         // todo: take layouts into concideration here
         // todo: combo support
@@ -44,7 +43,7 @@ pub const Processor = struct {
                 var layer_index: usize = @as(usize, LayerCount - 1);
                 while (layer_index > 0) {
                     //            std.log.warn("\ntesting: {}\n", .{layer_index});
-                    if (layers.is_layer_active(layer_index)) {
+                    if (self.layers.is_layer_active(layer_index)) {
                         pressed_key_def = keymap[layer_index][next_event.key_index];
 
                         //              std.log.warn("\nfound: {}\n", .{layer_index});
@@ -73,7 +72,7 @@ pub const Processor = struct {
                         try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     }
                     if (pressed_key_def.hold_layer != null) {
-                        layers.activate(pressed_key_def.hold_layer.?);
+                        self.layers.activate(pressed_key_def.hold_layer.?);
                     }
 
                     release_map[next_event.key_index] = pressed_key_def;
@@ -92,7 +91,7 @@ pub const Processor = struct {
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
                         if (released_key.?.hold_layer != null) {
-                            layers.deactivate(released_key.?.hold_layer.?);
+                            self.layers.deactivate(released_key.?.hold_layer.?);
                         }
                     }
                 }

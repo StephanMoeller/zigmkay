@@ -57,8 +57,9 @@ pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateCha
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
 
 // TODO: this can be optimized to store everything as one u32 field
+
 pub const LayerActivations = struct {
-    layers: [32]bool = [1]bool{false} ** 32,
+    layers: [32]bool = [_]bool{false} ** 32,
 
     pub fn activate(self: *LayerActivations, layer_index: usize) void {
         if (layer_index == 0)
@@ -72,7 +73,7 @@ pub const LayerActivations = struct {
         self.layers[layer_index] = false;
     }
 
-    pub fn is_layer_active(self: LayerActivations, layer_index: usize) bool {
+    pub fn is_layer_active(self: *const LayerActivations, layer_index: usize) bool {
         if (layer_index == 0)
             return true;
         return self.layers[layer_index];
