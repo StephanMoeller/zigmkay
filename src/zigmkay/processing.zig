@@ -15,6 +15,8 @@ const RA = 0x00E6;
 const RG = 0x00E7;
 
 pub const Processor = struct {
+    KeyCount: usize = 0,
+    var release_map: [28]?core.KeyDef = [_]?core.KeyDef{null} ** 28;
     var modifiers: core.Modifiers = .{};
     var previous_key: core.KeyDef = .{};
     pub fn Process(
@@ -32,24 +34,28 @@ pub const Processor = struct {
         while (input.Count() > 0) {
             const next_event = try input.dequeue();
             const current_layer_index: usize = 0;
-            const key_def = keymap[current_layer_index][next_event.key_index];
-            const uses_modifiers = !key_def.tap_modifiers.empty();
             if (next_event.pressed) {
+                const pressed_key_def = keymap[current_layer_index][next_event.key_index];
+                const uses_modifiers = !pressed_key_def.tap_modifiers.empty();
                 if (uses_modifiers) {
-                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = key_def.tap_modifiers });
+                    try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers });
+                } else {
+                    release_map[next_event.key_index] = pressed_key_def;
                 }
-                try output_queue.enqueue(core.OutputCommand{ .KeyCodePress = key_def.tap_keycode });
+                try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
                 if (uses_modifiers) {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.tap_keycode });
-                    try output_queue.enqueue(core.OutputCommand{ .ModifiersChanged = modifiers });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = pressed_key_def.tap_keycode });
+                    try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                 }
             } else {
+                const released_key = release_map[next_event.key_index];
+                if (released_key != null) {
+                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.?.tap_keycode });
+                    release_map[next_event.key_index] = null;
+                }
                 // TODO:
                 // key_def should not be read from the layout but be the exact key that was pressed to ensure a layer switch
                 // between press and release will still trigger releasing of the original key and not the one on the new layer
-                if (!uses_modifiers) {
-                    try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = key_def.tap_keycode });
-                }
             }
         }
     }
