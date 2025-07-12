@@ -45,7 +45,7 @@ pub const OutputCommand = union(enum) {
 
 const HidKeyCode = u8;
 const KeyIndex = usize;
-const LayerIndex = usize;
+const LayerIndex = u5;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const TimeStamp = struct {
     time_us_since_boot: u64,
@@ -56,6 +56,29 @@ pub const TimeStamp = struct {
 pub const TimeSinceBoot = u64;
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
+
+// TODO: this can be optimized to store everything as one u32 field
+pub const LayerLogic = struct {
+    layers: [32]bool = [1]bool{false} ** 32,
+
+    pub fn Activate(self: *LayerLogic, layer_index: LayerIndex) void {
+        if (layer_index == 0)
+            return;
+        self.layers[layer_index] = true;
+    }
+
+    pub fn Deactivate(self: *LayerLogic, layer_index: LayerIndex) void {
+        if (layer_index == 0)
+            return;
+        self.layers[layer_index] = false;
+    }
+
+    pub fn IsLayerActive(self: LayerLogic, layer_index: LayerIndex) bool {
+        if (layer_index == 0)
+            return true;
+        return self.layers[layer_index];
+    }
+};
 pub const Modifiers = packed struct {
     left_ctrl: bool = false,
     left_shift: bool = false,

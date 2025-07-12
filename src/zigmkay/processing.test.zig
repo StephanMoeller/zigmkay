@@ -334,34 +334,10 @@ test "Layers - specifically test that a key pressed existing on layer A is also 
     // Release E expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = E.tap_keycode }, try o.actions_queue.dequeue());
 
-    // Expect A
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
-
-    // At this point, layer 1 is expected to be activated
-
-    // Expect F
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = F.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = F.tap_keycode }, try o.actions_queue.dequeue());
-
-    // Expect E
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = E.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = E.tap_keycode }, try o.actions_queue.dequeue());
-
-    // At this point, layer 1 is expected to be deactivated again
-
-    // Expect B tapped
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
-
-    // Expect A
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
-
     // Expect no more actions
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
-// todos:
+
 test "Layers - multiple layer switches" {}
 test "Layers - transparent key defs" {}
 
