@@ -21,7 +21,7 @@ test "tapping - single key press" {
     const base_layer = [_]core.KeyDef{ A, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -39,7 +39,7 @@ test "tapping - single key release" {
     const base_layer = [_]core.KeyDef{ A, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -53,11 +53,11 @@ test "tapping - multiple simple tap events" {
     const base_layer = [_]core.KeyDef{ A, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 2 });
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -81,8 +81,8 @@ test "tapping - with modifiers - single key press" {
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
     // define some input events
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -105,10 +105,10 @@ test "tapping - with modifiers - with other key pressed between press and releas
     const base_layer = [_]core.KeyDef{ shiftedA, normalB, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 0 }); // Press A + shift
-    try o.keyboard_change_queue.enqueue(.{ .pressed = true, .key_index = 1 }); // Press B
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 0 }); // Release A + shift
-    try o.keyboard_change_queue.enqueue(.{ .pressed = false, .key_index = 1 }); // Release B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press A + shift
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release A + shift
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release B
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
@@ -120,6 +120,30 @@ test "tapping - with modifiers - with other key pressed between press and releas
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+}
+
+test "hold mod - simple example" {
+    var o = init_test();
+
+    const hold_left_shift = core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
+    const base_layer = [_]core.KeyDef{ hold_left_shift, B, C, D };
+    const keymap = [_][base_layer.len]core.KeyDef{base_layer};
+
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left shift
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());

@@ -17,6 +17,10 @@ pub const KeyDef = struct {
         return KeyDef{ .tap_keycode = keycode, .tap_modifiers = modifiers };
     }
 
+    pub fn HOLD_MOD(modifiers: Modifiers) KeyDef {
+        return KeyDef{ .hold_modifiers = modifiers };
+    }
+
     tap_keycode: u8 = 0,
     tap_modifiers: Modifiers = .{},
     tap_layers_permanent: LayerIndex = 0,
