@@ -1,4 +1,10 @@
 
+# Getting started
+1. Download zig version 14.1
+2. Clone this repo
+3. Define you own files (todo: write in details what needs to be done)
+4. Compile using ./build.zig and run any tests if you want using ./run_tests.sh
+
 # Why a new firmware? Current missing in qmk/zmk:
 - Possibility to hook into "on tap entered", "on tap exited", "on hold entered" and "on hold exited". In qmk you can only hook into "key pressed/released" and then have to handle tap/hold logic yourself but then one cannot use all the standard tapping/holding logic already built into qmk. 
 
