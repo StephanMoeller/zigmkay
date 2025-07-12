@@ -18,7 +18,7 @@ pub const UsbCommandExecutor = struct {
     var prev_action_time: microzig.drivers.time.Absolute = undefined;
     var first_call = true;
     var next_tick_delay: u64 = 0;
-    pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
+    pub fn HouseKeepAndProcessCommands(self: *const UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         if (first_call) {
             first_call = false;

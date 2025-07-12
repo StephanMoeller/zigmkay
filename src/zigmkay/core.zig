@@ -24,10 +24,10 @@ pub const KeyDef = struct {
         return .{ .hold_layer = layer };
     }
 
-    pub fn has_tap(self: KeyDef) bool {
+    pub fn has_tap(self: *const KeyDef) bool {
         return self.tap_keycode != 0;
     }
-    pub fn has_hold(self: KeyDef) bool {
+    pub fn has_hold(self: *const KeyDef) bool {
         return self.hold_modifiers != null or self.hold_layer != null;
     }
     tap_keycode: u8 = 0,
@@ -46,12 +46,6 @@ pub const OutputCommand = union(enum) {
 pub const KeyIndex = usize;
 pub const LayerIndex = usize;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
-pub const TimeStamp = struct {
-    time_us_since_boot: u64,
-    pub fn as_ns(self: TimeStamp) u64 {
-        return self.time_us_since_boot / 1000;
-    }
-};
 pub const TimeSinceBoot = u64;
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
@@ -89,20 +83,16 @@ pub const Modifiers = packed struct {
     right_alt: bool = false,
     right_gui: bool = false,
 
-    /// Convert the struct to a byte (u8) representation.
-    pub fn empty(self: Modifiers) bool {
-        return self.toByte() == 0;
-    }
     pub fn toByte(self: Modifiers) u8 {
         return @bitCast(self);
     }
-    pub fn add(self: Modifiers, other: Modifiers) Modifiers {
+    pub fn add(self: *const Modifiers, other: Modifiers) Modifiers {
         const self_bytes = self.toByte();
         const other_bytes = other.toByte();
         return Modifiers.fromByte(self_bytes | other_bytes);
     }
 
-    pub fn remove(self: Modifiers, other: Modifiers) Modifiers {
+    pub fn remove(self: *const Modifiers, other: Modifiers) Modifiers {
         const self_bytes = self.toByte();
         const other_bytes = other.toByte();
         return Modifiers.fromByte(self_bytes & ~other_bytes);
