@@ -9,20 +9,21 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 
 # TODO
 ## Scanning
-- (TODO) Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
+- Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
+
 ## Processor
-- (TODO) Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
-- (TODO) One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
-- (TODO) "Tap+hold for layer switch" on same keys
-- (TODO) "Tap+hold for modifiers switch" on same keys
-- (TODO) Combos
-- (TODO) Tri-layer functionality for two layers => 3rd layer
-- (TODO) Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
-- (TODO) Ensure special-tab case is covered
-- (TODO) Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
+- Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
+- One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
+- "Tap+hold for layer switch" on same keys
+- "Tap+hold for modifiers switch" on same keys
+- Combos
+- Tri-layer functionality for two layers => 3rd layer
+- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
+- Ensure special-tab case is covered
+- Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
 
 ## Hardware
-- (TODO) Support trrs connections
+- Support trrs connections
 
 # Highligthed features
 - Written in zig.
