@@ -297,10 +297,73 @@ test "Layers - simple switch" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
+test "Layers - specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release" {
+    var o = init_test();
+
+    const mo_key = core.KeyDef.MO(1);
+    const base_layer = [_]core.KeyDef{ A, B, mo_key, D };
+    const other_layer = [_]core.KeyDef{ E, F, C, D };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
+
+    // Tap B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+
+    // Hold for layer switch
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+
+    // Tap E
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+
+    // Release B
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+
+    // release layer switch
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
+
+    // Release E
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // Press B expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    // Press E expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = E.tap_keycode }, try o.actions_queue.dequeue());
+    // Release B expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+    // Release E expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = E.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect A
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
+
+    // At this point, layer 1 is expected to be activated
+
+    // Expect F
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = F.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = F.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect E
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = E.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = E.tap_keycode }, try o.actions_queue.dequeue());
+
+    // At this point, layer 1 is expected to be deactivated again
+
+    // Expect B tapped
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = B.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = B.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect A
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = A.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = A.tap_keycode }, try o.actions_queue.dequeue());
+
+    // Expect no more actions
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+}
 // todos:
-test "Layers - transparent key defs" {}
 test "Layers - multiple layer switches" {}
-test "Layers - specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release" {}
+test "Layers - transparent key defs" {}
 
 const A = core.KeyDef.TAP(0x04);
 const B = core.KeyDef.TAP(0x05);
