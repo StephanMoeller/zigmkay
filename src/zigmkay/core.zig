@@ -28,7 +28,7 @@ pub const KeyDef = struct {
         return self.tap_keycode != 0;
     }
     pub fn has_hold(self: KeyDef) bool {
-        return self.hold_modifiers != null;
+        return self.hold_modifiers != null or self.hold_layer != null;
     }
     tap_keycode: u8 = 0,
     tap_modifiers: ?Modifiers = null,
@@ -43,9 +43,8 @@ pub const OutputCommand = union(enum) {
     ModifiersChanged: Modifiers,
 };
 
-const HidKeyCode = u8;
-const KeyIndex = usize;
-const LayerIndex = u5;
+pub const KeyIndex = usize;
+pub const LayerIndex = usize;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const TimeStamp = struct {
     time_us_since_boot: u64,
@@ -58,22 +57,22 @@ pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateCha
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
 
 // TODO: this can be optimized to store everything as one u32 field
-pub const LayerLogic = struct {
+pub const LayerActivations = struct {
     layers: [32]bool = [1]bool{false} ** 32,
 
-    pub fn Activate(self: *LayerLogic, layer_index: LayerIndex) void {
+    pub fn activate(self: *LayerActivations, layer_index: usize) void {
         if (layer_index == 0)
             return;
         self.layers[layer_index] = true;
     }
 
-    pub fn Deactivate(self: *LayerLogic, layer_index: LayerIndex) void {
+    pub fn deactivate(self: *LayerActivations, layer_index: usize) void {
         if (layer_index == 0)
             return;
         self.layers[layer_index] = false;
     }
 
-    pub fn IsLayerActive(self: LayerLogic, layer_index: LayerIndex) bool {
+    pub fn is_layer_active(self: LayerActivations, layer_index: usize) bool {
         if (layer_index == 0)
             return true;
         return self.layers[layer_index];

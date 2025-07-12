@@ -18,7 +18,9 @@ pub const Processor = struct {
     KeyCount: usize = 0,
     var release_map: [28]?core.KeyDef = [_]?core.KeyDef{null} ** 28;
     var modifiers: core.Modifiers = .{};
+    var layers: core.LayerActivations = .{};
     var previous_key: core.KeyDef = .{};
+
     pub fn Process(
         self: Processor,
         comptime KeyCount: usize,
@@ -35,9 +37,22 @@ pub const Processor = struct {
         // idea: decide tap / hold / undecisive (wait some more)
         while (input.Count() > 0) {
             const next_event = try input.dequeue();
-            const current_layer_index: usize = 0;
             if (next_event.pressed) {
-                const pressed_key_def = keymap[current_layer_index][next_event.key_index];
+
+                // Find key on active position
+                var pressed_key_def = keymap[0][next_event.key_index];
+                var layer_index: usize = @as(usize, LayerCount - 1);
+                while (layer_index > 0) {
+                    //            std.log.warn("\ntesting: {}\n", .{layer_index});
+                    if (layers.is_layer_active(layer_index)) {
+                        pressed_key_def = keymap[layer_index][next_event.key_index];
+
+                        //              std.log.warn("\nfound: {}\n", .{layer_index});
+                        break;
+                    }
+                    layer_index -= 1;
+                }
+
                 if (pressed_key_def.has_tap()) {
                     const uses_modifiers = pressed_key_def.tap_modifiers != null;
                     if (uses_modifiers) {
@@ -55,13 +70,13 @@ pub const Processor = struct {
                     if (pressed_key_def.hold_modifiers != null) {
                         // Apply the hold modifier(s)
                         modifiers = modifiers.add(pressed_key_def.hold_modifiers.?);
+                        try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     }
                     if (pressed_key_def.hold_layer != null) {
-                        // TODO
+                        layers.activate(pressed_key_def.hold_layer.?);
                     }
 
                     release_map[next_event.key_index] = pressed_key_def;
-                    try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                 }
             } else {
                 const released_key = release_map[next_event.key_index];
@@ -77,7 +92,7 @@ pub const Processor = struct {
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
                         if (released_key.?.hold_layer != null) {
-                            // TODO
+                            layers.deactivate(released_key.?.hold_layer.?);
                         }
                     }
                 }

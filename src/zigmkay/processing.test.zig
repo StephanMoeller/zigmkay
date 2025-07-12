@@ -224,8 +224,26 @@ test "hold mod - combined with modified taps - ensure tap mods will be applied t
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
-
 test "Layers - simple switch" {
+    var o = init_test();
+
+    const mo_key = core.KeyDef.MO(1);
+    const base_layer = [_]core.KeyDef{ A, B, mo_key, D };
+    const other_layer = [_]core.KeyDef{ E, F, C, D };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
+
+    // switch layer
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    // tap
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = F.tap_keycode }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = F.tap_keycode }, try o.actions_queue.dequeue());
+}
+test "Layers - complex switch" {
     var o = init_test();
 
     const mo_key = core.KeyDef.MO(1);

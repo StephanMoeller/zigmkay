@@ -18,25 +18,25 @@ test "Modifiers.remove" {
 }
 
 test "LayerLogic" {
-    var layers = core.LayerLogic{};
-    try std.testing.expectEqual(true, layers.IsLayerActive(0)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(1)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(6)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(4)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(7)); // base is always active
+    var layers = core.LayerActivations{};
+    try std.testing.expectEqual(true, layers.is_layer_active(0)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(1)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(6)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(4)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(7)); // base is always active
 
-    layers.Activate(6);
+    layers.activate(6);
 
-    layers.Activate(4);
-    layers.Activate(4);
+    layers.activate(4);
+    layers.activate(4);
 
-    layers.Activate(7);
-    layers.Activate(7);
-    layers.Deactivate(7);
+    layers.activate(7);
+    layers.activate(7);
+    layers.deactivate(7);
 
-    try std.testing.expectEqual(true, layers.IsLayerActive(0)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(1)); // base is always active
-    try std.testing.expectEqual(true, layers.IsLayerActive(6)); // base is always active
-    try std.testing.expectEqual(true, layers.IsLayerActive(4)); // base is always active
-    try std.testing.expectEqual(false, layers.IsLayerActive(7)); // base is always active
+    try std.testing.expectEqual(true, layers.is_layer_active(0)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(1)); // base is always active
+    try std.testing.expectEqual(true, layers.is_layer_active(6)); // base is always active
+    try std.testing.expectEqual(true, layers.is_layer_active(4)); // base is always active
+    try std.testing.expectEqual(false, layers.is_layer_active(7)); // base is always active
 }
