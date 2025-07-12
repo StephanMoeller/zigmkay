@@ -66,10 +66,20 @@ pub const Modifiers = packed struct {
     pub fn toByte(self: Modifiers) u8 {
         return @bitCast(self);
     }
+    pub fn add(self: Modifiers, other: Modifiers) Modifiers {
+        const self_bytes = self.toByte();
+        const other_bytes = other.toByte();
+        return Modifiers.fromByte(self_bytes | other_bytes);
+    }
 
-    //pub fn fromByte(byte_val: u8) Modifiers {
-    //    return @bitCast(byte_val);
-    //}
+    pub fn remove(self: Modifiers, other: Modifiers) Modifiers {
+        const self_bytes = self.toByte();
+        const other_bytes = other.toByte();
+        return Modifiers.fromByte(self_bytes & ~other_bytes);
+    }
+    pub fn fromByte(byte_val: u8) Modifiers {
+        return @bitCast(byte_val);
+    }
 };
 pub const HID_ModifierMasks = enum(u8) {
     left_control = 0x01,
