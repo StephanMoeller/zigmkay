@@ -16,6 +16,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 -(TODO) Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 ## Processor
 - done Support for mods applied to key presses,
+- (TODO) Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
 - (TODO) Holds to switch layer
 - (TODO) "Tap+hold for layer switch" on same keys
 - (TODO) "Tap+hold for modifiers switch" on same keys
