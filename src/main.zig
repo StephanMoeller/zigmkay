@@ -14,6 +14,7 @@ pub fn main() !void {
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {
+        // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
         // TODO: where does layer state recide?
         // TODO: where does keyboard hid key state recide?
 
