@@ -43,8 +43,8 @@ pub const TimeStamp = struct {
         return self.time_us_since_boot / 1000;
     }
 };
-pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 100);
-pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 100);
+pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
+pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
 pub const Modifiers = packed struct {
     left_ctrl: bool = false,
     left_shift: bool = false,

@@ -1,5 +1,6 @@
 const std = @import("std");
 const q = @import("generic_queue.zig");
+
 test "queue" {
     var queue = q.GenericQueue(i32, 10).Create();
     try std.testing.expectEqual(0, queue.Count());
@@ -71,4 +72,20 @@ test "dequeue error" {
 
     try queue.enqueue(5);
     try std.testing.expectEqual(5, queue.dequeue());
+}
+
+test "queue ring buffer testing" {
+    var queue = q.GenericQueue(u32, 5).Create();
+    var idx: u32 = 0;
+    while (idx < 10) {
+        queue.enqueue(idx) catch {};
+        idx += 1;
+    }
+
+    try std.testing.expectEqual(0, try queue.dequeue());
+    try std.testing.expectEqual(1, try queue.dequeue());
+    try std.testing.expectEqual(2, try queue.dequeue());
+    try std.testing.expectEqual(3, try queue.dequeue());
+    try std.testing.expectEqual(4, try queue.dequeue());
+    try std.testing.expectEqual(0, queue.Count());
 }
