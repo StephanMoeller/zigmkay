@@ -20,6 +20,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
 - Ensure special-tab case is covered
 - Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
+- Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 
 ## Hardware
 - Support trrs connections

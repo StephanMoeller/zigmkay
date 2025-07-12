@@ -78,9 +78,8 @@ pub const Processor = struct {
                     release_map[next_event.key_index] = pressed_key_def;
                 }
             } else {
-                const released_key_or_null = release_map[next_event.key_index];
-                if (released_key_or_null != null) { // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
-                    const released_key = released_key_or_null.?;
+                // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
+                if (release_map[next_event.key_index]) |released_key| {
                     release_map[next_event.key_index] = null;
                     if (released_key.has_tap()) {
                         try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.tap_keycode });

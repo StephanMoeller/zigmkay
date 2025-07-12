@@ -22,11 +22,6 @@ pub fn main() !void {
         try scanner.DetectKeyboardChanges(&keyboard_change_queue);
 
         // Decide actions
-        // TODO: Add all logic needed for own keyboard here
-        //      layer shifting - on hold, on tap,
-        //      custom Autofire per key
-        //      Permissive hold (A press, B press, B release => always concider A as held (not tapped) - even withing tapping term)
-        //      Retrotapping (A press, tapping term expire, A released) => A hold triggers, A release triggers, A tap triggers
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue);
 
         // Execute actions
