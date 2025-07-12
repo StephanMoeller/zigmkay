@@ -16,18 +16,14 @@ pub fn main() !void {
     while (true) {
         // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
         // TODO: where does layer state recide?
-        // TODO: where does keyboard hid key state recide?
 
         // Register input
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        // TODO: Add rebounce logic to scanner
         try scanner.DetectKeyboardChanges(&keyboard_change_queue);
 
         // Decide actions
         // TODO: Add all logic needed for own keyboard here
-        //      modded key taps
         //      layer shifting - on hold, on tap,
-        //      mods - on hold, on tap
         //      custom Autofire per key
         //      Permissive hold (A press, B press, B release => always concider A as held (not tapped) - even withing tapping term)
         //      Retrotapping (A press, tapping term expire, A released) => A hold triggers, A release triggers, A tap triggers

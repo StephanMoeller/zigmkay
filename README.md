@@ -18,6 +18,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - done Support for mods applied to key presses,
 - (TODO) Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
 - (TODO) Holds to switch layer
+- (TODO) One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - (TODO) "Tap+hold for layer switch" on same keys
 - (TODO) "Tap+hold for modifiers switch" on same keys
 - (TODO) Combos
