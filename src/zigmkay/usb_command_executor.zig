@@ -1,6 +1,8 @@
 const std = @import("std");
 const core = @import("core.zig");
+const microzig = @import("microzig");
 const rp2xxx = @import("microzig").hal;
+
 const usb_if = @import("usb_if.zig");
 const usb_dev = rp2xxx.usb.Usb(.{});
 const time = rp2xxx.time;
@@ -13,8 +15,14 @@ pub fn CreateAndInitUsbCommandExecutor() UsbCommandExecutor {
 
 pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    var prev_action_time: microzig.drivers.time.Absolute = undefined;
+    var first_call = true;
     pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
+        if (first_call) {
+            first_call = false;
+            prev_action_time = time.get_time_since_boot();
+        }
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
 
         // TODO: extract this logic into seperate class and unit test it
@@ -23,7 +31,13 @@ pub const UsbCommandExecutor = struct {
         //
         // This is an 'if' and not a 'while loop', ensuring not to delay too much before scanning the matrix again by only prossessing one item in the output queue per cycle.
         // Highest priority is to capture as many changes as possible in the matrix. also if this means slower execution of these
-        if (output_command_queue.Count() > 0) {
+
+        // This waiting ensures, that there will be no more usb updates that per x time, but the send_keyboard_report will be called every time anyway to ensure data keeps being sent to the host
+        const current_time = time.get_time_since_boot();
+        const diff = current_time.diff(prev_action_time);
+        const TAP_CODE_DELAY_us = 25000;
+        if (diff.to_us() > TAP_CODE_DELAY_us and output_command_queue.Count() > 0) {
+            prev_action_time = current_time;
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
                 .KeyCodePress => |keycode| {
@@ -52,10 +66,8 @@ pub const UsbCommandExecutor = struct {
                 },
                 .ModifiersChanged => |modifiers| {
                     data[0] = modifiers.toByte();
-                    time.sleep_ms(5);
                 },
             }
-            time.sleep_ms(5);
         }
         usb_if.send_keyboard_report(usb_dev, &data);
     }
