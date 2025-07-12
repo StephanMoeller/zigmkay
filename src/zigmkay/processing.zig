@@ -78,20 +78,21 @@ pub const Processor = struct {
                     release_map[next_event.key_index] = pressed_key_def;
                 }
             } else {
-                const released_key = release_map[next_event.key_index];
-                if (released_key != null) { // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
+                const released_key_or_null = release_map[next_event.key_index];
+                if (released_key_or_null != null) { // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
+                    const released_key = released_key_or_null.?;
                     release_map[next_event.key_index] = null;
-                    if (released_key.?.has_tap()) {
-                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.?.tap_keycode });
+                    if (released_key.has_tap()) {
+                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.tap_keycode });
                     }
-                    if (released_key.?.has_hold()) {
-                        if (released_key.?.hold_modifiers != null) {
+                    if (released_key.has_hold()) {
+                        if (released_key.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
-                            modifiers = modifiers.remove(released_key.?.hold_modifiers.?);
+                            modifiers = modifiers.remove(released_key.hold_modifiers.?);
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
-                        if (released_key.?.hold_layer != null) {
-                            self.layers.deactivate(released_key.?.hold_layer.?);
+                        if (released_key.hold_layer != null) {
+                            self.layers.deactivate(released_key.hold_layer.?);
                         }
                     }
                 }

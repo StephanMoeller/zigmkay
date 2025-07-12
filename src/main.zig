@@ -30,7 +30,6 @@ pub fn main() !void {
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue);
 
         // Execute actions
-        // TODO: Fix modifiers so that eg shift works when held down
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
     }
 }
