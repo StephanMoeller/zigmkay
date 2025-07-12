@@ -7,14 +7,10 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 3. Define you own files (todo: write in details what needs to be done)
 4. Compile using ./build.zig and run any tests if you want using ./run_tests.sh
 
-# Why a new firmware? Current missing in qmk/zmk:
-- Possibility to hook into "on tap entered", "on tap exited", "on hold entered" and "on hold exited". In qmk you can only hook into "key pressed/released" and then have to handle tap/hold logic yourself but then one cannot use all the standard tapping/holding logic already built into qmk. 
-
-# Tasks
+# TODO
 ## Scanning
 - (TODO) Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 ## Processor
-- done Support for mods applied to key presses,
 - (TODO) Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
 - (TODO) One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - (TODO) "Tap+hold for layer switch" on same keys
