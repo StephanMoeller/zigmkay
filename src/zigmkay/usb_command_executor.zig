@@ -17,6 +17,7 @@ pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     var prev_action_time: microzig.drivers.time.Absolute = undefined;
     var first_call = true;
+    var minimum_delay: u64 = 0;
     pub fn HouseKeepAndProcessCommands(self: UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         if (first_call) {
@@ -35,12 +36,13 @@ pub const UsbCommandExecutor = struct {
         // This waiting ensures, that there will be no more usb updates that per x time, but the send_keyboard_report will be called every time anyway to ensure data keeps being sent to the host
         const current_time = time.get_time_since_boot();
         const diff = current_time.diff(prev_action_time);
-        const TAP_CODE_DELAY_us = 25000;
-        if (diff.to_us() > TAP_CODE_DELAY_us and output_command_queue.Count() > 0) {
+
+        if (diff.to_us() > minimum_delay and output_command_queue.Count() > 0) {
             prev_action_time = current_time;
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
                 .KeyCodePress => |keycode| {
+                    minimum_delay = 20000;
                     var idx: usize = 1;
                     while (idx < data.len) {
                         if (data[idx] == keycode) {
@@ -55,6 +57,7 @@ pub const UsbCommandExecutor = struct {
                     }
                 },
                 .KeyCodeRelease => |keycode| {
+                    minimum_delay = 1000;
                     var idx: usize = 1;
                     while (idx < data.len) {
                         if (data[idx] == keycode) {
@@ -65,10 +68,12 @@ pub const UsbCommandExecutor = struct {
                     }
                 },
                 .ModifiersChanged => |modifiers| {
+                    minimum_delay = 20000;
                     data[0] = modifiers.toByte();
                 },
             }
         }
+
         usb_if.send_keyboard_report(usb_dev, &data);
     }
 };

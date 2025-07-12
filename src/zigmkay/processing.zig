@@ -61,6 +61,8 @@ pub const Processor = struct {
                     try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
                     try output_queue.enqueue(.{ .KeyCodePress = 5 });
                     try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
+                    try output_queue.enqueue(.{ .KeyCodePress = 0x0028 });
+                    try output_queue.enqueue(.{ .KeyCodeRelease = 0x0028 });
                     continue;
                 }
                 const uses_modifiers = !pressed_key_def.tap_modifiers.empty();
