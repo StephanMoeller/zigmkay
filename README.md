@@ -1,5 +1,5 @@
 # License
-GPL2: The idea is: use this for whatever you want, but if you do, other must be able to use your customizations as well, hence your forks will be gpl2 as well
+GPL2: Use this for whatever you want, but if you do, others must be able to use your customizations as well, hence your forks will be gpl2 as well.
 
 # Getting started
 1. Download zig version 14.1
