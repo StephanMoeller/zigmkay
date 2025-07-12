@@ -198,8 +198,8 @@ test "hold mod - combined with modified taps - ensure tap mods will be applied t
     try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 4 }); // Press E
     try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 4 }); // Release E
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left alt
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left shift
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift
 
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
