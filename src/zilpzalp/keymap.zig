@@ -8,12 +8,17 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
     W, R, P, B,             K, L, O, U,
- N2_shifted, A, S, T, G,             M, N, E, I, Y,
+ left_shift, lower_case_a, S, T, G,             M, N, E, I, tuborg_start,
     X, C, D,                   H, COMM, DOT,
           ENTER, ENTER, MAGIC, SPACE
     },
 };
 
+const lower_case_a = core.KeyDef{
+    .tap_keycode = A.tap_keycode,
+    .tap_modifiers = .{}
+};
+const left_shift = HoldMod(.{.left_shift = true });
 const MAGIC = FromKey(1);
 const A = FromKey(4);
 const B = FromKey(5);
@@ -67,9 +72,9 @@ const N8 = FromKey(0x0025);
 const N9 = FromKey(0x0026);
 const N0 = FromKey(0x0027);
 
-const N2_shifted = core.KeyDef{
-    .tap_keycode = N2.tap_keycode,
-    .tap_modifiers = .{.left_shift = true}
+const tuborg_start = core.KeyDef{
+    .tap_keycode = N7.tap_keycode,
+    .tap_modifiers = .{.right_alt = true}
 };
 
 const Ae = FromKey(0x15);
@@ -78,4 +83,7 @@ const Aa = FromKey(0x15);
 
 fn FromKey(keycode: u8) core.KeyDef {
     return core.KeyDef.TAP(keycode);
+}
+fn HoldMod(mod: core.Modifiers) core.KeyDef {
+    return core.KeyDef.HOLD_MOD(mod);
 }
