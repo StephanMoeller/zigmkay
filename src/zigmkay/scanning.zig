@@ -2,12 +2,12 @@ const std = @import("std");
 const core = @import("core.zig");
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
-
 const time = rp2xxx.time;
+
 // PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
-pub fn CreateScanner() Scanner {
+pub fn CreateScanner(settings: ScannerSettings) Scanner {
     pin_config.apply();
-    return Scanner{};
+    return Scanner{ .debounce_us = settings.debounce_ms * 1000 };
 }
 
 // PIN CONFIGURATION
@@ -41,12 +41,16 @@ const pinsToKeysMapping = [_][2]rp2xxx.gpio.Pin{
                                            .{p.c1,p.r3},.{p.c3,p.r3},      .{p.c2,p.r3},.{p.c0,p.r3}
 };
 
+pub const ScannerSettings = struct{
+    debounce_ms: u64,
+};
+
 // zig fmt: on
 var current_states: [pinsToKeysMapping.len]bool = [1]bool{false} ** (pinsToKeysMapping.len);
-
+var current_states_last_changed: [pinsToKeysMapping.len]u64 = [1]u64{0} ** (pinsToKeysMapping.len);
 pub const Scanner = struct {
+    debounce_us: u64,
     pub fn DetectKeyboardChanges(self: Scanner, output_queue: *core.KeyboardStateChangeQueue) !void {
-        _ = self;
         // if
         for (pinsToKeysMapping, 0..) |mapping, key_index| {
             // todo: dont wait if previous col was the same as this one
@@ -57,11 +61,19 @@ pub const Scanner = struct {
             const read_value = row.read();
             const pressed = read_value == 1;
             if (pressed != current_states[key_index]) {
-                current_states[key_index] = pressed;
-                try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index });
-                p.led_red.put(read_value);
-                p.led_green.put(1 - read_value);
-                p.led_blue.put(1);
+                // DEBOUNCE HANDLING
+                // This state has changed. If this happened last time very recently, this could be a debounce.
+                // Then let it be for now. In a furute tick this will be picked up and handled correctly if it is still at the current state by then.
+                const last_changed_time = current_states_last_changed[key_index];
+                const now = time.get_time_since_boot().to_us();
+
+                if (last_changed_time < now - self.debounce_us) {
+                    current_states[key_index] = pressed;
+                    try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index, .time = time.get_time_since_boot().to_us() });
+                    p.led_red.put(read_value);
+                    p.led_green.put(1 - read_value);
+                    p.led_blue.put(1);
+                }
             }
             col.put(0);
         }

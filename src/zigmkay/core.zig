@@ -25,8 +25,7 @@ pub const KeyDef = struct {
     hold_modifiers: Modifiers = .{},
 };
 
-// a key definition that only has a tap functionality
-
+// A key definition that only has a tap functionality
 pub const OutputCommand = union(enum) {
     KeyCodePress: u8,
     KeyCodeRelease: u8,
@@ -36,13 +35,14 @@ pub const OutputCommand = union(enum) {
 const HidKeyCode = u8;
 const KeyIndex = usize;
 const LayerIndex = usize;
-pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex };
+pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const TimeStamp = struct {
     time_us_since_boot: u64,
     pub fn as_ns(self: TimeStamp) u64 {
         return self.time_us_since_boot / 1000;
     }
 };
+pub const TimeSinceBoot = u64;
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
 pub const Modifiers = packed struct {
