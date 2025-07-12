@@ -2,7 +2,7 @@ const std = @import("std");
 const core = @import("../zigmkay/core.zig");
 
 pub const KeyCount: usize = 28;
-pub const LayerCount: usize = 1;
+pub const LayerCount: usize = 2;
 
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
@@ -10,10 +10,18 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     W, R, P, B,             K, L, O, U,
  left_shift, lower_case_a, S, T, G,             M, N, E, I, tuborg_start,
     X, C, D,                   H, COMM, DOT,
-          ENTER, ENTER, MAGIC, SPACE
+          ENTER, layer_1, MAGIC, SPACE
     },
+.{ //--------------------- 0 ---------------------
+    N1, N2, N3, B,             K, L, O, U,
+ left_shift, lower_case_a, S, T, G,             M, N, E, I, tuborg_start,
+    X, C, D,                   H, COMM, DOT,
+          ENTER, layer_1, MAGIC, SPACE
+    },
+
 };
 
+const layer_1 = core.KeyDef.MO(1);
 const lower_case_a = core.KeyDef{
     .tap_keycode = A.tap_keycode,
     .tap_modifiers = .{}

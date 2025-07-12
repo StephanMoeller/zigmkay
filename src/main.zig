@@ -10,7 +10,7 @@ pub fn main() !void {
 
     // logic
     const scanner = zigmkay.scanning.CreateScanner(.{ .debounce_ms = 5 });
-    const processor = zigmkay.processing.CreateProcessor();
+    var processor = zigmkay.processing.CreateProcessor();
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {
