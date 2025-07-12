@@ -39,7 +39,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - Only dependencies is zig, which must be downloaded first, and microzig which will be auto-fetched when compiling (i think that is the time this happens)
 
 # When not to choose zigmkay
-- zigmkay is not planned to be wireless ever.
-- zigmkay will only support the mcu types that microzig supports.
-- zigmkay does not currently support tap dances - only tap/hold is supported as I don't need tap dances myself. 
-- zigmkay does not have rgb support - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
+- wireless: zigmkay is not planned to be wireless ever.
+- mcu: zigmkay will only support the mcu types that microzig supports.
+- tap: dances: zigmkay does not currently support tap dances - only tap/hold is supported as I don't need tap dances myself. 
+- rgb: zigmkay does not have rgb support - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
