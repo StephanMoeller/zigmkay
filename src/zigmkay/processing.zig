@@ -36,44 +36,16 @@ pub const Processor = struct {
             const current_layer_index: usize = 0;
             if (next_event.pressed) {
                 const pressed_key_def = keymap[current_layer_index][next_event.key_index];
-                if (pressed_key_def.tap_keycode == 1) {
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
-                    try output_queue.enqueue(.{ .KeyCodePress = 4 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 5 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 6 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 7 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 8 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 9 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 10 });
-                    try output_queue.enqueue(.{ .KeyCodePress = 11 });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 4 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 5 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 6 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 7 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 8 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = false } });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 9 });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 10 });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 11 });
-                    //try output_queue.enqueue(.{ .ModifiersChanged = .{ .left_shift = true } });
-                    try output_queue.enqueue(.{ .KeyCodePress = 0x0028 });
-                    try output_queue.enqueue(.{ .KeyCodeRelease = 0x0028 });
-                    continue;
-                }
                 const uses_modifiers = !pressed_key_def.tap_modifiers.empty();
                 if (uses_modifiers) {
+                    // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
                     try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers });
-                } else {
-                    release_map[next_event.key_index] = pressed_key_def;
-                }
-                try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
-                if (uses_modifiers) {
+                    try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
                     try output_queue.enqueue(.{ .KeyCodeRelease = pressed_key_def.tap_keycode });
                     try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+                } else {
+                    release_map[next_event.key_index] = pressed_key_def;
+                    try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
                 }
             } else {
                 const released_key = release_map[next_event.key_index];
