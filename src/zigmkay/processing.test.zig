@@ -30,6 +30,7 @@ test "tapping - single key press" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -45,7 +46,8 @@ test "tapping - single key release" {
 
     try std.testing.expectEqual(1, o.actions_queue.Count()); // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count()); // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
 test "tapping - multiple simple tap events" {
@@ -70,6 +72,7 @@ test "tapping - multiple simple tap events" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -94,6 +97,7 @@ test "tapping - with modifiers - single key press" {
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -122,6 +126,7 @@ test "tapping - with tap modifiers - with other key pressed between press and re
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -146,6 +151,7 @@ test "hold mod - single hold" {
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -175,6 +181,7 @@ test "hold mod - multiple hold mods at the same time" {
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -222,6 +229,7 @@ test "hold mod - combined with modified taps - ensure tap mods will be applied t
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 test "Layers - simple switch" {
@@ -242,6 +250,9 @@ test "Layers - simple switch" {
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = f }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = f }, try o.actions_queue.dequeue());
+
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 test "Layers - complex switch" {
     var o = init_test();
@@ -312,6 +323,7 @@ test "Layers - complex switch" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
 
     // Expect no more actions
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -353,6 +365,7 @@ test "Layers - specifically test that a key pressed existing on layer A is also 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = e }, try o.actions_queue.dequeue());
 
     // Expect no more actions
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 test "Layers - multiple layer switches, hold 1, hold 2, release 2, release 1" {
@@ -415,6 +428,7 @@ test "Layers - multiple layer switches, hold 1, hold 2, release 2, release 1" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     // Expect no more actions
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -478,6 +492,7 @@ test "Layers - multiple layer switches, hold 1, hold 2, release 1, release 2" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     // Expect no more actions
+    try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
@@ -487,8 +502,8 @@ test "Layers - transparent key - ensure key on lower active layers used - case A
     const mo1_key = core.KeyDef.MO(1);
     const mo2_key = core.KeyDef.MO(2);
     const mo3_key = core.KeyDef.MO(3);
-    const base_layer = [_]core.KeyDef{ A, mo1_key, mo2_key, mo3_key, A, A };
-    const layer_1 = [_]core.KeyDef{ B, B, B, B, B, B };
+    const base_layer = [_]core.KeyDef{ A, mo1_key, mo2_key, A, A, A };
+    const layer_1 = [_]core.KeyDef{ B, B, B, mo3_key, B, B };
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
@@ -504,11 +519,12 @@ test "Layers - transparent key - ensure key on lower active layers used - case A
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
 
     // Press B expected
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodePress);
+    try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodeRelease);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
 test "Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer" {
@@ -517,8 +533,8 @@ test "Layers - transparent key - ensure key on lower active layers used - case B
     const mo1_key = core.KeyDef.MO(1);
     const mo2_key = core.KeyDef.MO(2);
     const mo3_key = core.KeyDef.MO(3);
-    const base_layer = [_]core.KeyDef{ A, mo1_key, mo2_key, mo3_key, A, A };
-    const layer_1 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, B, B, B };
+    const base_layer = [_]core.KeyDef{ A, mo1_key, mo2_key, A, A, A };
+    const layer_1 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, mo3_key, B, B };
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
@@ -539,6 +555,7 @@ test "Layers - transparent key - ensure key on lower active layers used - case B
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
 test "Layers - transparent key - ensure transparent key on base layer won't do anything" {

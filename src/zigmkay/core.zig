@@ -19,13 +19,9 @@ pub const HoldDef = struct {
 pub const KeyDef = struct {
     tap: ?TapDef = null,
     hold: ?HoldDef = null,
+    transparent: bool = false,
     pub fn is_transparent(self: KeyDef) bool {
-        if (self.hold) |hold_val| {
-            if (hold_val.hold_layer) |layer_val| {
-                return layer_val == TransparentLayerValue;
-            }
-        }
-        return false;
+        return self.transparent;
     }
     pub fn TAP(keycode: u8) KeyDef {
         return KeyDef{ .tap = .{ .tap_keycode = keycode } };
@@ -45,7 +41,7 @@ pub const KeyDef = struct {
         return KeyDef{};
     }
     pub fn TRANSPARENT() KeyDef {
-        return KeyDef{ .hold = .{ .hold_layer = TransparentLayerValue } };
+        return KeyDef{ .transparent = true };
     }
 };
 const TransparentLayerValue = 15;
