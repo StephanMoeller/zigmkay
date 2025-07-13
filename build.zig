@@ -20,7 +20,17 @@ pub fn build(b: *std.Build) void {
     // RP2040 is UF2, but we can also output other formats easily
     mb.install_firmware(firmware, .{});
 
-    const test_exe = b.addTest(.{ .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = "src/zigmkay/core.test.zig" } } });
-    const run_tests = b.addRunArtifact(test_exe);
-    b.step("test", "Run unit tests").dependOn(&run_tests.step);
+    const test_files = &[_][]const u8{
+        "src/zigmkay/core.test.zig",
+        "src/zigmkay/processing.test.zig",
+        "src/zigmkay/generic_queue.test.zig",
+    };
+
+    const test_step = b.step("test", "Run unit tests");
+
+    for (test_files) |path| {
+        const test_exe = b.addTest(.{ .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = path } } });
+        const run = b.addRunArtifact(test_exe);
+        test_step.dependOn(&run.step);
+    }
 }
