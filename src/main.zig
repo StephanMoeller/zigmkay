@@ -15,7 +15,6 @@ pub fn main() !void {
 
     while (true) {
         // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
-        // TODO: where does layer state recide?
 
         // Register input
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
