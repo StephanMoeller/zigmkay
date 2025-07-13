@@ -355,7 +355,7 @@ test "Layers - specifically test that a key pressed existing on layer A is also 
     // Expect no more actions
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
-test "Layers - multiple layer switches, layer 0, layer 1, layer 2, layer 1, layer 0" {
+test "Layers - multiple layer switches, hold 1, hold 2, release 2, release 1" {
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -418,7 +418,7 @@ test "Layers - multiple layer switches, layer 0, layer 1, layer 2, layer 1, laye
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - multiple layer switches, layer 0, layer 1, layer 2, layer 0" {
+test "Layers - multiple layer switches, hold 1, hold 2, release 1, release 2" {
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
