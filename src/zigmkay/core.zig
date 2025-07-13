@@ -19,6 +19,14 @@ pub const HoldDef = struct {
 pub const KeyDef = struct {
     tap: ?TapDef = null,
     hold: ?HoldDef = null,
+    pub fn is_transparent(self: KeyDef) bool {
+        if (self.hold) |hold_val| {
+            if (hold_val.hold_layer) |layer_val| {
+                return layer_val == TransparentLayerValue;
+            }
+        }
+        return false;
+    }
     pub fn TAP(keycode: u8) KeyDef {
         return KeyDef{ .tap = .{ .tap_keycode = keycode } };
     }
@@ -37,9 +45,10 @@ pub const KeyDef = struct {
         return KeyDef{};
     }
     pub fn TRANSPARENT() KeyDef {
-        return KeyDef{};
+        return KeyDef{ .hold = .{ .hold_layer = TransparentLayerValue } };
     }
 };
+const TransparentLayerValue = 15;
 
 // A key definition that only has a tap functionality
 pub const OutputCommand = union(enum) {

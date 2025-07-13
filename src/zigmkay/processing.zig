@@ -42,11 +42,8 @@ pub const Processor = struct {
                 var pressed_key_def = keymap[0][next_event.key_index];
                 var layer_index: usize = @as(usize, LayerCount - 1);
                 while (layer_index > 0) {
-                    //            std.log.warn("\ntesting: {}\n", .{layer_index});
-                    if (self.layers.is_layer_active(layer_index)) {
+                    if (self.layers.is_layer_active(layer_index) and !(keymap[layer_index][next_event.key_index].is_transparent())) {
                         pressed_key_def = keymap[layer_index][next_event.key_index];
-
-                        //              std.log.warn("\nfound: {}\n", .{layer_index});
                         break;
                     }
                     layer_index -= 1;
