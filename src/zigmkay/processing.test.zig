@@ -567,7 +567,30 @@ test "Layers - transparent key - ensure transparent key on base layer won't do a
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - ensure nothing breaks if referencing too high layer index" {}
+test "Layers - ensure nothing breaks if referencing too high layer index" {
+    var o = init_test();
+
+    const mo4_key = core.KeyDef.MO(4);
+    const base_layer = [_]core.KeyDef{ A, A, A, mo4_key };
+    const layer_1 = [_]core.KeyDef{ B, B, B, B };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    // Hold for invalid layer switch
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+
+    // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // expect A pressed as no layer switch is expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+
+    // Expect no more actions
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+}
 
 const a = 0x04;
 const b = 0x05;
