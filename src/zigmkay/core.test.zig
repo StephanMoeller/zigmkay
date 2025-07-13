@@ -17,7 +17,7 @@ test "Modifiers.remove" {
     try std.testing.expectEqual(core.Modifiers{ .left_gui = true, .left_shift = true }, result);
 }
 
-test "LayerLogic" {
+test "LayerActivations" {
     var layers = core.LayerActivations{};
     try std.testing.expectEqual(true, layers.is_layer_active(0)); // base is always active
     try std.testing.expectEqual(false, layers.is_layer_active(1)); // base is always active
