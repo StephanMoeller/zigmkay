@@ -42,6 +42,7 @@ test "LayerLogic" {
 }
 
 test "KeyDef.TRANSPARENT()" {
+    // Ensure consistency with is_transparent()
     try std.testing.expectEqual(true, core.KeyDef.TRANSPARENT().is_transparent());
     try std.testing.expectEqual(false, core.KeyDef.NONE().is_transparent());
     try std.testing.expectEqual(false, core.KeyDef.MO(1).is_transparent());
