@@ -47,3 +47,12 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - mcu: zigmkay will only support the mcu types that microzig supports.
 - tap: dances: zigmkay does not currently support tap dances - only tap/hold is supported as I don't need tap dances myself. 
 - rgb: zigmkay does not have rgb support - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
+
+# Guide
+## Key definitions
+- Transparent key: core.KeyDef.TRANSPARENT
+- None key: core.KeyDef.NONE
+- Tap-only key: core.KeyDef.TAP(keycode)
+- Tap-only key with a modifier applied: core.KeyDef.TAP_WITH_MOD(keycode, .{.left_shift = true})
+- Hold-only for modifier(s): core.KeyDef.HOLD_MOD(.{.left_shift = true})
+- Hold-only for layer shift: core.KeyDef.MO(layer_index)
