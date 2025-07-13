@@ -19,6 +19,8 @@ pub fn build(b: *std.Build) void {
     // We call this twice to demonstrate that the default binary output for
     // RP2040 is UF2, but we can also output other formats easily
     mb.install_firmware(firmware, .{});
-    // mb.install_firmware(firmware, .{ .format = .elf });
-}
 
+    const test_exe = b.addTest(.{ .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = "src/zigmkay/core.test.zig" } } });
+    const run_tests = b.addRunArtifact(test_exe);
+    b.step("test", "Run unit tests").dependOn(&run_tests.step);
+}
