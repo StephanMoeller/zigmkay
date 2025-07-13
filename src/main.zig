@@ -4,17 +4,18 @@ const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
 
 pub fn main() !void {
-    // data queues
+    // Data queues
     var keyboard_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
-    // logic
+    // Logic
     const scanner = zigmkay.scanning.CreateScanner(.{ .debounce_ms = 5 });
     var processor = zigmkay.processing.CreateProcessor();
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
+    // Cycle
+    // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
     while (true) {
-        // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
 
         // Register input
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
