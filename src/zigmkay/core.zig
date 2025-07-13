@@ -33,6 +33,12 @@ pub const KeyDef = struct {
     pub fn MO(layer: LayerIndex) KeyDef {
         return KeyDef{ .hold = .{ .hold_layer = layer } };
     }
+    pub fn NONE() KeyDef {
+        return KeyDef{};
+    }
+    pub fn TRANSPARENT() KeyDef {
+        return KeyDef{};
+    }
 };
 
 // A key definition that only has a tap functionality
