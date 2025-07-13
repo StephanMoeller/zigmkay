@@ -41,7 +41,7 @@ test "LayerLogic" {
     try std.testing.expectEqual(false, layers.is_layer_active(7)); // base is always active
 }
 
-test "KeyDef transparent" {
+test "KeyDef.TRANSPARENT()" {
     try std.testing.expectEqual(true, core.KeyDef.TRANSPARENT().is_transparent());
     try std.testing.expectEqual(false, core.KeyDef.NONE().is_transparent());
     try std.testing.expectEqual(false, core.KeyDef.MO(1).is_transparent());
