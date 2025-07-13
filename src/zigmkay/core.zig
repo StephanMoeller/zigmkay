@@ -8,32 +8,31 @@ const generic_queue = @import("generic_queue.zig");
 // TODO Hold for Modifiers
 // TODO Hold for momentary layer switch
 // TODO Combine any tap with any hold
+pub const TapDef = struct {
+    tap_keycode: u8 = 0,
+    tap_modifiers: ?Modifiers = null,
+};
+pub const HoldDef = struct {
+    hold_modifiers: ?Modifiers = null,
+    hold_layer: ?LayerIndex = null,
+};
 pub const KeyDef = struct {
+    tap: ?TapDef = null,
+    hold: ?HoldDef = null,
     pub fn TAP(keycode: u8) KeyDef {
-        return KeyDef{ .tap_keycode = keycode };
+        return KeyDef{ .tap = .{ .tap_keycode = keycode } };
     }
 
     pub fn TAP_WITH_MOD(keycode: u8, modifiers: Modifiers) KeyDef {
-        return KeyDef{ .tap_keycode = keycode, .tap_modifiers = modifiers };
+        return KeyDef{ .tap = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
     }
 
     pub fn HOLD_MOD(modifiers: Modifiers) KeyDef {
-        return KeyDef{ .hold_modifiers = modifiers };
+        return KeyDef{ .hold = .{ .hold_modifiers = modifiers } };
     }
     pub fn MO(layer: LayerIndex) KeyDef {
-        return .{ .hold_layer = layer };
+        return KeyDef{ .hold = .{ .hold_layer = layer } };
     }
-
-    pub fn has_tap(self: *const KeyDef) bool {
-        return self.tap_keycode != 0;
-    }
-    pub fn has_hold(self: *const KeyDef) bool {
-        return self.hold_modifiers != null or self.hold_layer != null;
-    }
-    tap_keycode: u8 = 0,
-    tap_modifiers: ?Modifiers = null,
-    hold_modifiers: ?Modifiers = null,
-    hold_layer: ?LayerIndex = null,
 };
 
 // A key definition that only has a tap functionality

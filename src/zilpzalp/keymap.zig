@@ -23,8 +23,10 @@ pub const keymap = [LayerCount][KeyCount]core.KeyDef{
 
 const layer_1 = core.KeyDef.MO(1);
 const lower_case_a = core.KeyDef{
-    .tap_keycode = A.tap_keycode,
+    .tap = core.TapDef{
+    .tap_keycode = A.tap.?.tap_keycode,
     .tap_modifiers = .{}
+    }
 };
 const left_shift = HoldMod(.{.left_shift = true });
 const MAGIC = FromKey(1);
@@ -81,8 +83,10 @@ const N9 = FromKey(0x0026);
 const N0 = FromKey(0x0027);
 
 const tuborg_start = core.KeyDef{
-    .tap_keycode = N7.tap_keycode,
-    .tap_modifiers = .{.right_alt = true}
+    .tap = .{
+.tap_keycode = N7.tap.?.tap_keycode,
+    .tap_modifiers = .{.right_alt = true},
+    }
 };
 
 const Ae = FromKey(0x15);

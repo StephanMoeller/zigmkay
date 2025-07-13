@@ -52,27 +52,27 @@ pub const Processor = struct {
                     layer_index -= 1;
                 }
 
-                if (pressed_key_def.has_tap()) {
-                    const uses_modifiers = pressed_key_def.tap_modifiers != null;
+                if (pressed_key_def.tap) |tap| {
+                    const uses_modifiers = tap.tap_modifiers != null;
                     if (uses_modifiers) {
                         // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
-                        try output_queue.enqueue(.{ .ModifiersChanged = pressed_key_def.tap_modifiers.? });
-                        try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
-                        try output_queue.enqueue(.{ .KeyCodeRelease = pressed_key_def.tap_keycode });
+                        try output_queue.enqueue(.{ .ModifiersChanged = tap.tap_modifiers.? });
+                        try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
+                        try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
                         try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     } else {
                         release_map[next_event.key_index] = pressed_key_def;
-                        try output_queue.enqueue(.{ .KeyCodePress = pressed_key_def.tap_keycode });
+                        try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                     }
                 }
-                if (pressed_key_def.has_hold()) {
-                    if (pressed_key_def.hold_modifiers != null) {
+                if (pressed_key_def.hold) |hold| {
+                    if (hold.hold_modifiers != null) {
                         // Apply the hold modifier(s)
-                        modifiers = modifiers.add(pressed_key_def.hold_modifiers.?);
+                        modifiers = modifiers.add(hold.hold_modifiers.?);
                         try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     }
-                    if (pressed_key_def.hold_layer != null) {
-                        self.layers.activate(pressed_key_def.hold_layer.?);
+                    if (hold.hold_layer != null) {
+                        self.layers.activate(hold.hold_layer.?);
                     }
 
                     release_map[next_event.key_index] = pressed_key_def;
@@ -81,17 +81,17 @@ pub const Processor = struct {
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
                 if (release_map[next_event.key_index]) |released_key| {
                     release_map[next_event.key_index] = null;
-                    if (released_key.has_tap()) {
-                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = released_key.tap_keycode });
+                    if (released_key.tap) |tap| {
+                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = tap.tap_keycode });
                     }
-                    if (released_key.has_hold()) {
-                        if (released_key.hold_modifiers != null) {
+                    if (released_key.hold) |hold| {
+                        if (hold.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
-                            modifiers = modifiers.remove(released_key.hold_modifiers.?);
+                            modifiers = modifiers.remove(hold.hold_modifiers.?);
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
-                        if (released_key.hold_layer != null) {
-                            self.layers.deactivate(released_key.hold_layer.?);
+                        if (hold.hold_layer != null) {
+                            self.layers.deactivate(hold.hold_layer.?);
                         }
                     }
                 }
