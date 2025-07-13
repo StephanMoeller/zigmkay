@@ -15,7 +15,7 @@ fn init_test() TestObjects {
     };
 }
 // test stuff
-test "tapping - single key press" {
+test "TAP - single key press" {
     var o = init_test();
 
     const base_layer = [_]core.KeyDef{ A, B, C, D };
@@ -34,7 +34,7 @@ test "tapping - single key press" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "tapping - single key release" {
+test "TAP - single key release" {
     var o = init_test();
 
     const base_layer = [_]core.KeyDef{ A, B, C, D };
@@ -50,7 +50,7 @@ test "tapping - single key release" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "tapping - multiple simple tap events" {
+test "TAP - multiple simple tap events" {
     var o = init_test();
     const base_layer = [_]core.KeyDef{ A, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
@@ -76,7 +76,7 @@ test "tapping - multiple simple tap events" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "tapping - with modifiers - single key press" {
+test "TAP_WITH_MOD - single key press" {
     var o = init_test();
 
     const shiftedA = core.KeyDef.TAP_WITH_MOD(0x04, .{ .left_shift = true });
@@ -101,7 +101,8 @@ test "tapping - with modifiers - single key press" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "tapping - with tap modifiers - with other key pressed between press and release" {
+test "TAP_WITH_MOD - with other keys" {
+    // with other keys pressed between press and release
     var o = init_test();
 
     const shiftedA = core.KeyDef.TAP_WITH_MOD(0x04, .{ .left_shift = true });
@@ -130,7 +131,7 @@ test "tapping - with tap modifiers - with other key pressed between press and re
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "hold mod - single hold" {
+test "HOLD_MOD - single hold" {
     var o = init_test();
 
     const hold_left_shift = core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
@@ -155,7 +156,8 @@ test "hold mod - single hold" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "hold mod - multiple hold mods at the same time" {
+test "HOLD_MOD - multiple holds" {
+    // multiple mod hold presses at the same time
     var o = init_test();
 
     const hold_left_shift = core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
@@ -185,7 +187,8 @@ test "hold mod - multiple hold mods at the same time" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "hold mod - combined with modified taps - ensure tap mods will be applied temporarily and then cancelled again after the tap while hold mods are kept" {
+test "HOLD_MOD combined with TAP_WITH_MOD" {
+    // hold mods combined with modified taps - ensure tap mods will be applied temporarily and then cancelled again after the tap while hold mods are kept
     var o = init_test();
 
     const c_with_left_gui = core.KeyDef.TAP_WITH_MOD(0x06, .{ .left_gui = true });
@@ -327,7 +330,8 @@ test "Layers - complex switch" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release" {
+test "MO - ensure correct release key" {
+    // Specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release
     var o = init_test();
 
     const mo_key = core.KeyDef.MO(1);
@@ -368,7 +372,8 @@ test "Layers - specifically test that a key pressed existing on layer A is also 
     try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
-test "Layers - multiple layer switches, hold 1, hold 2, release 2, release 1" {
+test "Layers - multiple layers case 1" {
+    // multiple layer switches, hold 1, hold 2, release 2, release 1
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -431,8 +436,8 @@ test "Layers - multiple layer switches, hold 1, hold 2, release 2, release 1" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
-
-test "Layers - multiple layer switches, hold 1, hold 2, release 1, release 2" {
+test "Layers - multiple layers case 2" {
+    //Layers - multiple layer switches, hold 1, hold 2, release 1, release 2
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -496,7 +501,8 @@ test "Layers - multiple layer switches, hold 1, hold 2, release 1, release 2" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - transparent key - ensure key on lower active layers used - case A - expect fallback to next active layer" {
+test "TRANSPARENT case 1" {
+    // Transparent key - ensure key on lower active layers used - case A - expect fallback to next active layer
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -526,8 +532,8 @@ test "Layers - transparent key - ensure key on lower active layers used - case A
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
-
-test "Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer" {
+test "TRANSPARENT case 2" {
+    // Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -558,7 +564,8 @@ test "Layers - transparent key - ensure key on lower active layers used - case B
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
-test "Layers - transparent key - ensure transparent key on base layer won't do anything" {
+test "TRANSPARENT case 3" {
+    // Layers - transparent key - ensure transparent key on base layer won't do anything
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
@@ -584,7 +591,8 @@ test "Layers - transparent key - ensure transparent key on base layer won't do a
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - ensure nothing breaks if referencing too high layer index" {
+test "MO - invalid layer id" {
+    // ensure nothing breaks if referencing too high layer index
     var o = init_test();
 
     const mo4_key = core.KeyDef.MO(4);
@@ -609,7 +617,8 @@ test "Layers - ensure nothing breaks if referencing too high layer index" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
-test "Layers - NOME key - expect nothing to happen" {
+test "NONE key" {
+    // Expect nothing to happen
     var o = init_test();
 
     const mo1_key = core.KeyDef.MO(1);
