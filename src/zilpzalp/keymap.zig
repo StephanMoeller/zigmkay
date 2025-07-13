@@ -7,9 +7,9 @@ pub const LayerCount: usize = 2;
 pub const keymap = [LayerCount][KeyCount]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
-    W, R, P, B,             K, L, O, U,
- left_shift, lower_case_a, S, T, G,             M, N, E, I, tuborg_start,
-    X, C, D,                   H, COMM, DOT,
+    W, R, P, B,                            K, L, O, U,
+ left_shift, lower_case_a, S, T, G,     M, N, E, I, tuborg_start,
+    X, C, D,                                H, COMM, DOT,
           ENTER, layer_1, MAGIC, SPACE
     },
 .{ //--------------------- 0 ---------------------
