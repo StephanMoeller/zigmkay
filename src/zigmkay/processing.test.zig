@@ -592,6 +592,27 @@ test "Layers - ensure nothing breaks if referencing too high layer index" {
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
 }
 
+test "Layers - NOME key - expect nothing to happen" {
+    var o = init_test();
+
+    const mo1_key = core.KeyDef.MO(1);
+    const base_layer = [_]core.KeyDef{ A, A, mo1_key };
+    const layer_1 = [_]core.KeyDef{ core.KeyDef.NONE(), D, D };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    // Hold for layer switch 1
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
+
+    // Tap a transparent key at position 0 which is NONE - expect nothing to happen
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // Expect no more actions
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+}
+
 const a = 0x04;
 const b = 0x05;
 const c = 0x06;
