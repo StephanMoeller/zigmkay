@@ -30,7 +30,9 @@ pub const Processor = struct {
         keymap: *const [LayerCount][KeyCount]core.KeyDef,
         input: *core.KeyboardStateChangeQueue,
         output_queue: *core.OutputCommandQueue,
+        current_time: core.TimeSinceBoot,
     ) !void {
+        _ = current_time;
         // todo: hold-support
         // todo: take layouts into concideration here
         // todo: combo support

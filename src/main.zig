@@ -2,6 +2,7 @@ const std = @import("std");
 const zigmkay = @import("zigmkay/zigmkay.zig");
 const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
+const time = rp2xxx.time;
 
 pub fn main() !void {
     // Data queues
@@ -16,13 +17,13 @@ pub fn main() !void {
     // Cycle
     // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
     while (true) {
-
+        const current_time = time.get_time_since_boot().to_us();
         // Register input
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        try scanner.DetectKeyboardChanges(&keyboard_change_queue);
+        try scanner.DetectKeyboardChanges(&keyboard_change_queue, current_time);
 
         // Decide actions
-        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue);
+        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue, current_time);
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
