@@ -24,7 +24,7 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/core.test.zig",
         "src/zigmkay/processing.test.basics.tap_only.zig",
         "src/zigmkay/processing.test.basics.hold_only.zig",
-        "src/zigmkay/processing.test.basics.transparent_and_none.zig",
+        "src/zigmkay/processing.test.basics.trans_none.zig",
         "src/zigmkay/processing.test.tap_hold.zig",
         "src/zigmkay/generic_queue.test.zig",
     };
