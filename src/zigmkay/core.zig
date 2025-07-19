@@ -20,6 +20,7 @@ pub const KeyDef = struct {
     tap: ?TapDef = null,
     hold: ?HoldDef = null,
     transparent: bool = false,
+    tapping_term_ms: TappingTermType = 100,
     pub fn is_transparent(self: KeyDef) bool {
         return self.transparent;
     }
@@ -37,11 +38,11 @@ pub const KeyDef = struct {
     pub fn MO(layer: LayerIndex) KeyDef {
         return KeyDef{ .hold = .{ .hold_layer = layer } };
     }
-    pub fn LT(layer: LayerIndex, tap_keycode: u8, tap_modifiers: Modifiers, tapping_terms_ms: u16) KeyDef {
-        _ = tapping_terms_ms;
+    pub fn LT(layer: LayerIndex, tap_keycode: u8, tap_modifiers: Modifiers, tapping_term_ms: u16) KeyDef {
         return KeyDef{
             .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
             .hold = .{ .hold_layer = layer },
+            .tapping_term_ms = tapping_term_ms,
         };
     }
     pub fn NONE() KeyDef {
@@ -62,6 +63,7 @@ pub const OutputCommand = union(enum) {
 
 pub const KeyIndex = usize;
 pub const LayerIndex = usize;
+pub const TappingTermType = u16;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const TimeSinceBoot = u64;
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
