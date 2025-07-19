@@ -15,11 +15,13 @@ const RA = 0x00E6;
 const RG = 0x00E7;
 
 pub const Processor = struct {
-    KeyCount: usize = 0,
-    layers: core.LayerActivations = .{},
+    layers_activations: core.LayerActivations = .{},
+
+    // release_map is used to keep track of what to do when a key is released as the layer activations may have changed since is was pressed
     var release_map: [28]?core.KeyDef = [_]?core.KeyDef{null} ** 28;
+
+    // The currently activated modifiers
     var modifiers: core.Modifiers = .{};
-    var previous_key: core.KeyDef = .{};
 
     pub fn Process(
         self: *Processor,
@@ -43,7 +45,7 @@ pub const Processor = struct {
                 var layer_index: usize = @as(usize, LayerCount - 1);
                 while (layer_index > 0) {
                     //std.log.warn("\ntesting: {}\n", .{layer_index});
-                    if (self.layers.is_layer_active(layer_index) and !keymap[layer_index][next_event.key_index].is_transparent()) {
+                    if (self.layers_activations.is_layer_active(layer_index) and !keymap[layer_index][next_event.key_index].is_transparent()) {
                         pressed_key_def = keymap[layer_index][next_event.key_index];
                         //std.log.warn("\nfound: {}\n", .{layer_index});
                         break;
@@ -71,7 +73,7 @@ pub const Processor = struct {
                         try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     }
                     if (hold.hold_layer != null) {
-                        self.layers.activate(hold.hold_layer.?);
+                        self.layers_activations.activate(hold.hold_layer.?);
                     }
 
                     release_map[next_event.key_index] = pressed_key_def;
@@ -90,7 +92,7 @@ pub const Processor = struct {
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
                         if (hold.hold_layer != null) {
-                            self.layers.deactivate(hold.hold_layer.?);
+                            self.layers_activations.deactivate(hold.hold_layer.?);
                         }
                     }
                 }
