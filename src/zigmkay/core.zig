@@ -37,6 +37,13 @@ pub const KeyDef = struct {
     pub fn MO(layer: LayerIndex) KeyDef {
         return KeyDef{ .hold = .{ .hold_layer = layer } };
     }
+    pub fn LT(layer: LayerIndex, tap_keycode: u8, tap_modifiers: Modifiers, tapping_terms_ms: u16) KeyDef {
+        _ = tapping_terms_ms;
+        return KeyDef{
+            .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
+            .hold = .{ .hold_layer = layer },
+        };
+    }
     pub fn NONE() KeyDef {
         return KeyDef{};
     }

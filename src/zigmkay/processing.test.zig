@@ -637,8 +637,42 @@ test "NONE key" {
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
+test "LT tap/hold layer - tap case 1" {
+    var o = init_test();
+    const tapping_terms_ms: u16 = 250;
+    const mo_layer1_cWithLeftAlt = core.KeyDef.LT(1, c, .{ .left_alt = true }, tapping_terms_ms);
+
+    const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
+    const layer_1 = [_]core.KeyDef{ D, E, F };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    // Tap a transparent key at position 0 which is just a normal key
+    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    // Release withing the tapping term
+    try o.keyboard_change_queue.enqueue(.{ .time = 100 + tapping_terms_ms - 1, .pressed = false, .key_index = 0 });
+
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue);
+
+    // expect A pressed as no layer switch is expected
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+}
+
+test "tap/hold mod - case: tap" {
+    // Tap and release within tapping term
+}
+
+test "tap/hold layer - case: hold" {
+    // Tap and release within tapping term
+}
+test "tap/hold mod - case: hold" {
+    // Tap and release within tapping term
+}
 const a = 0x04;
 const b = 0x05;
 const c = 0x06;
