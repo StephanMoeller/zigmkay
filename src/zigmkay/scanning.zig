@@ -5,7 +5,7 @@ const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
 
 // PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
-pub fn CreateScanner(settings: ScannerSettings) Scanner {
+pub fn CreateMatrixScanner(settings: ScannerSettings) Scanner {
     pin_config.apply();
     return Scanner{ .debounce_us = settings.debounce_ms * 1000 };
 }

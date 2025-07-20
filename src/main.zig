@@ -10,7 +10,7 @@ pub fn main() !void {
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     // Logic
-    const scanner = zigmkay.scanning.CreateScanner(.{ .debounce_ms = 5 });
+    const matrix_scanner = zigmkay.scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
     var processor = zigmkay.processing.CreateProcessor();
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
@@ -27,7 +27,7 @@ pub fn main() !void {
         //
         //
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        try scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
+        try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Decide actions
         try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &matrix_change_queue, &usb_command_queue, current_time);

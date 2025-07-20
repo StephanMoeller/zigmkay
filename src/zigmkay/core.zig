@@ -58,15 +58,19 @@ pub const KeyIndex = usize;
 pub const LayerIndex = usize;
 pub const TappingTermType = u16;
 
+const queue_capacities = 250;
+
 // Matrix events: switch press/release,
 pub const MatrixStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
-pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, 250);
+pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, queue_capacities);
 
 // KeyDef events: KeyDef press/release (could be a combo activating)
+pub const KeyDefStateChange = struct { pressed: bool, key_def: KeyDef, key_index: KeyIndex };
+pub const KeyDefStateChangeQueue = generic_queue.GenericQueue(KeyDefStateChange, queue_capacities);
 
 // USB output
 pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers };
-pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
+pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, queue_capacities);
 
 pub const TimeSinceBoot = u64;
 
