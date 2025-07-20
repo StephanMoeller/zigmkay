@@ -21,27 +21,55 @@ fn init_test() TestObjects {
     };
 }
 
-test "LT tap/hold layer - tap case 1" {
+test "MT tap within tapping term" {
     var o = init_test();
-    const current_time: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = core.KeyDef.LT(1, c, .{ .left_alt = true }, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
 
     const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = [_]core.KeyDef{ D, E, F };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
-    // Tap a transparent key at position 0 which is just a normal key
-    try o.press_key(0, 1000);
-    try o.release_key(0, 1000 + tapping_terms_ms - 1);
-
+    // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
+    try o.press_key(0, current_time);
     try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
+    // Now ensure that a tap will happen when releasing within tapping term
+    current_time += tapping_terms_ms - 1; // within tapping term
+    try o.release_key(0, current_time);
 
     // expect A pressed as no layer switch is expected
-    //try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
-    //try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
-    //try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+}
+
+test "MT tap exceeding tapping term on release" {
+    // Expect hold
+    var o = init_test();
+    var current_time: core.TimeSinceBoot = 100;
+    const tapping_terms_ms: u16 = 250;
+    const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+
+    const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
+    const layer_1 = [_]core.KeyDef{ D, E, F };
+    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    // ensure nothing
+    try o.press_key(0, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+
+    current_time += tapping_terms_ms + 1; //exceeds tapping term
+    try o.release_key(0, current_time);
+
+    // expect A pressed as no layer switch is expected
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
 test "tap/hold mod - case: tap" {

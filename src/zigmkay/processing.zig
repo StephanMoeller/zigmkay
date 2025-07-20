@@ -14,11 +14,16 @@ const RS = 0x00E5;
 const RA = 0x00E6;
 const RG = 0x00E7;
 
+const KeyReleaseAction = union(enum) {
+    None,
+    ReleaseTap: core.TapDef,
+    ReleaseHold: core.HoldDef,
+};
 pub const Processor = struct {
     layers_activations: core.LayerActivations = .{},
 
     // release_map is used to keep track of what to do when a key is released as the layer activations may have changed since is was pressed
-    var release_map: [28]?core.KeyDef = [_]?core.KeyDef{null} ** 28;
+    var release_map: [28]KeyReleaseAction = [_]KeyReleaseAction{KeyReleaseAction.None} ** 28;
 
     // The currently activated modifiers
     var modifiers: core.Modifiers = .{};
@@ -64,7 +69,7 @@ pub const Processor = struct {
                         try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
                         try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                     } else {
-                        release_map[next_event.key_index] = pressed_key_def;
+                        release_map[next_event.key_index] = KeyReleaseAction{ .ReleaseTap = pressed_key_def.tap.? };
                         try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                     }
                 }
@@ -78,25 +83,27 @@ pub const Processor = struct {
                         self.layers_activations.activate(hold.hold_layer.?);
                     }
 
-                    release_map[next_event.key_index] = pressed_key_def;
+                    release_map[next_event.key_index] = KeyReleaseAction{ .ReleaseHold = pressed_key_def.hold.? };
                 }
             } else {
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
-                if (release_map[next_event.key_index]) |released_key| {
-                    release_map[next_event.key_index] = null;
-                    if (released_key.tap) |tap| {
-                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = tap.tap_keycode });
-                    }
-                    if (released_key.hold) |hold| {
-                        if (hold.hold_modifiers != null) {
+                switch (release_map[next_event.key_index]) {
+                    .None => {},
+                    .ReleaseTap => |tap_def| {
+                        try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
+                        release_map[next_event.key_index] = KeyReleaseAction.None;
+                    },
+                    .ReleaseHold => |hold_def| {
+                        if (hold_def.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
-                            modifiers = modifiers.remove(hold.hold_modifiers.?);
+                            modifiers = modifiers.remove(hold_def.hold_modifiers.?);
                             try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
                         }
-                        if (hold.hold_layer != null) {
-                            self.layers_activations.deactivate(hold.hold_layer.?);
+                        if (hold_def.hold_layer != null) {
+                            self.layers_activations.deactivate(hold_def.hold_layer.?);
                         }
-                    }
+                        release_map[next_event.key_index] = KeyReleaseAction.None;
+                    },
                 }
                 // TODO:
                 // key_def should not be read from the layout but be the exact key that was pressed to ensure a layer switch

@@ -45,6 +45,13 @@ pub const KeyDef = struct {
             .tapping_term_ms = tapping_term_ms,
         };
     }
+    pub fn MT(hold_modifiers: Modifiers, tap_keycode: u8, tap_modifiers: Modifiers, tapping_term_ms: u16) KeyDef {
+        return KeyDef{
+            .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
+            .hold = .{ .hold_modifiers = hold_modifiers },
+            .tapping_term_ms = tapping_term_ms,
+        };
+    }
     pub fn NONE() KeyDef {
         return KeyDef{};
     }
