@@ -3,19 +3,19 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const TestObjects = struct {
-    keyboard_change_queue: core.MatrixStateChangeQueue,
+    matrix_change_queue: core.MatrixStateChangeQueue,
     actions_queue: core.OutputCommandQueue,
     processor: zigmkay.processing.Processor,
     fn press_key(self: *TestObjects, key_index: usize, time: core.TimeSinceBoot) !void {
-        try self.keyboard_change_queue.enqueue(.{ .time = time, .pressed = true, .key_index = key_index });
+        try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = true, .key_index = key_index });
     }
     fn release_key(self: *TestObjects, key_index: usize, time: core.TimeSinceBoot) !void {
-        try self.keyboard_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
+        try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
     }
 };
 fn init_test() TestObjects {
     return TestObjects{
-        .keyboard_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
+        .matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
         .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
         .processor = zigmkay.processing.CreateProcessor(),
     };
@@ -35,12 +35,12 @@ test "LT tap/hold layer - tap case 1" {
     try o.press_key(0, 1000);
     try o.release_key(0, 1000 + tapping_terms_ms - 1);
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
     //try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     //try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
     //try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 

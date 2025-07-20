@@ -3,13 +3,13 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const TestObjects = struct {
-    keyboard_change_queue: core.MatrixStateChangeQueue,
+    matrix_change_queue: core.MatrixStateChangeQueue,
     actions_queue: core.OutputCommandQueue,
     processor: zigmkay.processing.Processor,
 };
 fn init_test() TestObjects {
     return TestObjects{
-        .keyboard_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
+        .matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
         .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
         .processor = zigmkay.processing.CreateProcessor(),
     };
@@ -23,12 +23,12 @@ test "HOLD_MOD - single hold" {
     const base_layer = [_]core.KeyDef{ hold_left_shift, B, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press B
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release B
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -38,7 +38,7 @@ test "HOLD_MOD - single hold" {
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
 test "HOLD_MOD - multiple holds" {
@@ -51,14 +51,14 @@ test "HOLD_MOD - multiple holds" {
     const base_layer = [_]core.KeyDef{ hold_left_shift, hold_left_alt, C, D };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press left alt
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); // Press C
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); // Release C
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift first (to mix things up)
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press left alt
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); // Press C
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); // Release C
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift first (to mix things up)
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -70,7 +70,7 @@ test "HOLD_MOD - multiple holds" {
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
 test "HOLD_MOD combined with TAP_WITH_MOD" {
@@ -84,21 +84,21 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
     const base_layer = [_]core.KeyDef{ hold_left_shift, hold_left_alt, c_with_left_gui, D, E };
     const keymap = [_][base_layer.len]core.KeyDef{base_layer};
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press left alt
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); // Press D
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); // Release D
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 }); // Press left shift
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 }); // Press left alt
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); // Press D
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); // Release D
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); // Press gui+C
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); // Release gui+C
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); // Press gui+C
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); // Release gui+C
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 4 }); // Press E
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 4 }); // Release E
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 4 }); // Press E
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 4 }); // Release E
 
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 }); // Release left alt
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 }); // Release left shift
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -120,7 +120,7 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 test "Layers - simple switch" {
     var o = init_test();
@@ -132,18 +132,18 @@ test "Layers - simple switch" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
 
     // switch layer
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
     // tap
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = f }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = f }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 test "Layers - complex switch" {
     var o = init_test();
@@ -155,36 +155,36 @@ test "Layers - complex switch" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Tap A
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
     // Hold for layer switch
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
 
     // Tap F
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Tap E
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
     // Release layer switch again
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key released
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key released
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Tap A
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect B tapped
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -216,7 +216,7 @@ test "Layers - complex switch" {
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
 test "Layers - ensure correct release key" {
@@ -230,24 +230,24 @@ test "Layers - ensure correct release key" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
 
     // Hold for layer switch
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
 
     // Tap E
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
 
     // Release B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // release layer switch
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
 
     // Release E
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -260,7 +260,7 @@ test "Layers - ensure correct release key" {
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 test "Layers - multiple layers case 1" {
     // multiple layer switches, hold 1, hold 2, release 2, release 1
@@ -275,38 +275,38 @@ test "Layers - multiple layers case 1" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2 };
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Hold for layer switch 1
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
 
     // Tap F
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Hold for layer switch 2
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); //mo_key pressed
 
     // Tap G
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Release layer 2
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); //mo_key pressed
 
     // Tap F
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Release layer 1
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -325,7 +325,7 @@ test "Layers - multiple layers case 1" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     // Expect no more actions
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 test "Layers - multiple layers case 2" {
     //Layers - multiple layer switches, hold 1, hold 2, release 1, release 2
@@ -340,38 +340,38 @@ test "Layers - multiple layers case 2" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2 };
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Hold for layer switch 1
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 }); //mo_key pressed
 
     // Tap F
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Hold for layer switch 2
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 }); //mo_key pressed
 
     // Tap G
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Release layer 1
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 2 }); //mo_key pressed
 
     // Tap G
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
     // Release layer 2
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); //mo_key pressed
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 3 }); //mo_key pressed
 
     // Tap B
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -390,7 +390,7 @@ test "Layers - multiple layers case 2" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     // Expect no more actions
     try std.testing.expectEqual(0, o.actions_queue.Count());
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 test "MO - invalid layer id" {
     // ensure nothing breaks if referencing too high layer index
@@ -403,20 +403,20 @@ test "MO - invalid layer id" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
     // Hold for invalid layer switch
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
 
     // Expect no more actions
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 const a = 0x04;
 const b = 0x05;

@@ -3,13 +3,13 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const TestObjects = struct {
-    keyboard_change_queue: core.MatrixStateChangeQueue,
+    matrix_change_queue: core.MatrixStateChangeQueue,
     actions_queue: core.OutputCommandQueue,
     processor: zigmkay.processing.Processor,
 };
 fn init_test() TestObjects {
     return TestObjects{
-        .keyboard_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
+        .matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
         .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
         .processor = zigmkay.processing.CreateProcessor(),
     };
@@ -30,21 +30,21 @@ test "TRANSPARENT case 1" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
 
     // Hold for layer switch 1 and 3
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodePress);
     try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodeRelease);
 
     // Expect no more actions
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 test "TRANSPARENT case 2" {
@@ -62,21 +62,21 @@ test "TRANSPARENT case 2" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
 
     // Hold for layer switch 1 and 3
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press A expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
 
     // Expect no more actions
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
@@ -95,17 +95,17 @@ test "TRANSPARENT case 3" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
 
     // Hold for layer switch 1 and 3
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
 test "NONE key" {
@@ -119,16 +119,16 @@ test "NONE key" {
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
     // Hold for layer switch 1
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
 
     // Tap a transparent key at position 0 which is NONE - expect nothing to happen
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.keyboard_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.keyboard_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
-    try std.testing.expectEqual(0, o.keyboard_change_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
