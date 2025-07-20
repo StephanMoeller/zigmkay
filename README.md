@@ -5,29 +5,31 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 1. Download zig version 14.1
 2. Clone this repo
 3. Define you own files (todo: write in details what needs to be done)
-4. Compile using ./build.zig and run any tests if you want using ./run_tests.sh
+4. Compile using ./build.zig and deploy using ./
 
 # TODO
 ## Scanning
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 ## Processor
-- Transparent key support
-- None key support
+- (done) tap-only keys
+- (done) hold-only keys
+- (done) Transparent key support
+- (done) None key support
+- Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
 - One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - "Tap+hold for layer switch" on same keys
 - "Tap+hold for modifiers switch" on same keys
-- Combos
+
 - Tri-layer functionality for two layers => 3rd layer
-- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing 
+- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
 - Ensure special-tab case is covered
 - Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
 - Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 
 ## Hardware
 - Support trrs connections
-
 
 # Highligthed features
 - Written in zig.
@@ -45,14 +47,8 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 # When not to choose zigmkay
 - wireless: zigmkay is not planned to be wireless ever.
 - mcu: zigmkay will only support the mcu types that microzig supports.
-- tap: dances: zigmkay does not currently support tap dances - only tap/hold is supported as I don't need tap dances myself. 
-- rgb: zigmkay does not have rgb support - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
+- tap dances: only tap/hold is supported as I don't need tap dances myself. But might be a future thing.
+- rgb: I don't need rgb support myself - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
 
 # Guide
-## Key definitions
-- Transparent key: core.KeyDef.TRANSPARENT
-- None key: core.KeyDef.NONE
-- Tap-only key: core.KeyDef.TAP(keycode)
-- Tap-only key with a modifier applied: core.KeyDef.TAP_WITH_MOD(keycode, .{.left_shift = true})
-- Hold-only for modifier(s): core.KeyDef.HOLD_MOD(.{.left_shift = true})
-- Hold-only for layer shift: core.KeyDef.MO(layer_index)
+(todo)
