@@ -11,9 +11,7 @@ pub fn main() !void {
 
     // Logic
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
-    var processor = zigmkay.processing.CreateProcessorType(
-        &keyboard.dimensions,
-    ){};
+    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     // Cycle
