@@ -2,27 +2,9 @@ const std = @import("std");
 const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
-const TestObjects = struct {
-    matrix_change_queue: core.MatrixStateChangeQueue,
-    actions_queue: core.OutputCommandQueue,
-    processor: zigmkay.processing.Processor,
-    fn press_key(self: *TestObjects, key_index: usize, time: core.TimeSinceBoot) !void {
-        try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = true, .key_index = key_index });
-    }
-    fn release_key(self: *TestObjects, key_index: usize, time: core.TimeSinceBoot) !void {
-        try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
-    }
-};
-fn init_test() TestObjects {
-    return TestObjects{
-        .matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
-        .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
-        .processor = zigmkay.processing.CreateProcessor(),
-    };
-}
+const init_test = @import("processing.test_helpers.zig").init_test;
 
 test "MT tap within tapping term" {
-    var o = init_test();
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
     const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
@@ -31,9 +13,10 @@ test "MT tap within tapping term" {
     const layer_1 = [_]core.KeyDef{ D, E, F };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(0, current_time);
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // Now ensure that a tap will happen when releasing within tapping term
@@ -49,7 +32,6 @@ test "MT tap within tapping term" {
 
 test "MT tap exceeding tapping term on release" {
     // Expect hold
-    var o = init_test();
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
     const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
@@ -58,9 +40,10 @@ test "MT tap exceeding tapping term on release" {
     const layer_1 = [_]core.KeyDef{ D, E, F };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // ensure nothing
     try o.press_key(0, current_time);
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     current_time += tapping_terms_ms + 1; //exceeds tapping term
     try o.release_key(0, current_time);

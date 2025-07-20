@@ -2,22 +2,10 @@ const std = @import("std");
 const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
-const TestObjects = struct {
-    matrix_change_queue: core.MatrixStateChangeQueue,
-    actions_queue: core.OutputCommandQueue,
-    processor: zigmkay.processing.Processor,
-};
-fn init_test() TestObjects {
-    return TestObjects{
-        .matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
-        .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
-        .processor = zigmkay.processing.CreateProcessor(),
-    };
-}
+const init_test = @import("processing.test_helpers.zig").init_test;
 
 test "TRANSPARENT case 1" {
     // Transparent key - ensure key on lower active layers used - case A - expect fallback to next active layer
-    var o = init_test();
 
     const current_time: core.TimeSinceBoot = 100;
     const mo1_key = core.KeyDef.MO(1);
@@ -28,7 +16,7 @@ test "TRANSPARENT case 1" {
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -37,7 +25,7 @@ test "TRANSPARENT case 1" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodePress);
@@ -49,7 +37,6 @@ test "TRANSPARENT case 1" {
 }
 test "TRANSPARENT case 2" {
     // Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer
-    var o = init_test();
 
     const current_time: core.TimeSinceBoot = 100;
     const mo1_key = core.KeyDef.MO(1);
@@ -60,7 +47,7 @@ test "TRANSPARENT case 2" {
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -69,7 +56,7 @@ test "TRANSPARENT case 2" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press A expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -82,7 +69,6 @@ test "TRANSPARENT case 2" {
 
 test "TRANSPARENT case 3" {
     // Layers - transparent key - ensure transparent key on base layer won't do anything
-    var o = init_test();
 
     const current_time: core.TimeSinceBoot = 100;
     const mo1_key = core.KeyDef.MO(1);
@@ -93,7 +79,7 @@ test "TRANSPARENT case 3" {
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -102,7 +88,7 @@ test "TRANSPARENT case 3" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
@@ -110,14 +96,13 @@ test "TRANSPARENT case 3" {
 
 test "NONE key" {
     // Expect nothing to happen
-    var o = init_test();
 
     const current_time: core.TimeSinceBoot = 100;
     const mo1_key = core.KeyDef.MO(1);
     const base_layer = [_]core.KeyDef{ A, A, mo1_key };
     const layer_1 = [_]core.KeyDef{ core.KeyDef.NONE(), D, D };
     const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
-
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
     // Hold for layer switch 1
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
 
@@ -125,7 +110,7 @@ test "NONE key" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(base_layer.len, keymap.len, &keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
