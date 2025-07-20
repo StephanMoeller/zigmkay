@@ -30,9 +30,8 @@ pub const Processor = struct {
 
     pub fn Process(
         self: *Processor,
-        comptime KeyCount: usize,
-        comptime LayerCount: usize,
-        keymap: *const [LayerCount][KeyCount]core.KeyDef,
+        comptime keymap_dimensions: *const core.KeymapDimensions,
+        keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
         input: *core.MatrixStateChangeQueue,
         output_queue: *core.OutputCommandQueue,
         current_time: core.TimeSinceBoot,
@@ -49,7 +48,7 @@ pub const Processor = struct {
 
                 // Find key on active position
                 var pressed_key_def = keymap[0][next_event.key_index];
-                var layer_index: usize = @as(usize, LayerCount - 1);
+                var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
                 while (layer_index > 0) {
                     //std.log.warn("\ntesting: {}\n", .{layer_index});
                     if (self.layers_activations.is_layer_active(layer_index) and !keymap[layer_index][next_event.key_index].is_transparent()) {

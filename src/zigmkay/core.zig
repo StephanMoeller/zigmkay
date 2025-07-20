@@ -8,6 +8,10 @@ const generic_queue = @import("generic_queue.zig");
 // TODO Hold for Modifiers
 // TODO Hold for momentary layer switch
 // TODO Combine any tap with any hold
+pub const KeymapDimensions = struct {
+    key_count: usize,
+    layer_count: usize,
+};
 pub const TapDef = struct {
     tap_keycode: u8 = 0,
     tap_modifiers: ?Modifiers = null,

@@ -30,7 +30,7 @@ pub fn main() !void {
         try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Decide actions
-        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &matrix_change_queue, &usb_command_queue, current_time);
+        try processor.Process(&keyboard.dimensions, &keyboard.keymap, &matrix_change_queue, &usb_command_queue, current_time);
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
