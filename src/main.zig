@@ -18,7 +18,14 @@ pub fn main() !void {
     // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
     while (true) {
         const current_time = time.get_time_since_boot().to_us();
-        // Register input
+
+        // Register switch activations
+        // Read switch activations => output KeyDef press/hold (this is where combos are handled and a combo can fire anything that a single key can, including tap/hold
+        //      NOTE: if a combo is layer specific, knowledge about what layer is active should be readable here and can no longer just be part of
+        // Read KeyDef press/hold => decide taps and holds
+        //      NOTE: if holds should only applies if preceeding by specific key indexes, the key indexes should also be readable here
+        //
+        //
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
         try scanner.DetectKeyboardChanges(&keyboard_change_queue, current_time);
 

@@ -66,7 +66,11 @@ pub const LayerIndex = usize;
 pub const TappingTermType = u16;
 pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const TimeSinceBoot = u64;
+
+// Switch events
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
+
+// Output usb commands
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
 
 // TODO: this can be optimized to store everything as one u32 field
