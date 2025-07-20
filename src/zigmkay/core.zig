@@ -54,24 +54,21 @@ pub const KeyDef = struct {
 };
 const TransparentLayerValue = 15;
 
-// A key definition that only has a tap functionality
-pub const OutputCommand = union(enum) {
-    KeyCodePress: u8,
-    KeyCodeRelease: u8,
-    ModifiersChanged: Modifiers,
-};
-
 pub const KeyIndex = usize;
 pub const LayerIndex = usize;
 pub const TappingTermType = u16;
-pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
-pub const TimeSinceBoot = u64;
 
-// Switch events
+// Matrix events: switch press/release,
+pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
 
-// Output usb commands
+// KeyDef events: KeyDef press/release (could be a combo activating)
+
+// USB output
+pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers };
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, 250);
+
+pub const TimeSinceBoot = u64;
 
 // TODO: this can be optimized to store everything as one u32 field
 
