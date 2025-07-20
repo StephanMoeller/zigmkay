@@ -50,7 +50,7 @@ var current_states: [pinsToKeysMapping.len]bool = [1]bool{false} ** (pinsToKeysM
 var current_states_last_changed: [pinsToKeysMapping.len]u64 = [1]u64{0} ** (pinsToKeysMapping.len);
 pub const Scanner = struct {
     debounce_us: u64,
-    pub fn DetectKeyboardChanges(self: *const Scanner, output_queue: *core.KeyboardStateChangeQueue, current_time: core.TimeSinceBoot) !void {
+    pub fn DetectKeyboardChanges(self: *const Scanner, output_queue: *core.MatrixStateChangeQueue, current_time: core.TimeSinceBoot) !void {
         // if
         for (pinsToKeysMapping, 0..) |mapping, key_index| {
             // todo: dont wait if previous col was the same as this one

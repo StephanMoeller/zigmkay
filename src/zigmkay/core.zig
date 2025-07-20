@@ -59,8 +59,8 @@ pub const LayerIndex = usize;
 pub const TappingTermType = u16;
 
 // Matrix events: switch press/release,
-pub const KeyboardStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
-pub const KeyboardStateChangeQueue = generic_queue.GenericQueue(KeyboardStateChange, 250);
+pub const MatrixStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
+pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, 250);
 
 // KeyDef events: KeyDef press/release (could be a combo activating)
 

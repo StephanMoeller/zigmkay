@@ -28,7 +28,7 @@ pub const Processor = struct {
         comptime KeyCount: usize,
         comptime LayerCount: usize,
         keymap: *const [LayerCount][KeyCount]core.KeyDef,
-        input: *core.KeyboardStateChangeQueue,
+        input: *core.MatrixStateChangeQueue,
         output_queue: *core.OutputCommandQueue,
         current_time: core.TimeSinceBoot,
     ) !void {

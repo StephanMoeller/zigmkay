@@ -3,7 +3,7 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const TestObjects = struct {
-    keyboard_change_queue: core.KeyboardStateChangeQueue,
+    keyboard_change_queue: core.MatrixStateChangeQueue,
     actions_queue: core.OutputCommandQueue,
     processor: zigmkay.processing.Processor,
     fn press_key(self: *TestObjects, key_index: usize, time: core.TimeSinceBoot) !void {
@@ -15,7 +15,7 @@ const TestObjects = struct {
 };
 fn init_test() TestObjects {
     return TestObjects{
-        .keyboard_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create(),
+        .keyboard_change_queue = zigmkay.core.MatrixStateChangeQueue.Create(),
         .actions_queue = zigmkay.core.OutputCommandQueue.Create(),
         .processor = zigmkay.processing.CreateProcessor(),
     };

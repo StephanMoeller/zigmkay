@@ -6,7 +6,7 @@ const time = rp2xxx.time;
 
 pub fn main() !void {
     // Data queues
-    var keyboard_change_queue = zigmkay.core.KeyboardStateChangeQueue.Create();
+    var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     // Logic
@@ -27,10 +27,10 @@ pub fn main() !void {
         //
         //
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        try scanner.DetectKeyboardChanges(&keyboard_change_queue, current_time);
+        try scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Decide actions
-        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &keyboard_change_queue, &usb_command_queue, current_time);
+        try processor.Process(keyboard.KeyCount, keyboard.LayerCount, &keyboard.keymap, &matrix_change_queue, &usb_command_queue, current_time);
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
