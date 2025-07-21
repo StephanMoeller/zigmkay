@@ -4,8 +4,9 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 # Getting started
 1. Download zig version 14.1
 2. Clone this repo
-3. Define you own files (todo: write in details what needs to be done)
-4. Compile using ./build.zig and deploy using ./
+3. (todo)
+4.
+5.
 
 # TODO
 ## Scanning
@@ -16,17 +17,14 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - (done) hold-only keys
 - (done) Transparent key support
 - (done) None key support
-- Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
-- Tap and hold on the same key (remember features: tapping term, retrotapping, permissive hold)
-- One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
-- "Tap+hold for layer switch" on same keys
-- "Tap+hold for modifiers switch" on same keys
-
-- Tri-layer functionality for two layers => 3rd layer
-- Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
-- Ensure special-tab case is covered
-- Find a way to do tri-layer support, eg no matter in what order, holding ie both thumbs should always give you a third layer. This is possible in default land in zmk, but in qmk it must be done manually.
-- Autofire: allow fast reacting autofire on certain keys, eg arrow keys
+- (done) Tap/Hold - both layer and modifiers are supported. Currently only simple cases where the key is held for more than tapping term period and where it is tapped quickly
+- TODO Tap/Hold feature: retrotapping
+- TODO Tap/Hold feature: permissive hold
+- TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
+- TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
+- TODO Tri-layer functionality for two layers => 3rd layer
+- TODO Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
+- TODO Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 
 ## Hardware
 - Support trrs connections
@@ -52,3 +50,24 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 
 # Guide
 (todo)
+
+
+I have used the last month working on a custom firmware. I have previous been playing with arduino stuff and embedded programming and did some toy projects in zig. But with microzig (a project working on zig support on a range of mcu's) it suddenly seemed within reach to have a poc running on my rp2040 based keyboard.
+I made this project: https://github.com/StephanMoeller/zigmkay/tree/main and it is running on a uniboard that I have. 
+
+The overall orchestration can be seen in https://github.com/StephanMoeller/zigmkay/blob/main/src/main.zig and consists of:
+
+1. Matrix scanning
+This is a small part of the overall project and is currently fully working but very customized to the current board I have and not optimal regarding performance. But it works flawlessly and is concidered done for this poc.
+
+2. Processing
+This is where all the fun is.
+
+3. Usb communication
+This part is also very small regarding complexity and is also concidered done. There might be some tweeks later on, but overall it works like it should.
+
+
+
+Features supported:
+
+It consists of some minimal code 
