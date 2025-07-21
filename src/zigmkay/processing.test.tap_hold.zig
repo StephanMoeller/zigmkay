@@ -11,12 +11,12 @@ test "MT tap within tapping term" {
 
     const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = [_]core.KeyDef{ D, E, F };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(0, current_time);
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // Now ensure that a tap will happen when releasing within tapping term
@@ -38,12 +38,12 @@ test "MT tap exceeding tapping term on release" {
 
     const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = [_]core.KeyDef{ D, E, F };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // ensure nothing
     try o.press_key(0, current_time);
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     current_time += tapping_terms_ms + 1; //exceeds tapping term
     try o.release_key(0, current_time);

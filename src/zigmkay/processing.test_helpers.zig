@@ -1,7 +1,10 @@
 const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
-pub fn init_test(comptime dimensions: core.KeymapDimensions) type {
-    const ProcessorType = zigmkay.processing.CreateProcessorType(dimensions);
+pub fn init_test(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
+    const ProcessorType = zigmkay.processing.CreateProcessorType(
+        keymap_dimensions,
+        keymap,
+    );
     return struct {
         const Self = @This();
         matrix_change_queue: zigmkay.core.MatrixStateChangeQueue = zigmkay.core.MatrixStateChangeQueue.Create(),

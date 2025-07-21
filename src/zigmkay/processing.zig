@@ -1,7 +1,7 @@
 const std = @import("std");
 const core = @import("core.zig");
 
-pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions) type {
+pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
     return struct {
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
@@ -14,7 +14,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions) ty
 
         pub fn Process(
             self: *Self,
-            keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
             input: *core.MatrixStateChangeQueue,
             output_queue: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,

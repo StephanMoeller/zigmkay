@@ -15,8 +15,8 @@ test "TRANSPARENT case 1" {
     const layer_1 = [_]core.KeyDef{ B, B, B, mo3_key, B, B };
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -25,7 +25,7 @@ test "TRANSPARENT case 1" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press B expected
     try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodePress);
@@ -46,8 +46,8 @@ test "TRANSPARENT case 2" {
     const layer_1 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, mo3_key, B, B };
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -56,7 +56,7 @@ test "TRANSPARENT case 2" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Press A expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -78,8 +78,8 @@ test "TRANSPARENT case 3" {
     const layer_1 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, B, B, B };
     const layer_2 = [_]core.KeyDef{ C, C, C, C, C, C };
     const layer_3 = [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), core.KeyDef.NONE(), D, D, D, D };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
@@ -88,7 +88,7 @@ test "TRANSPARENT case 3" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
@@ -101,8 +101,8 @@ test "NONE key" {
     const mo1_key = core.KeyDef.MO(1);
     const base_layer = [_]core.KeyDef{ A, A, mo1_key };
     const layer_1 = [_]core.KeyDef{ core.KeyDef.NONE(), D, D };
-    const keymap = [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
-    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }){};
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
 
@@ -110,7 +110,7 @@ test "NONE key" {
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&keymap, &o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());

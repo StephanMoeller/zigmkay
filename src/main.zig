@@ -11,7 +11,7 @@ pub fn main() !void {
 
     // Logic
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
-    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions){};
+    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     // Cycle
@@ -30,7 +30,7 @@ pub fn main() !void {
         try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Decide actions
-        try processor.Process(&keyboard.keymap, &matrix_change_queue, &usb_command_queue, current_time);
+        try processor.Process(&matrix_change_queue, &usb_command_queue, current_time);
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
