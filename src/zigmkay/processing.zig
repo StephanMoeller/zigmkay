@@ -39,6 +39,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 }
             }
         }
+        var retro_to_fire: ?core.TapDef = null;
         fn process_one(self: *Self, current_event: core.MatrixStateChange, output_usb_commands: *core.OutputCommandQueue) !void {
             // todo: hold-support
             // todo: take layouts into concideration here
@@ -98,6 +99,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             self.layers_activations.deactivate(hold_def.hold_layer.?);
                         }
                         release_map[current_event.key_index] = KeyReleaseAction.None;
+                        // decide if retro tapping should happen here.
+                        // Prerequisites:
+                        //     previous actions should be a press of the key current_event.key_index
+                        //     previous should be a tap_hold with retro tapping enabled
                     },
                 }
             }
@@ -117,6 +122,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
             }
         }
+
         fn apply_hold(self: *Self, hold: core.HoldDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
