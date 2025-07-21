@@ -7,10 +7,10 @@ const init_test = @import("processing.test_helpers.zig").init_test;
 test "MT tap within tapping term" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
 
-    const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
-    const layer_1 = [_]core.KeyDef{ D, E, F };
+    const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
+    const layer_1 = comptime [_]core.KeyDef{ D, E, F };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
@@ -34,10 +34,10 @@ test "MT tap exceeding tapping term on release" {
     // Expect hold
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
 
-    const base_layer = [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
-    const layer_1 = [_]core.KeyDef{ D, E, F };
+    const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
+    const layer_1 = comptime [_]core.KeyDef{ D, E, F };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
