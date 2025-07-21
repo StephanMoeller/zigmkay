@@ -27,10 +27,17 @@ pub fn main() !void {
         //
         //
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
+        try matrix_scanner.DetectKeyboardChanges(
+            &matrix_change_queue, // output queue
+            current_time,
+        );
 
         // Decide actions
-        try processor.Process(&matrix_change_queue, &usb_command_queue, current_time);
+        try processor.Process(
+            &matrix_change_queue, // input queue
+            &usb_command_queue, // output queue
+            current_time,
+        );
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
