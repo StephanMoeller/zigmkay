@@ -137,19 +137,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
     };
 }
 
-const State = enum
-{
-    None,
-    TapHoldPressed,
-    OtherKeyPressed,
-    SameKeyReleased,
-    TappingTermElapsed
-}
-const Command = 
-const StateMachine = struct{
-
-}
-
 const LC = 0x00E0;
 const LS = 0x00E1;
 const LA = 0x00E2;
