@@ -131,9 +131,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             release_map[current_event.key_index] = KeyReleaseAction.None;
                         },
                     }
-                    // TODO:
-                    // key_def should not be read from the layout but be the exact key that was pressed to ensure a layer switch
-                    // between press and release will still trigger releasing of the original key and not the one on the new layer
                 }
             }
         }
