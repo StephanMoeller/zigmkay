@@ -12,6 +12,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
         // The currently activated modifiers
         var modifiers: core.Modifiers = .{};
+        var retro_to_fire: ?core.TapDef = null;
+        var previous_matrix_change: core.MatrixStateChange = undefined;
 
         pub fn Process(
             self: *Self,
@@ -25,6 +27,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 const next_change = try input_matrix_changes.dequeue();
                 try time_elapsed(self, next_change.time, output_usb_commands);
                 try self.process_one(next_change, output_usb_commands);
+                previous_matrix_change = next_change;
             }
             try time_elapsed(self, current_time, output_usb_commands);
         }
@@ -35,11 +38,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 if (current_time - current_undecided_matrix_change.time > pending_key_def.tap_hold.tapping_term_ms) {
                     // Pressed, timeout => hold
                     self.current_undecided_matrix_change_or_null = null;
-                    try apply_hold(self, pending_key_def.tap_hold.hold, current_undecided_matrix_change, output_usb_commands);
+                    try apply_hold(self, pending_key_def.tap_hold.hold, pending_key_def, current_undecided_matrix_change, output_usb_commands);
                 }
             }
         }
-        var retro_to_fire: ?core.TapDef = null;
+
         fn process_one(self: *Self, current_event: core.MatrixStateChange, output_usb_commands: *core.OutputCommandQueue) !void {
             // todo: hold-support
             // todo: take layouts into concideration here
@@ -51,11 +54,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 if (pending_change.pressed and current_event.pressed == false and pending_change.key_index == current_event.key_index) {
                     // same key has been released => tap
                     const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands);
+                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                 } else {
                     // all other cases currently also trigger a tap but is isolated in this code for the above logic to remain as it is a known case
                     const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands);
+                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                 }
             }
 
@@ -64,10 +67,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 const pressed_key_def = determine_key_def(self, current_event.key_index);
                 switch (pressed_key_def) {
                     .tap_only => |tap| {
-                        try apply_tap(tap, current_event, output_usb_commands);
+                        try apply_tap(tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                     },
                     .hold_only => |hold| {
-                        try apply_hold(self, hold, current_event, output_usb_commands);
+                        try apply_hold(self, hold, pressed_key_def, current_event, output_usb_commands);
                     },
                     .tap_hold => |tap_and_hold| {
                         _ = tap_and_hold;
@@ -99,16 +102,27 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             self.layers_activations.deactivate(hold_def.hold_layer.?);
                         }
                         release_map[current_event.key_index] = KeyReleaseAction.None;
+
                         // decide if retro tapping should happen here.
                         // Prerequisites:
                         //     previous actions should be a press of the key current_event.key_index
                         //     previous should be a tap_hold with retro tapping enabled
+                        const same_key_was_just_pressed = previous_matrix_change.pressed and previous_matrix_change.key_index == current_event.key_index;
+                        if (same_key_was_just_pressed) {
+                            warn("same key was just released");
+                            if (retro_to_fire) |tap| {
+                                warn("retro tap executing");
+                                try apply_tap(tap, current_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                                retro_to_fire = null;
+                            }
+                        }
                     },
                 }
             }
         }
 
-        fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+        const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
+        fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
             if (tap.tap_modifiers) |tap_modifiers| {
                 warn("tap with modifier - all done at once");
                 // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
@@ -117,13 +131,21 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
                 try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
             } else {
-                warn("tap with modifier - release set");
-                release_map[event.key_index] = KeyReleaseAction{ .ReleaseTap = tap };
+                warn("tap without modifier - release set");
+
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
+                switch (release_mode) {
+                    .AwaitKeyReleased => {
+                        release_map[event.key_index] = KeyReleaseAction{ .ReleaseTap = tap };
+                    },
+                    .ForceInstant => {
+                        try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
+                    },
+                }
             }
         }
 
-        fn apply_hold(self: *Self, hold: core.HoldDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+        fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
                 modifiers = modifiers.add(hold.hold_modifiers.?);
@@ -134,6 +156,16 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
 
             release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
+            retro_to_fire = null;
+            switch (key_def) {
+                .tap_hold => |val| {
+                    if (val.retro_tapping) {
+                        warn("prepared retro tap");
+                        retro_to_fire = val.tap;
+                    }
+                },
+                else => {},
+            }
         }
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {
             // Find key on active position
@@ -151,8 +183,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             return pressed_key_def;
         }
         fn warn(comptime msg: []const u8) void {
-            _ = msg;
-            //std.log.warn(msg, .{});
+            //_ = msg;
+            std.log.warn(msg, .{});
         }
     };
 }
