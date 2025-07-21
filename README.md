@@ -30,7 +30,7 @@ GPL2: Use this for whatever you want, but if you do, others must be able to use 
 - Support trrs connections
 
 # Highligthed features
-- Written in zig.
+- Written in zig. This should make it possible to give better and more compile error messages.
 - Easy start: Easy to setup and compile locally (in opposition to qmk where python is now annoying, you must git pull with -recursive flag, you must run a qmk setup command etc). The "etc" is mainly because I personally always feel there are more cases, but I could not come up with any at the time of writing :D
 - tap-with-mod combined with hold: Say you need to press altgr+7 for making a {, then you also want the same key to be a modifier when hold. This is possible out of the box (possible in zmk, but in qmk this must be done using custom tap/hold handling)
 - custom code is more isolated to a key. This is one of the very nice feature in zmk - in qmk you cannot do this in the same manner, you will have the big switch case to handle all the custom behaviour.
