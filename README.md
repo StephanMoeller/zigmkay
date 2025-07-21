@@ -23,6 +23,8 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - (done) Tap/Hold - both layer and modifiers are supported. Currently only simple cases where the key is held for more than tapping term period and where it is tapped quickly
 - (done) Tap/Hold feature: retrotapping
 - TODO Tap/Hold feature: permissive hold
+- TODO Tap/Hold feature: double modifier holds
+- TODO Tap/Hold feature: tripple modifier holds
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - TODO Tri-layer functionality for two layers => 3rd layer
