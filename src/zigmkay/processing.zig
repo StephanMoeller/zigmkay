@@ -54,11 +54,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 if (pending_change.pressed and current_event.pressed == false and pending_change.key_index == current_event.key_index) {
                     // same key has been released => tap
                     const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                    try apply_tap(pending_key_def.tap_hold.tap, pending_change, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                 } else {
                     // all other cases currently also trigger a tap but is isolated in this code for the above logic to remain as it is a known case
                     const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                    try apply_tap(pending_key_def.tap_hold.tap, pending_change, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                 }
             }
 
@@ -80,19 +80,19 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     .none => {},
                 }
             } else {
-                warn("1 released");
+                warn("1 released", .{});
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
                 switch (release_map[current_event.key_index]) {
                     .None => {
-                        warn("1 released c");
+                        warn("empty slot was released at key_index {}", .{current_event.key_index});
                     },
                     .ReleaseTap => |tap_def| {
-                        warn("1 released a");
+                        warn("1 released a", .{});
                         try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
                         release_map[current_event.key_index] = KeyReleaseAction.None;
                     },
                     .ReleaseHold => |hold_def| {
-                        warn("1 released B");
+                        warn("1 released B", .{});
                         if (hold_def.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
                             modifiers = modifiers.remove(hold_def.hold_modifiers.?);
@@ -109,13 +109,13 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         //     previous should be a tap_hold with retro tapping enabled
                         const same_key_was_just_pressed = previous_matrix_change.pressed and previous_matrix_change.key_index == current_event.key_index;
                         if (same_key_was_just_pressed) {
-                            warn("same key was just released");
+                            warn("same key was just released", .{});
                             if (retro_to_fire) |tap| {
-                                warn("retro tap executing");
+                                warn("retro tap executing", .{});
                                 try apply_tap(tap, current_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                                retro_to_fire = null;
                             }
                         }
+                        retro_to_fire = null;
                     },
                 }
             }
@@ -124,14 +124,14 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
         fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
             if (tap.tap_modifiers) |tap_modifiers| {
-                warn("tap with modifier - all done at once");
+                warn("tap with modifier - all done at once", .{});
                 // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
                 try output_queue.enqueue(.{ .ModifiersChanged = tap_modifiers });
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                 try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
                 try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
             } else {
-                warn("tap without modifier - release set");
+                warn("tap without modifier - release set - key: {}, at index: {}", .{ tap.tap_keycode, event.key_index });
 
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                 switch (release_mode) {
@@ -146,6 +146,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         }
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
                 modifiers = modifiers.add(hold.hold_modifiers.?);
@@ -160,7 +161,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             switch (key_def) {
                 .tap_hold => |val| {
                     if (val.retro_tapping) {
-                        warn("prepared retro tap");
+                        warn("prepared retro tap", .{});
                         retro_to_fire = val.tap;
                     }
                 },
@@ -182,9 +183,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
             return pressed_key_def;
         }
-        fn warn(comptime msg: []const u8) void {
+        fn warn(comptime msg: []const u8, args: anytype) void {
             //_ = msg;
-            std.log.warn(msg, .{});
+            std.log.warn(msg, args);
         }
     };
 }
