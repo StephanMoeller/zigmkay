@@ -28,6 +28,7 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - TODO Tri-layer functionality for two layers => 3rd layer
 - TODO Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
 - TODO Autofire: allow fast reacting autofire on certain keys, eg arrow keys
+- TODO Trrs
 
 ## Hardware
 - Support trrs connections
