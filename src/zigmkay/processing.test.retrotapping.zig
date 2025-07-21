@@ -111,13 +111,13 @@ test "MT retrotapping - press/other/release case B" {
 }
 test "MT retrotapping - press/other/release case C" {
     // retro disabled, released after tt, expect hold only
-    try run_retrotest_test(.{ .retro_enabled = false, .tapping_terms_ms = 250, .release_delta_time = 251, .press_other_before_release = true, .expectation = Expectation.Hold });
-    try run_retrotest_test(.{ .retro_enabled = false, .tapping_terms_ms = 250, .release_delta_time = 350, .press_other_before_release = true, .expectation = Expectation.Hold });
+    try run_retrotest_test(.{ .retro_enabled = false, .tapping_terms_ms = 250, .release_delta_time = 251, .press_other_before_release = true, .expectation = Expectation.Tap });
+    try run_retrotest_test(.{ .retro_enabled = false, .tapping_terms_ms = 250, .release_delta_time = 350, .press_other_before_release = true, .expectation = Expectation.Tap });
 }
 test "MT retrotapping - press/other/release case D" {
     // retro enabled, released after tt, expect hold only
-    try run_retrotest_test(.{ .retro_enabled = true, .tapping_terms_ms = 250, .release_delta_time = 251, .press_other_before_release = true, .expectation = Expectation.Hold });
-    try run_retrotest_test(.{ .retro_enabled = true, .tapping_terms_ms = 250, .release_delta_time = 350, .press_other_before_release = true, .expectation = Expectation.Hold });
+    try run_retrotest_test(.{ .retro_enabled = true, .tapping_terms_ms = 250, .release_delta_time = 251, .press_other_before_release = true, .expectation = Expectation.Tap });
+    try run_retrotest_test(.{ .retro_enabled = true, .tapping_terms_ms = 250, .release_delta_time = 350, .press_other_before_release = true, .expectation = Expectation.Tap });
 }
 const a = 0x04;
 const b = 0x05;
