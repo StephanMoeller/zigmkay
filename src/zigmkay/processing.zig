@@ -68,8 +68,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             while (input.Count() > 0) {
                 const next_event = try input.dequeue();
                 if (next_event.pressed) {
-
-                    // Find key on active position
                     const pressed_key_def = determine_key_def(self, next_event.key_index);
                     switch (pressed_key_def) {
                         .tap_only => |tap| {
