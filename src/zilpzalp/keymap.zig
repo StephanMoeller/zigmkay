@@ -7,13 +7,13 @@ pub const keymap = [dimensions.layer_count][dimensions.key_count]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
     W, R, P, B,                            K, L, O, U,
- left_shift, lower_case_a, S, T, G,     M, N, E, I, tuborg_start,
+ left_shift, A, S, T, G,     M, N, E, I, tuborg_start,
     X, C, D,                                H, COMM, DOT,
           ENTER, layer_1, MAGIC, SPACE
     },
 .{ //--------------------- 0 ---------------------
     N1, N2, N3, B,             K, L, O, U,
- left_shift, lower_case_a, S, T, G,             M, N, E, I, tuborg_start,
+ left_shift, A, S, T, G,             M, N, E, I, tuborg_start,
     X, C, D,                   H, COMM, DOT,
           ENTER, layer_1, MAGIC, SPACE
     },
@@ -21,12 +21,6 @@ pub const keymap = [dimensions.layer_count][dimensions.key_count]core.KeyDef{
 };
 
 const layer_1 = core.KeyDef.MO(1);
-const lower_case_a = core.KeyDef{
-    .tap = core.TapDef{
-    .tap_keycode = A.tap.?.tap_keycode,
-    .tap_modifiers = .{}
-    }
-};
 const left_shift = HoldMod(.{.left_shift = true });
 const MAGIC = FromKey(1);
 const A = FromKey(4);
@@ -82,9 +76,9 @@ const N9 = FromKey(0x0026);
 const N0 = FromKey(0x0027);
 
 const tuborg_start = core.KeyDef{
-    .tap = .{
-.tap_keycode = N7.tap.?.tap_keycode,
-    .tap_modifiers = .{.right_alt = true},
+    .tap_only = .{
+        .tap_keycode = N7.tap_only.tap_keycode,
+        .tap_modifiers = .{.right_alt = true},
     }
 };
 

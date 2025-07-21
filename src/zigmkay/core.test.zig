@@ -40,13 +40,3 @@ test "LayerActivations" {
     try std.testing.expectEqual(true, layers.is_layer_active(4)); // base is always active
     try std.testing.expectEqual(false, layers.is_layer_active(7)); // base is always active
 }
-
-test "KeyDef.TRANSPARENT()" {
-    // Ensure consistency with is_transparent()
-    try std.testing.expectEqual(true, core.KeyDef.TRANSPARENT().is_transparent());
-    try std.testing.expectEqual(false, core.KeyDef.NONE().is_transparent());
-    try std.testing.expectEqual(false, core.KeyDef.MO(1).is_transparent());
-    try std.testing.expectEqual(false, core.KeyDef.HOLD_MOD(.{}).is_transparent());
-    try std.testing.expectEqual(false, core.KeyDef.TAP(1).is_transparent());
-    try std.testing.expectEqual(false, core.KeyDef.TAP_WITH_MOD(1, .{}).is_transparent());
-}

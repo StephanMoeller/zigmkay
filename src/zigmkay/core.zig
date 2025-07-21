@@ -20,47 +20,51 @@ pub const HoldDef = struct {
     hold_modifiers: ?Modifiers = null,
     hold_layer: ?LayerIndex = null,
 };
-pub const KeyDef = struct {
-    tap: ?TapDef = null,
-    hold: ?HoldDef = null,
-    transparent: bool = false,
-    tapping_term_ms: TappingTermType = 100,
-    pub fn is_transparent(self: KeyDef) bool {
-        return self.transparent;
-    }
+pub const KeyDef = union(enum) {
+    none,
+    transparent,
+    tap_only: TapDef,
+    hold_only: HoldDef,
+    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType = 100 },
+
     pub fn TAP(keycode: u8) KeyDef {
-        return KeyDef{ .tap = .{ .tap_keycode = keycode } };
+        return KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
     }
 
     pub fn TAP_WITH_MOD(keycode: u8, modifiers: Modifiers) KeyDef {
-        return KeyDef{ .tap = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
+        return KeyDef{ .tap_only = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
     }
 
     pub fn HOLD_MOD(modifiers: Modifiers) KeyDef {
-        return KeyDef{ .hold = .{ .hold_modifiers = modifiers } };
+        return KeyDef{ .hold_only = .{ .hold_modifiers = modifiers } };
     }
     pub fn MO(layer: LayerIndex) KeyDef {
-        return KeyDef{ .hold = .{ .hold_layer = layer } };
+        return KeyDef{ .hold_only = .{ .hold_layer = layer } };
     }
     pub fn LT(layer: LayerIndex, tap_keycode: u8, tap_modifiers: Modifiers, tapping_term_ms: u16) KeyDef {
-        return KeyDef{
+        return KeyDef{ .tap_hold = .{
             .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
             .hold = .{ .hold_layer = layer },
             .tapping_term_ms = tapping_term_ms,
-        };
+        } };
     }
     pub fn MT(hold_modifiers: Modifiers, tap_keycode: u8, tap_modifiers: Modifiers, tapping_term_ms: u16) KeyDef {
-        return KeyDef{
-            .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
-            .hold = .{ .hold_modifiers = hold_modifiers },
+        return KeyDef{ .tap_hold = .{
+            .tap = .{
+                .tap_keycode = tap_keycode,
+                .tap_modifiers = tap_modifiers,
+            },
+            .hold = .{
+                .hold_modifiers = hold_modifiers,
+            },
             .tapping_term_ms = tapping_term_ms,
-        };
+        } };
     }
     pub fn NONE() KeyDef {
-        return KeyDef{};
+        return KeyDef.none;
     }
     pub fn TRANSPARENT() KeyDef {
-        return KeyDef{ .transparent = true };
+        return KeyDef.transparent;
     }
 };
 const TransparentLayerValue = 15;
