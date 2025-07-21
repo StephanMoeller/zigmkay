@@ -35,8 +35,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions) ty
                     var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
                     while (layer_index > 0) {
                         //std.log.warn("\ntesting: {}\n", .{layer_index});
-                        // transparent support: ... and !keymap[layer_index][next_event.key_index] == .{.transparent}
-                        if (self.layers_activations.is_layer_active(layer_index)) {
+                        // transparent support: ...
+                        if (self.layers_activations.is_layer_active(layer_index) and keymap[layer_index][next_event.key_index] != core.KeyDef.transparent) {
                             pressed_key_def = keymap[layer_index][next_event.key_index];
                             //std.log.warn("\nfound: {}\n", .{layer_index});
                             break;
