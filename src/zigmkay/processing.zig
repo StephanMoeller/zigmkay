@@ -37,6 +37,23 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
             release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
         }
+        fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {
+            // Find key on active position
+            var pressed_key_def = keymap[0][key_index];
+
+            var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
+            while (layer_index > 0) {
+                //std.log.warn("\ntesting: {}\n", .{layer_index});
+                // transparent support: ...
+                if (self.layers_activations.is_layer_active(layer_index) and keymap[layer_index][key_index] != core.KeyDef.transparent) {
+                    pressed_key_def = keymap[layer_index][key_index];
+                    //std.log.warn("\nfound: {}\n", .{layer_index});
+                    break;
+                }
+                layer_index -= 1;
+            }
+            return pressed_key_def;
+        }
         pub fn Process(
             self: *Self,
             input: *core.MatrixStateChangeQueue,
@@ -53,19 +70,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 if (next_event.pressed) {
 
                     // Find key on active position
-                    var pressed_key_def = keymap[0][next_event.key_index];
-
-                    var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
-                    while (layer_index > 0) {
-                        //std.log.warn("\ntesting: {}\n", .{layer_index});
-                        // transparent support: ...
-                        if (self.layers_activations.is_layer_active(layer_index) and keymap[layer_index][next_event.key_index] != core.KeyDef.transparent) {
-                            pressed_key_def = keymap[layer_index][next_event.key_index];
-                            //std.log.warn("\nfound: {}\n", .{layer_index});
-                            break;
-                        }
-                        layer_index -= 1;
-                    }
+                    const pressed_key_def = determine_key_def(self, next_event.key_index);
                     switch (pressed_key_def) {
                         .tap_only => |tap| {
                             try apply_tap(tap, next_event, output_queue);
