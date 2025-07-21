@@ -1,6 +1,9 @@
 # License
 GPL2: Use this for whatever you want, but if you do, others must be able to use your customizations as well, hence your forks will be gpl2 as well.
 
+# Philosophy
+No hidden control flow. I don't want any behind-the-scenes triggered timing events og interrupts working anywhere it can be avoided (which I believe is everywhere). I want plain, readable sequential code that the reader can make sense of, even the first time they read the code. 
+
 # Getting started
 1. Download zig version 14.1
 2. Clone this repo
