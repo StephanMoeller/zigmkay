@@ -20,7 +20,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             current_time: core.TimeSinceBoot,
         ) !void {
             // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
-            // This decreases the number of test combinations required to be run.
+            // This decreases the number of test combinations required to be run as all cases will result in changes being processed one by one
             while (input_matrix_changes.Count() > 0) {
                 const next_change = try input_matrix_changes.dequeue();
                 try time_elapsed(self, next_change.time, output_usb_commands);
