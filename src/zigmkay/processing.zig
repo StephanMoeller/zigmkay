@@ -12,13 +12,37 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         // The currently activated modifiers
         var modifiers: core.Modifiers = .{};
 
+        fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            const uses_modifiers = tap.tap_modifiers != null;
+            if (uses_modifiers) {
+                // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
+                try output_queue.enqueue(.{ .ModifiersChanged = tap.tap_modifiers.? });
+                try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
+                try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
+                try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+            } else {
+                release_map[event.key_index] = KeyReleaseAction{ .ReleaseTap = tap };
+                try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
+            }
+        }
+        fn apply_hold(self: *Self, hold: core.HoldDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            if (hold.hold_modifiers != null) {
+                // Apply the hold modifier(s)
+                modifiers = modifiers.add(hold.hold_modifiers.?);
+                try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
+            }
+            if (hold.hold_layer != null) {
+                self.layers_activations.activate(hold.hold_layer.?);
+            }
+
+            release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
+        }
         pub fn Process(
             self: *Self,
             input: *core.MatrixStateChangeQueue,
             output_queue: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
-            _ = current_time;
             // todo: hold-support
             // todo: take layouts into concideration here
             // todo: combo support
@@ -44,32 +68,23 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     }
                     switch (pressed_key_def) {
                         .tap_only => |tap| {
-                            const uses_modifiers = tap.tap_modifiers != null;
-                            if (uses_modifiers) {
-                                // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
-                                try output_queue.enqueue(.{ .ModifiersChanged = tap.tap_modifiers.? });
-                                try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
-                                try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
-                                try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
-                            } else {
-                                release_map[next_event.key_index] = KeyReleaseAction{ .ReleaseTap = tap };
-                                try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
-                            }
+                            try apply_tap(tap, next_event, output_queue);
                         },
                         .hold_only => |hold| {
-                            if (hold.hold_modifiers != null) {
-                                // Apply the hold modifier(s)
-                                modifiers = modifiers.add(hold.hold_modifiers.?);
-                                try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
-                            }
-                            if (hold.hold_layer != null) {
-                                self.layers_activations.activate(hold.hold_layer.?);
-                            }
-
-                            release_map[next_event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
+                            try apply_hold(self, hold, next_event, output_queue);
                         },
                         .tap_hold => |tap_and_hold| {
-                            _ = tap_and_hold;
+                            const data = input.peek_all();
+
+                            // If held for more than tapping term and nothing else happened => hold
+                            if (data.len == 0 and current_time - next_event.time > tap_and_hold.tapping_term_ms) {
+                                try apply_hold(self, tap_and_hold.hold, next_event, output_queue);
+                            }
+
+                            // If held for more than tapping term and next action happened after tapping term => hold
+                            if (data.len > 0 and data[0].time - next_event.time > tap_and_hold.tapping_term_ms) {
+                                try apply_hold(self, tap_and_hold.hold, next_event, output_queue);
+                            }
                         },
                         .transparent => {},
                         .none => {},
