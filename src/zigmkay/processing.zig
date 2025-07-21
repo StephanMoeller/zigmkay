@@ -94,9 +94,13 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 try apply_hold(self, tap_and_hold.hold, current_event, output_queue);
                             } else if (next_event_before_tapping_term) {
                                 // todo: this case is not covered by any tests
-
                                 warn("1 pressed B");
                                 try apply_tap(tap_and_hold.tap, current_event, output_queue);
+                            } else {
+                                // Add back the event to the queue
+                                // TODO: In case multible events are in the queue, indecisive cases will cause wrongful order of elements in queue if the first one is just re-enqueued as the tail
+                                try input.enqueue(current_event);
+                                return;
                             }
                         },
                         .transparent => {},
