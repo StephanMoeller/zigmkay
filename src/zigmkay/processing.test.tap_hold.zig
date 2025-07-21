@@ -3,11 +3,10 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const init_test = @import("processing.test_helpers.zig").init_test;
-
-test "MT tap within tapping term" {
+test "MT tap within tapping term - no modifier on tap" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -18,9 +17,8 @@ test "MT tap within tapping term" {
     try o.press_key(0, current_time);
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time += tapping_terms_ms - 1; // within tapping term
+    current_time += 10; // within tapping term
     try o.release_key(0, current_time);
-
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
@@ -33,7 +31,7 @@ test "MT tap within tapping term" {
 test "MT hold case: release after tapping term => hold" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -59,7 +57,7 @@ test "MT hold case: release after tapping term => hold" {
 test "MT hold case: timeout => hold" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
