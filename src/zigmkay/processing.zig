@@ -79,8 +79,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         .tap_hold => |tap_and_hold| {
                             const data = input.peek_all();
 
-                            const next_event_time: core.TimeSinceBoot = if (data.len > 0) data[0].time else current_time;
-                            const tapping_term_exceeded: bool = next_event_time - current_event.time > tap_and_hold.tapping_term_ms;
+                            const next_event_or_current_time: core.TimeSinceBoot = if (data.len > 0) data[0].time else current_time;
+                            const tapping_term_exceeded: bool = next_event_or_current_time - current_event.time > tap_and_hold.tapping_term_ms;
 
                             if (tapping_term_exceeded) {
                                 try apply_hold(self, tap_and_hold.hold, current_event, output_queue);
