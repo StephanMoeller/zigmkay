@@ -89,3 +89,39 @@ test "queue ring buffer testing" {
     try std.testing.expectEqual(4, try queue.dequeue());
     try std.testing.expectEqual(0, queue.Count());
 }
+
+test "peek_all" {
+    var queue = q.GenericQueue(u32, 5).Create();
+    try queue.enqueue(1);
+
+    {
+        const all = queue.peek_all();
+        try std.testing.expectEqual(1, all.len);
+        try std.testing.expectEqual(1, all[0]);
+    }
+    _ = try queue.enqueue(2);
+    _ = try queue.enqueue(3);
+    _ = try queue.enqueue(4);
+
+    {
+        const all = queue.peek_all();
+        try std.testing.expectEqual(4, all.len);
+
+        try std.testing.expectEqual(1, all[0]);
+        try std.testing.expectEqual(2, all[1]);
+        try std.testing.expectEqual(3, all[2]);
+        try std.testing.expectEqual(4, all[3]);
+    }
+
+    _ = try queue.dequeue();
+    _ = try queue.dequeue();
+
+    const all = queue.peek_all();
+    try std.testing.expectEqual(2, queue.Count());
+    {
+        try std.testing.expectEqual(2, all.len);
+
+        try std.testing.expectEqual(3, all[0]);
+        try std.testing.expectEqual(4, all[1]);
+    }
+}
