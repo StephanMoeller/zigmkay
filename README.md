@@ -21,7 +21,7 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - (done) Transparent key support
 - (done) None key support
 - (done) Tap/Hold - both layer and modifiers are supported. Currently only simple cases where the key is held for more than tapping term period and where it is tapped quickly
-- TODO Tap/Hold feature: retrotapping
+- (done) Tap/Hold feature: retrotapping
 - TODO Tap/Hold feature: permissive hold
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
