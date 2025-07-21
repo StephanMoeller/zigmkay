@@ -19,19 +19,14 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
-            if (input_matrix_changes.Count() == 0) {
-                // this will happen most of the time - and we need to be able to react to time passing by without anything else happening to handle tapping term timeouts
-                try time_elapsed(self, current_time, output_usb_commands);
-            } else {
-                // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
-                // This decreases the number of test combinations required to be run.
-                while (input_matrix_changes.Count() > 0) {
-                    const next_change = try input_matrix_changes.dequeue();
-                    try time_elapsed(self, next_change.time, output_usb_commands);
-                    try self.process_one(next_change, output_usb_commands);
-                }
-                try time_elapsed(self, current_time, output_usb_commands);
+            // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
+            // This decreases the number of test combinations required to be run.
+            while (input_matrix_changes.Count() > 0) {
+                const next_change = try input_matrix_changes.dequeue();
+                try time_elapsed(self, next_change.time, output_usb_commands);
+                try self.process_one(next_change, output_usb_commands);
             }
+            try time_elapsed(self, current_time, output_usb_commands);
         }
 
         fn time_elapsed(self: *Self, current_time: core.TimeSinceBoot, output_usb_commands: *core.OutputCommandQueue) !void {
