@@ -4,7 +4,8 @@ const core = @import("core.zig");
 pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
     return struct {
         fn warn(comptime msg: []const u8) void {
-            std.log.warn(msg, .{});
+            _ = msg;
+            //std.log.warn(msg, .{});
         }
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
