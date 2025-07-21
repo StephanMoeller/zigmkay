@@ -3,10 +3,6 @@ const core = @import("core.zig");
 
 pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
     return struct {
-        fn warn(comptime msg: []const u8) void {
-            _ = msg;
-            //std.log.warn(msg, .{});
-        }
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
 
@@ -15,6 +11,84 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
         // The currently activated modifiers
         var modifiers: core.Modifiers = .{};
+
+        pub fn Process(
+            self: *Self,
+            input_matrix_changes: *core.MatrixStateChangeQueue,
+            output_usb_commands: *core.OutputCommandQueue,
+            current_time: core.TimeSinceBoot,
+        ) !void {
+            // todo: hold-support
+            // todo: take layouts into concideration here
+            // todo: combo support
+            //
+            // idea: decide tap / hold / undecisive (wait some more)
+            while (input_matrix_changes.Count() > 0) {
+                const current_event = try input_matrix_changes.dequeue();
+                if (current_event.pressed) {
+                    const pressed_key_def = determine_key_def(self, current_event.key_index);
+                    switch (pressed_key_def) {
+                        .tap_only => |tap| {
+                            try apply_tap(tap, current_event, output_usb_commands);
+                        },
+                        .hold_only => |hold| {
+                            try apply_hold(self, hold, current_event, output_usb_commands);
+                        },
+                        .tap_hold => |tap_and_hold| {
+                            warn("1 pressed");
+                            const data = input_matrix_changes.peek_all();
+
+                            const next_event_or_current_time: core.TimeSinceBoot = if (data.len > 0) data[0].time else current_time;
+                            const tapping_term_exceeded: bool = next_event_or_current_time - current_event.time > tap_and_hold.tapping_term_ms;
+                            const next_event_before_tapping_term: bool = if (data.len > 0) data[0].time - current_event.time < tap_and_hold.tapping_term_ms else false;
+
+                            // tapping term expired - hold
+                            // same key released withing tapping term - tap
+                            if (tapping_term_exceeded) {
+                                warn("1 pressed A");
+                                try apply_hold(self, tap_and_hold.hold, current_event, output_usb_commands);
+                            } else if (next_event_before_tapping_term) {
+                                // todo: this case is not covered by any tests
+                                warn("1 pressed B");
+                                try apply_tap(tap_and_hold.tap, current_event, output_usb_commands);
+                            } else {
+                                // Add back the event to the queue
+                                // TODO: In case multible events are in the queue, indecisive cases will cause wrongful order of elements in queue if the first one is just re-enqueued as the tail
+                                try input_matrix_changes.enqueue(current_event);
+                                return;
+                            }
+                        },
+                        .transparent => {},
+                        .none => {},
+                    }
+                } else {
+                    warn("1 released");
+                    // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
+                    switch (release_map[current_event.key_index]) {
+                        .None => {
+                            warn("1 released c");
+                        },
+                        .ReleaseTap => |tap_def| {
+                            warn("1 released a");
+                            try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
+                            release_map[current_event.key_index] = KeyReleaseAction.None;
+                        },
+                        .ReleaseHold => |hold_def| {
+                            warn("1 released B");
+                            if (hold_def.hold_modifiers != null) {
+                                // Cancel the hold modifier(s)
+                                modifiers = modifiers.remove(hold_def.hold_modifiers.?);
+                                try output_usb_commands.enqueue(.{ .ModifiersChanged = modifiers });
+                            }
+                            if (hold_def.hold_layer != null) {
+                                self.layers_activations.deactivate(hold_def.hold_layer.?);
+                            }
+                            release_map[current_event.key_index] = KeyReleaseAction.None;
+                        },
+                    }
+                }
+            }
+        }
 
         fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
             if (tap.tap_modifiers) |tap_modifiers| {
@@ -57,82 +131,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
             return pressed_key_def;
         }
-        pub fn Process(
-            self: *Self,
-            input: *core.MatrixStateChangeQueue,
-            output_queue: *core.OutputCommandQueue,
-            current_time: core.TimeSinceBoot,
-        ) !void {
-            // todo: hold-support
-            // todo: take layouts into concideration here
-            // todo: combo support
-            //
-            // idea: decide tap / hold / undecisive (wait some more)
-            while (input.Count() > 0) {
-                const current_event = try input.dequeue();
-                if (current_event.pressed) {
-                    const pressed_key_def = determine_key_def(self, current_event.key_index);
-                    switch (pressed_key_def) {
-                        .tap_only => |tap| {
-                            try apply_tap(tap, current_event, output_queue);
-                        },
-                        .hold_only => |hold| {
-                            try apply_hold(self, hold, current_event, output_queue);
-                        },
-                        .tap_hold => |tap_and_hold| {
-                            warn("1 pressed");
-                            const data = input.peek_all();
-
-                            const next_event_or_current_time: core.TimeSinceBoot = if (data.len > 0) data[0].time else current_time;
-                            const tapping_term_exceeded: bool = next_event_or_current_time - current_event.time > tap_and_hold.tapping_term_ms;
-                            const next_event_before_tapping_term: bool = if (data.len > 0) data[0].time - current_event.time < tap_and_hold.tapping_term_ms else false;
-
-                            // tapping term expired - hold
-                            // same key released withing tapping term - tap
-                            if (tapping_term_exceeded) {
-                                warn("1 pressed A");
-                                try apply_hold(self, tap_and_hold.hold, current_event, output_queue);
-                            } else if (next_event_before_tapping_term) {
-                                // todo: this case is not covered by any tests
-                                warn("1 pressed B");
-                                try apply_tap(tap_and_hold.tap, current_event, output_queue);
-                            } else {
-                                // Add back the event to the queue
-                                // TODO: In case multible events are in the queue, indecisive cases will cause wrongful order of elements in queue if the first one is just re-enqueued as the tail
-                                try input.enqueue(current_event);
-                                return;
-                            }
-                        },
-                        .transparent => {},
-                        .none => {},
-                    }
-                } else {
-                    warn("1 released");
-                    // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
-                    switch (release_map[current_event.key_index]) {
-                        .None => {
-                            warn("1 released c");
-                        },
-                        .ReleaseTap => |tap_def| {
-                            warn("1 released a");
-                            try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
-                            release_map[current_event.key_index] = KeyReleaseAction.None;
-                        },
-                        .ReleaseHold => |hold_def| {
-                            warn("1 released B");
-                            if (hold_def.hold_modifiers != null) {
-                                // Cancel the hold modifier(s)
-                                modifiers = modifiers.remove(hold_def.hold_modifiers.?);
-                                try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
-                            }
-                            if (hold_def.hold_layer != null) {
-                                self.layers_activations.deactivate(hold_def.hold_layer.?);
-                            }
-                            release_map[current_event.key_index] = KeyReleaseAction.None;
-                        },
-                    }
-                }
-            }
+        fn warn(comptime msg: []const u8) void {
+            _ = msg;
+            //std.log.warn(msg, .{});
         }
     };
 }
