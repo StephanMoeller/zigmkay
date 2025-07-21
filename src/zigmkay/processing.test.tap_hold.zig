@@ -104,16 +104,6 @@ test "MT hold case: timeout => hold" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
-test "tap/hold mod - case: tap" {
-    // Tap and release within tapping term
-}
-
-test "tap/hold layer - case: hold" {
-    // Tap and release within tapping term
-}
-test "tap/hold mod - case: hold" {
-    // Tap and release within tapping term
-}
 const a = 0x04;
 const b = 0x05;
 const c = 0x06;

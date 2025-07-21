@@ -25,7 +25,7 @@ pub const KeyDef = union(enum) {
     transparent,
     tap_only: TapDef,
     hold_only: HoldDef,
-    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType = 100 },
+    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType = 100, retro_tapping: bool = false },
 
     pub fn TAP(keycode: u8) KeyDef {
         return KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
