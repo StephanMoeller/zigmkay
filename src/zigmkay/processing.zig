@@ -66,27 +66,27 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             //
             // idea: decide tap / hold / undecisive (wait some more)
             while (input.Count() > 0) {
-                const next_event = try input.dequeue();
-                if (next_event.pressed) {
-                    const pressed_key_def = determine_key_def(self, next_event.key_index);
+                const current_event = try input.dequeue();
+                if (current_event.pressed) {
+                    const pressed_key_def = determine_key_def(self, current_event.key_index);
                     switch (pressed_key_def) {
                         .tap_only => |tap| {
-                            try apply_tap(tap, next_event, output_queue);
+                            try apply_tap(tap, current_event, output_queue);
                         },
                         .hold_only => |hold| {
-                            try apply_hold(self, hold, next_event, output_queue);
+                            try apply_hold(self, hold, current_event, output_queue);
                         },
                         .tap_hold => |tap_and_hold| {
                             const data = input.peek_all();
 
                             // If held for more than tapping term and nothing else happened => hold
-                            if (data.len == 0 and current_time - next_event.time > tap_and_hold.tapping_term_ms) {
-                                try apply_hold(self, tap_and_hold.hold, next_event, output_queue);
-                            }
+                            if (data.len == 0 and current_time - current_event.time > tap_and_hold.tapping_term_ms) {
+                                try apply_hold(self, tap_and_hold.hold, current_event, output_queue);
+                            } else
 
                             // If held for more than tapping term and next action happened after tapping term => hold
-                            if (data.len > 0 and data[0].time - next_event.time > tap_and_hold.tapping_term_ms) {
-                                try apply_hold(self, tap_and_hold.hold, next_event, output_queue);
+                            if (data.len > 0 and data[0].time - current_event.time > tap_and_hold.tapping_term_ms) {
+                                try apply_hold(self, tap_and_hold.hold, current_event, output_queue);
                             }
                         },
                         .transparent => {},
@@ -94,11 +94,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     }
                 } else {
                     // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
-                    switch (release_map[next_event.key_index]) {
+                    switch (release_map[current_event.key_index]) {
                         .None => {},
                         .ReleaseTap => |tap_def| {
                             try output_queue.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
-                            release_map[next_event.key_index] = KeyReleaseAction.None;
+                            release_map[current_event.key_index] = KeyReleaseAction.None;
                         },
                         .ReleaseHold => |hold_def| {
                             if (hold_def.hold_modifiers != null) {
@@ -109,7 +109,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             if (hold_def.hold_layer != null) {
                                 self.layers_activations.deactivate(hold_def.hold_layer.?);
                             }
-                            release_map[next_event.key_index] = KeyReleaseAction.None;
+                            release_map[current_event.key_index] = KeyReleaseAction.None;
                         },
                     }
                     // TODO:

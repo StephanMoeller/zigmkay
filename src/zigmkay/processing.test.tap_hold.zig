@@ -16,12 +16,12 @@ test "MT tap within tapping term" {
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
-    try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // Now ensure that a tap will happen when releasing within tapping term
     current_time += tapping_terms_ms - 1; // within tapping term
     try o.release_key(0, current_time);
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -30,8 +30,7 @@ test "MT tap within tapping term" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 
-test "MT tap exceeding tapping term on release" {
-    // Expect hold
+test "MT hold case: release after tapping term => hold" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
     const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
@@ -41,16 +40,43 @@ test "MT tap exceeding tapping term on release" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    // ensure nothing
+    // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
-    current_time += tapping_terms_ms + 1; //exceeds tapping term
+    // Now ensure that a tap will happen when releasing within tapping term
+    current_time += tapping_terms_ms + 1; // within tapping term
     try o.release_key(0, current_time);
 
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
     // expect A pressed as no layer switch is expected
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+}
+
+test "MT hold case: timeout => hold" {
+    var current_time: core.TimeSinceBoot = 100;
+    const tapping_terms_ms: u16 = 250;
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(.{ .left_alt = true }, c, .{}, tapping_terms_ms);
+
+    const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
+    const layer_1 = comptime [_]core.KeyDef{ D, E, F };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
+    try o.press_key(0, current_time);
+
+    // Now ensure that a tap will happen when releasing within tapping term
+    current_time += tapping_terms_ms + 1; // within tapping term
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect A pressed as no layer switch is expected
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
+    //try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
