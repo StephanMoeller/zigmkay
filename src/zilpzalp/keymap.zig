@@ -6,9 +6,9 @@ pub const dimensions = core.KeymapDimensions{ .key_count = 28, .layer_count = 2 
 pub const keymap = [dimensions.layer_count][dimensions.key_count]core.KeyDef{
     // zig fmt: off
             .{ //--------------------- 0 ---------------------
-    W, R, P, B,                            K, L, O, U,
- left_shift, A, S, T, G,     M, N, E, I, tuborg_start,
-    X, C, D,                                H, COMM, DOT,
+    W, R, P,     B,        K,     L,    O, U,
+ F, A, S, LS(T), G,     M, LS(N), E,    I, Y,
+    X, C, D,               H,     COMM, DOT,
           ENTER, layer_1, MAGIC, SPACE
     },
 .{ //--------------------- 0 ---------------------
@@ -56,7 +56,24 @@ const COMM = FromKey(0x0036);
 const DOT = FromKey(0x0037);
 
 const LC = FromKey(0x00E0);
-const LS = FromKey(0x00E1);
+fn apply_mods(key_def: core.KeyDef, mods: core.Modifiers) core.KeyDef
+{
+    switch(key_def){
+        .tap_only => |tap| {
+            return core.KeyDef{.tap_hold = .{.tap = tap, .hold = core.HoldDef{.hold_modifiers = mods}, .retro_tapping = false, .tapping_term_ms = 250},};
+        },
+        .hold_only => |hold| {
+            return core.KeyDef{.hold_only = .{.hold = core.HoldDef{.hold_layer = hold.hold_layer, .hold_modifiers = mods, .retro_tapping = false, .tapping_term_ms = 250,}}};
+        },
+        .tap_hold => |tap_hold| {
+            return core.KeyDef{.tap_hold = .{.tap = tap_hold.tap, .hold = core.HoldDef{.hold_modifiers = mods}, .retro_tapping = false, .tapping_term_ms = 250},};
+ 
+    },
+        else => unreachable,
+}} 
+fn LS(key_def: core.KeyDef) core.KeyDef{
+    return apply_mods(key_def, .{.left_shift = true});
+}
 const LA = FromKey(0x00E2);
 const LG = FromKey(0x00E3);
 const RC = FromKey(0x00E4);
