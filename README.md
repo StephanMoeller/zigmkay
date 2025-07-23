@@ -16,7 +16,6 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 ## Processor
-<del>
 - (done) tap-only keys
 - (done) hold-only keys
 - (done) Transparent key support
@@ -26,7 +25,6 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - (done) Tap/Hold feature: permissive hold - on for all, not possible to disable as I have never seen anyone wanting this off
 - (done) Tap/Hold feature: double modifier holds (fixed automatically by improved logic)
 - (done) Tap/Hold feature: tripple modifier holds (fixed automatically by improved logic)
-</del>
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - TODO Tri-layer functionality for two layers => 3rd layer
