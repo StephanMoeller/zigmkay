@@ -16,7 +16,7 @@ No hidden control flow. I don't want any behind-the-scenes triggered timing even
 - Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 ## Processor
-- (done) tap-only keys
+<del>- (done) tap-only keys</del>
 - (done) hold-only keys
 - (done) Transparent key support
 - (done) None key support
