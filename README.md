@@ -1,3 +1,5 @@
+![ZigMkay - keyboard firmware created with zig](logo.png "ZigMkay - keyboard firmware created with zig")
+
 # License
 GPL2: Use this for whatever you want, but if you do, others must be able to use your customizations as well, hence your forks will be gpl2 as well.
 
