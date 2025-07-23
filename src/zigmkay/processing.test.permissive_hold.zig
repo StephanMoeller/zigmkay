@@ -10,7 +10,6 @@ const PermissiveHoldParameters = struct {
     other_release_delta: core.TimeSinceBoot,
     expectation: Expectation,
     tapping_terms_ms: core.TappingTermType,
-    other_key_def: core.KeyDef,
 };
 
 fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
@@ -23,7 +22,7 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
         .retro_tapping = false,
     } };
 
-    const other_key_def = config.other_key_def;
+    const other_key_def = comptime core.KeyDef.TAP(b);
     const base_layer = comptime [_]core.KeyDef{ key_with_permissive_hold, other_key_def, A };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
 
@@ -58,28 +57,22 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 test "MT perm hold - other key is tap, case A" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 3, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 3, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case B" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 251, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 251, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case C" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 247, .other_release_delta = 248, .target_release_delta = 249, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 247, .other_release_delta = 248, .target_release_delta = 249, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case D" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 248, .other_release_delta = 252, .target_release_delta = 253, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 248, .other_release_delta = 252, .target_release_delta = 253, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case E" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 252, .other_release_delta = 500, .target_release_delta = 501, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 252, .other_release_delta = 500, .target_release_delta = 501, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case F" {
-    const other_key = comptime core.KeyDef.TAP(b);
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 500, .other_release_delta = 600, .target_release_delta = 650, .other_key_def = other_key, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 500, .other_release_delta = 600, .target_release_delta = 650, .expectation = Expectation.Hold });
 }
 
 const a = 0x04;

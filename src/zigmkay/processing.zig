@@ -83,21 +83,15 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 }
                             }
                         }
+
+                        // No decision made while looping through all events, finally check if time just passed without anything happened
+                        // In this case, it's a hold.
                         const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
                         if (tapping_term_expired) {
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                             return ProcessContinuation.DequeueOneAndRunAgain;
                         }
 
-                        // more events, not including this key and tapping term expired
-                        // (permissive hold) another key were both pressed and release
-                        //
-                        //
-                        // tap cases:
-                        // pressed and released within tapping term expired
-                        //
-                        // retro tap:
-                        // pressed, another
                         return ProcessContinuation.Stop;
                     },
                     .transparent => {
