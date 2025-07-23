@@ -99,15 +99,15 @@ test "Rolling - with sudden shift usage" {
     try o.press_key(_a, 1);
     try o.press_key(_b, 2);
     try o.release_key(_a, 3);
-    try o.press_key(_e_with_shift, 4);
     try o.release_key(_b, 5);
+    try o.press_key(_e_with_shift, 4);
     try o.press_key(_c, 6);
     try o.release_key(_c, 7);
     try o.release_key(_e_with_shift, 8);
     try o.press_key(_d, 9);
     try o.press_key(_a, 10);
     try o.release_key(_d, 11);
-    try o.release_key(_a, 11);
+    try o.release_key(_a, 12);
 
     const current_time: core.TimeSinceBoot = 100;
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -116,8 +116,8 @@ test "Rolling - with sudden shift usage" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
