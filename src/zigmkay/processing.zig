@@ -20,10 +20,12 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
-            while (ProcessContinuation.RunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {}
+            while (ProcessContinuation.DequeueOneAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
+                _ = try input_matrix_changes.dequeue();
+            }
         }
 
-        const ProcessContinuation = enum { RunAgain, Stop };
+        const ProcessContinuation = enum { DequeueOneAndRunAgain, Stop };
         fn process_next(
             self: *Self,
             input_matrix_changes: *core.MatrixStateChangeQueue,
@@ -45,13 +47,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 switch (head_key_def) {
                     .tap_only => |tap| {
                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, head_key_def, head_event, output_usb_commands);
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .tap_hold => |tap_and_hold| {
 
@@ -64,12 +64,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
                                 if (tapping_term_expired) {
                                     try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                    _ = try input_matrix_changes.dequeue();
-                                    return ProcessContinuation.RunAgain;
+                                    return ProcessContinuation.DequeueOneAndRunAgain;
                                 } else {
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                                    _ = try input_matrix_changes.dequeue();
-                                    return ProcessContinuation.RunAgain;
+                                    return ProcessContinuation.DequeueOneAndRunAgain;
                                 }
                             }
 
@@ -78,8 +76,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             if (current_time - head_event.time > tap_and_hold.tapping_term_ms) {
                                 // No more events, tapping term expired
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                _ = try input_matrix_changes.dequeue();
-                                return ProcessContinuation.RunAgain;
+                                return ProcessContinuation.DequeueOneAndRunAgain;
                             } else {
                                 return ProcessContinuation.Stop; // Key pressed, nothing else happened yet and tapping term has not expired
                             }
@@ -101,12 +98,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     },
                     .transparent => {
                         // only happening if the base layer has a transparent key - in this case handle as none
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .none => {
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                 }
             } else {
@@ -115,15 +110,13 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 switch (release_map[head_event.key_index]) {
                     .None => {
                         warn("empty slot was released at key_index {}", .{head_event.key_index});
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .ReleaseTap => |tap_def| {
                         warn("1 released a", .{});
                         try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
                         release_map[head_event.key_index] = KeyReleaseAction.None;
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .ReleaseHold => |hold_def| {
                         warn("1 released B", .{});
@@ -150,8 +143,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             }
                         }
                         retro_to_fire = null;
-                        _ = try input_matrix_changes.dequeue();
-                        return ProcessContinuation.RunAgain;
+                        return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                 }
             }
