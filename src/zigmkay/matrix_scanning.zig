@@ -68,7 +68,7 @@ pub const Scanner = struct {
                 const last_changed_time = current_states_last_changed[key_index];
                 const now = time.get_time_since_boot().to_us();
 
-                if (last_changed_time < now - self.debounce_us) {
+                if (now - last_changed_time > self.debounce_us) {
                     current_states[key_index] = pressed;
                     try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index, .time = current_time });
                     p.led_red.put(read_value);
