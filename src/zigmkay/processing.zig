@@ -11,7 +11,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
         // The currently activated modifiers
         var modifiers: core.Modifiers = .{};
-        var retro_to_fire: ?core.TapDef = null;
         var previous_matrix_change: core.MatrixStateChange = undefined;
 
         pub fn Process(
@@ -134,19 +133,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         }
                         release_map[head_event.key_index] = KeyReleaseAction.None;
 
-                        // decide if retro tapping should happen here.
-                        // Prerequisites:
-                        //     previous actions should be a press of the key current_event.key_index
-                        //     previous should be a tap_hold with retro tapping enabled
-                        const same_key_was_just_pressed = previous_matrix_change.pressed and previous_matrix_change.key_index == head_event.key_index;
-                        if (same_key_was_just_pressed) {
-                            warn("same key was just released", .{});
-                            if (retro_to_fire) |tap| {
-                                warn("retro tap executing", .{});
-                                try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                            }
-                        }
-                        retro_to_fire = null;
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                 }
@@ -178,6 +164,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         }
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            _ = key_def;
             warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
@@ -189,16 +176,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
 
             release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
-            retro_to_fire = null;
-            switch (key_def) {
-                .tap_hold => |val| {
-                    if (val.retro_tapping) {
-                        warn("prepared retro tap", .{});
-                        retro_to_fire = val.tap;
-                    }
-                },
-                else => {},
-            }
         }
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {
             // Find key on active position
