@@ -68,7 +68,7 @@ const TransparentLayerValue = 15;
 
 pub const KeyIndex = usize;
 pub const LayerIndex = usize;
-pub const TappingTermType = u16;
+pub const TappingTermType = u64;
 
 const queue_capacities = 250;
 
