@@ -56,13 +56,38 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     .tap_hold => |tap_and_hold| {
 
                         // hold cases:
-                        if (data.len == 1 and current_time - head_event.time > tap_and_hold.tapping_term_ms) {
-                            // No more events, tapping term expired
-                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                            _ = try input_matrix_changes.dequeue();
-                            return ProcessContinuation.RunAgain;
+                        const has_more_elements = data.len > 1;
+                        if (has_more_elements) {
+                            const next_event = data[1];
+                            if (next_event.key_index == head_event.key_index and next_event.pressed == false) {
+                                // Next element is same key released
+                                const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
+                                if (tapping_term_expired) {
+                                    try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                                    _ = try input_matrix_changes.dequeue();
+                                    return ProcessContinuation.RunAgain;
+                                } else {
+                                    try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                                    _ = try input_matrix_changes.dequeue();
+                                    return ProcessContinuation.RunAgain;
+                                }
+                            }
+
+                            return ProcessContinuation.Stop;
+                        } else {
+                            if (current_time - head_event.time > tap_and_hold.tapping_term_ms) {
+                                // No more events, tapping term expired
+                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                                _ = try input_matrix_changes.dequeue();
+                                return ProcessContinuation.RunAgain;
+                            } else {
+                                return ProcessContinuation.Stop; // Key pressed, nothing else happened yet and tapping term has not expired
+                            }
+
+                            // more elements exist
                         }
 
+                        if (data.len > 1) {}
                         // more events, not including this key and tapping term expired
                         // (permissive hold) another key were both pressed and release
                         //
