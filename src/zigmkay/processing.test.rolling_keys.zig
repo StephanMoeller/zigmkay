@@ -75,6 +75,62 @@ test "Rolling - tap/hold keys" {
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
+test "Rolling - with sudden shift usage" {
+    // This test is supposed to spell out abCda with rolling behaviour combined with
+    const tapping_term: u64 = 250;
+    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+    const key_e = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = e }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+
+    const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d, key_e };
+
+    const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
+
+    // intexes
+    const _a = 0;
+    const _b = 1;
+    const _c = 2;
+    const _d = 3;
+    const _e_with_shift = 4;
+
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    try o.press_key(_a, 1);
+    try o.press_key(_b, 2);
+    try o.release_key(_a, 3);
+    try o.press_key(_e_with_shift, 4);
+    try o.release_key(_b, 5);
+    try o.press_key(_c, 6);
+    try o.release_key(_c, 7);
+    try o.release_key(_e_with_shift, 8);
+    try o.press_key(_d, 9);
+    try o.press_key(_a, 10);
+    try o.release_key(_d, 11);
+    try o.release_key(_a, 11);
+
+    const current_time: core.TimeSinceBoot = 100;
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = d }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = d }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+}
+
 const a = 0x04;
 const b = 0x05;
 const c = 0x06;
