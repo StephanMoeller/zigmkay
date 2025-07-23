@@ -26,6 +26,7 @@ fn run_retrotest_test(comptime config: RetroTestParameters) !void {
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term_ms = config.tapping_terms_ms,
         .retro_tapping = config.retro_enabled,
+        .permissive_hold = false,
     } };
 
     const base_layer = comptime [_]core.KeyDef{ key_without_retro_tapping, B, A };
