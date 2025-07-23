@@ -19,13 +19,6 @@ pub fn main() !void {
     while (true) {
         const current_time = time.get_time_since_boot().to_us();
 
-        // Register switch activations
-        // Read switch activations => output KeyDef press/hold (this is where combos are handled and a combo can fire anything that a single key can, including tap/hold
-        //      NOTE: if a combo is layer specific, knowledge about what layer is active should be readable here and can no longer just be part of
-        // Read KeyDef press/hold => decide taps and holds
-        //      NOTE: if holds should only applies if preceeding by specific key indexes, the key indexes should also be readable here
-        //
-        //
         // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
         try matrix_scanner.DetectKeyboardChanges(
             &matrix_change_queue, // output queue

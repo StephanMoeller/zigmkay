@@ -46,6 +46,7 @@ pub const ScannerSettings = struct{
 };
 
 // zig fmt: on
+// current_states should be a packed struct
 var current_states: [pinsToKeysMapping.len]bool = [1]bool{false} ** (pinsToKeysMapping.len);
 var current_states_last_changed: [pinsToKeysMapping.len]u64 = [1]u64{0} ** (pinsToKeysMapping.len);
 pub const Scanner = struct {
