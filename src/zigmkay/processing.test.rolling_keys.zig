@@ -36,6 +36,32 @@ test "Rolling - only tap keys" {
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
+test "Rolling - tap/hold keys" {
+    const tapping_term: u64 = 250;
+    const _a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+    const _b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+    const _c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+    const _d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+
+    const base_layer = comptime [_]core.KeyDef{ _a, _b, _c, _d };
+
+    const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
+
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    try o.press_key(0, 1);
+    try o.press_key(1, 2);
+    try o.release_key(0, 3);
+    try o.press_key(2, 4);
+    try o.release_key(1, 5);
+    try o.press_key(3, 6);
+    try o.release_key(2, 5);
+    try o.release_key(3, 6);
+
+    const current_time: core.TimeSinceBoot = 100;
+    try std.testing.expectEqual(1, 2);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+}
+
 const a = 0x04;
 const b = 0x05;
 const c = 0x06;
