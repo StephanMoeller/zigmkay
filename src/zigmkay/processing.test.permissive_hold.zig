@@ -74,6 +74,101 @@ test "MT perm hold - other key is tap, case E" {
 test "MT perm hold - other key is tap, case F" {
     try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 500, .other_release_delta = 600, .target_release_delta = 650, .expectation = Expectation.Hold });
 }
+test "MT - multiple holds, release in same order" {
+    const tapping_term: u64 = 250;
+    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_term);
+    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } }, tapping_term);
+    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{ .left_gui = true } }, tapping_term);
+
+    const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
+
+    // intexes
+    const _a = 0;
+    const _b = 1;
+    const _c = 2;
+    const _d = 3;
+
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    // should be seen as modifiers:
+    try o.press_key(_a, 1);
+    try o.press_key(_b, 2);
+    try o.press_key(_c, 3);
+    // should be seen as a tap:
+    try o.press_key(_d, 3);
+    try o.release_key(_d, 3);
+
+    // modifier releases
+    try o.release_key(_a, 3);
+    try o.release_key(_b, 3);
+    try o.release_key(_c, 3);
+
+    const current_time: core.TimeSinceBoot = 100;
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true, .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = d }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = d }, try o.actions_queue.dequeue());
+
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true, .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+}
+
+test "MT - multiple holds, release in reverse order" {
+    const tapping_term: u64 = 250;
+    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
+    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_term);
+    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } }, tapping_term);
+    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{ .left_gui = true } }, tapping_term);
+
+    const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
+
+    // intexes
+    const _a = 0;
+    const _b = 1;
+    const _c = 2;
+    const _d = 3;
+
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    // should be seen as modifiers:
+    try o.press_key(_a, 1);
+    try o.press_key(_b, 2);
+    try o.press_key(_c, 3);
+    // should be seen as a tap:
+    try o.press_key(_d, 3);
+    try o.release_key(_d, 3);
+
+    // modifier releases
+    try o.release_key(_c, 3);
+    try o.release_key(_b, 3);
+    try o.release_key(_a, 3);
+
+    const current_time: core.TimeSinceBoot = 100;
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true, .left_ctrl = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = d }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = d }, try o.actions_queue.dequeue());
+
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+}
 
 const a = 0x04;
 const b = 0x05;
