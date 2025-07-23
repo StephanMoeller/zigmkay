@@ -63,7 +63,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 return ProcessContinuation.DequeueOneAndRunAgain;
                             }
 
-                            if (!outer_ev.pressed) {
+                            const key_was_released = !outer_ev.pressed;
+                            if (key_was_released) {
                                 // if released key was the pressed one, choose tap
                                 if (outer_ev.key_index == head_event.key_index) {
                                     warn("case 0", .{});
