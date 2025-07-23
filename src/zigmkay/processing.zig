@@ -54,12 +54,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .tap_hold => |tap_and_hold| {
-
-                        // hold cases:
                         const has_more_elements = data.len > 1;
                         if (has_more_elements) {
                             const next_event = data[1];
-                            if (next_event.key_index == head_event.key_index and next_event.pressed == false) {
+                            const next_is_release_of_same_key = next_event.key_index == head_event.key_index and next_event.pressed == false;
+                            if (next_is_release_of_same_key) {
                                 // Next element is same key released
                                 const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
                                 if (tapping_term_expired) {
@@ -69,6 +68,12 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                                     return ProcessContinuation.DequeueOneAndRunAgain;
                                 }
+                            }
+
+                            const next_is_later_than_tt: bool = next_event.time - head_event.time > tap_and_hold.tapping_term_ms;
+                            if (next_is_later_than_tt) {
+                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                                return ProcessContinuation.DequeueOneAndRunAgain;
                             }
 
                             return ProcessContinuation.Stop;

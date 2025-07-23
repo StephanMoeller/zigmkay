@@ -25,7 +25,7 @@ pub const KeyDef = union(enum) {
     transparent,
     tap_only: TapDef,
     hold_only: HoldDef,
-    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool, permissive_hold: bool },
+    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool },
 
     pub fn TAP(keycode: u8) KeyDef {
         return KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
@@ -47,7 +47,6 @@ pub const KeyDef = union(enum) {
             .hold = .{ .hold_layer = layer },
             .tapping_term_ms = tapping_term_ms,
             .retro_tapping = false,
-            .permissive_hold = true,
         } };
     }
     pub fn MT(tap: TapDef, hold: HoldDef, tapping_term_ms: u64) KeyDef {
@@ -56,7 +55,6 @@ pub const KeyDef = union(enum) {
             .hold = hold,
             .tapping_term_ms = tapping_term_ms,
             .retro_tapping = false,
-            .permissive_hold = true,
         } };
     }
     pub fn NONE() KeyDef {

@@ -23,6 +23,7 @@ pub fn build(b: *std.Build) void {
     const test_files = &[_][]const u8{
         "src/zigmkay/core.test.zig",
         "src/zigmkay/processing.test.retrotapping.zig",
+        "src/zigmkay/processing.test.permissive_hold.zig",
         "src/zigmkay/processing.test.basics.tap_only.zig",
         "src/zigmkay/processing.test.basics.hold_only.zig",
         "src/zigmkay/processing.test.basics.trans_none.zig",
