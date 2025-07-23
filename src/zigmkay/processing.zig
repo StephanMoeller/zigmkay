@@ -63,6 +63,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                                 return ProcessContinuation.DequeueOneAndRunAgain;
                             }
+
                             if (!outer_ev.pressed) {
                                 // if released key was the pressed one, choose tap
                                 if (outer_ev.key_index == head_event.key_index) {

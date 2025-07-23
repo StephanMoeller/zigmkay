@@ -82,7 +82,7 @@ test "Rolling - with sudden shift usage" {
     const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
     const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
     const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
-    const key_e = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = e }, core.HoldDef{ .hold_modifiers = .{} }, tapping_term);
+    const key_e = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = e }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d, key_e };
 
