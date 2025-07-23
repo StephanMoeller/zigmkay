@@ -13,6 +13,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         var modifiers: core.Modifiers = .{};
         var previous_matrix_change: core.MatrixStateChange = undefined;
 
+        var last_consumed_key_index: core.KeyIndex = 0;
         pub fn Process(
             self: *Self,
             input_matrix_changes: *core.MatrixStateChangeQueue,
@@ -20,7 +21,8 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             current_time: core.TimeSinceBoot,
         ) !void {
             while (ProcessContinuation.DequeueOneAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
-                _ = try input_matrix_changes.dequeue();
+                const consumed_event = try input_matrix_changes.dequeue();
+                last_consumed_key_index = consumed_event.key_index;
             }
         }
 
@@ -123,16 +125,24 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .ReleaseHold => |hold_def| {
+                        const hold = hold_def.hold;
                         warn("1 released B", .{});
-                        if (hold_def.hold_modifiers != null) {
+                        if (hold.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
-                            modifiers = modifiers.remove(hold_def.hold_modifiers.?);
+                            modifiers = modifiers.remove(hold.hold_modifiers.?);
                             try output_usb_commands.enqueue(.{ .ModifiersChanged = modifiers });
                         }
-                        if (hold_def.hold_layer != null) {
-                            self.layers_activations.deactivate(hold_def.hold_layer.?);
+                        if (hold.hold_layer != null) {
+                            self.layers_activations.deactivate(hold.hold_layer.?);
                         }
                         release_map[head_event.key_index] = KeyReleaseAction.None;
+
+                        // handle retro tapping
+                        if (last_consumed_key_index == head_event.key_index) {
+                            if (hold_def.retro_tap) |tap| {
+                                try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                            }
+                        }
 
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
@@ -165,7 +175,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         }
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
-            _ = key_def;
             warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
@@ -176,7 +185,17 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 self.layers_activations.activate(hold.hold_layer.?);
             }
 
-            release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = hold };
+            var retro_tap: ?core.TapDef = null;
+            switch (key_def) {
+                .tap_hold => |tap_hold| {
+                    if (tap_hold.retro_tapping) {
+                        retro_tap = tap_hold.tap;
+                    }
+                },
+                else => {},
+            }
+
+            release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = .{ .hold = hold, .retro_tap = retro_tap } };
         }
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {
             // Find key on active position
@@ -213,5 +232,5 @@ const RG = 0x00E7;
 const KeyReleaseAction = union(enum) {
     None,
     ReleaseTap: core.TapDef,
-    ReleaseHold: core.HoldDef,
+    ReleaseHold: struct { hold: core.HoldDef, retro_tap: ?core.TapDef },
 };
