@@ -5,7 +5,6 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
     return struct {
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
-        current_undecided_matrix_change_or_null: ?core.MatrixStateChange = null,
 
         // release_map is used to keep track of what to do when a key is released as the layer activations may have changed since is was pressed
         var release_map: [28]KeyReleaseAction = [_]KeyReleaseAction{KeyReleaseAction.None} ** 28;
@@ -21,75 +20,85 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
+            while (ProcessContinuation.RunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {}
+        }
+
+        const ProcessContinuation = enum { RunAgain, Stop };
+        fn process_next(
+            self: *Self,
+            input_matrix_changes: *core.MatrixStateChangeQueue,
+            output_usb_commands: *core.OutputCommandQueue,
+            current_time: core.TimeSinceBoot,
+        ) !ProcessContinuation {
+            if (input_matrix_changes.Count() == 0) {
+                return ProcessContinuation.Stop;
+            }
             // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
             // This decreases the number of test combinations required to be run as all cases will result in changes being processed one by one
-            while (input_matrix_changes.Count() > 0) {
-                const next_change = try input_matrix_changes.dequeue();
-                try time_elapsed(self, next_change.time, output_usb_commands);
-                try self.process_one(next_change, output_usb_commands);
-                previous_matrix_change = next_change;
-            }
-            try time_elapsed(self, current_time, output_usb_commands);
-        }
+            const data = input_matrix_changes.peek_all();
 
-        fn time_elapsed(self: *Self, current_time: core.TimeSinceBoot, output_usb_commands: *core.OutputCommandQueue) !void {
-            if (self.current_undecided_matrix_change_or_null) |current_undecided_matrix_change| {
-                const pending_key_def = determine_key_def(self, current_undecided_matrix_change.key_index);
-                if (current_time - current_undecided_matrix_change.time > pending_key_def.tap_hold.tapping_term_ms) {
-                    // Pressed, timeout => hold
-                    self.current_undecided_matrix_change_or_null = null;
-                    try apply_hold(self, pending_key_def.tap_hold.hold, pending_key_def, current_undecided_matrix_change, output_usb_commands);
-                }
-            }
-        }
+            // Only decide for the head
+            const head_event = data[0];
 
-        fn process_one(self: *Self, current_event: core.MatrixStateChange, output_usb_commands: *core.OutputCommandQueue) !void {
-            // todo: hold-support
-            // todo: take layouts into concideration here
-            // todo: combo support
-            //
-            // Handle any pending if exists
-            if (self.current_undecided_matrix_change_or_null) |pending_change| {
-                self.current_undecided_matrix_change_or_null = null; // currently it is expected to all pending to be decided when the next even happens but later it may take a list of events to really decide the final action
-                if (pending_change.pressed and current_event.pressed == false and pending_change.key_index == current_event.key_index) {
-                    // same key has been released => tap
-                    const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, pending_change, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                } else {
-                    // all other cases currently also trigger a tap but is isolated in this code for the above logic to remain as it is a known case
-                    const pending_key_def = determine_key_def(self, pending_change.key_index);
-                    try apply_tap(pending_key_def.tap_hold.tap, pending_change, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                }
-            }
-
-            // Handle new event
-            if (current_event.pressed) {
-                const pressed_key_def = determine_key_def(self, current_event.key_index);
-                switch (pressed_key_def) {
+            if (head_event.pressed) {
+                const head_key_def = determine_key_def(self, head_event.key_index);
+                switch (head_key_def) {
                     .tap_only => |tap| {
-                        try apply_tap(tap, current_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                        try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
                     },
                     .hold_only => |hold| {
-                        try apply_hold(self, hold, pressed_key_def, current_event, output_usb_commands);
+                        try apply_hold(self, hold, head_key_def, head_event, output_usb_commands);
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
                     },
                     .tap_hold => |tap_and_hold| {
-                        _ = tap_and_hold;
-                        self.current_undecided_matrix_change_or_null = current_event;
+
+                        // hold cases:
+                        if (data.len == 1 and current_time - head_event.time > tap_and_hold.tapping_term_ms) {
+                            // No more events, tapping term expired
+                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                            _ = try input_matrix_changes.dequeue();
+                            return ProcessContinuation.RunAgain;
+                        }
+
+                        // more events, not including this key and tapping term expired
+                        // (permissive hold) another key were both pressed and release
+                        //
+                        //
+                        // tap cases:
+                        // pressed and released within tapping term expired
+                        //
+                        // retro tap:
+                        // pressed, another
+                        return ProcessContinuation.Stop;
                     },
-                    .transparent => {},
-                    .none => {},
+                    .transparent => {
+                        // only happening if the base layer has a transparent key - in this case handle as none
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
+                    },
+                    .none => {
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
+                    },
                 }
             } else {
-                warn("1 released", .{});
+                // handle release
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
-                switch (release_map[current_event.key_index]) {
+                switch (release_map[head_event.key_index]) {
                     .None => {
-                        warn("empty slot was released at key_index {}", .{current_event.key_index});
+                        warn("empty slot was released at key_index {}", .{head_event.key_index});
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
                     },
                     .ReleaseTap => |tap_def| {
                         warn("1 released a", .{});
                         try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
-                        release_map[current_event.key_index] = KeyReleaseAction.None;
+                        release_map[head_event.key_index] = KeyReleaseAction.None;
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
                     },
                     .ReleaseHold => |hold_def| {
                         warn("1 released B", .{});
@@ -101,21 +110,23 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         if (hold_def.hold_layer != null) {
                             self.layers_activations.deactivate(hold_def.hold_layer.?);
                         }
-                        release_map[current_event.key_index] = KeyReleaseAction.None;
+                        release_map[head_event.key_index] = KeyReleaseAction.None;
 
                         // decide if retro tapping should happen here.
                         // Prerequisites:
                         //     previous actions should be a press of the key current_event.key_index
                         //     previous should be a tap_hold with retro tapping enabled
-                        const same_key_was_just_pressed = previous_matrix_change.pressed and previous_matrix_change.key_index == current_event.key_index;
+                        const same_key_was_just_pressed = previous_matrix_change.pressed and previous_matrix_change.key_index == head_event.key_index;
                         if (same_key_was_just_pressed) {
                             warn("same key was just released", .{});
                             if (retro_to_fire) |tap| {
                                 warn("retro tap executing", .{});
-                                try apply_tap(tap, current_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                                try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                             }
                         }
                         retro_to_fire = null;
+                        _ = try input_matrix_changes.dequeue();
+                        return ProcessContinuation.RunAgain;
                     },
                 }
             }
