@@ -54,14 +54,27 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .tap_hold => |tap_and_hold| {
-                        const has_more_elements = data.len > 1;
-                        if (has_more_elements) {
-                            const next_event = data[1];
-                            const next_is_release_of_same_key = next_event.key_index == head_event.key_index and next_event.pressed == false;
-                            if (next_is_release_of_same_key) {
-                                // Next element is same key released
-                                const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
-                                if (tapping_term_expired) {
+                        for (data[1..], 1..) |outer_ev, outer_index| {
+                            const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms;
+                            if (tapping_term_expired) {
+                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                                return ProcessContinuation.DequeueOneAndRunAgain;
+                            }
+                            if (!outer_ev.pressed) {
+                                // if released key was the pressed one, choose tap
+                                if (outer_ev.key_index == head_event.key_index) {
+                                    try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                                    return ProcessContinuation.DequeueOneAndRunAgain;
+                                }
+                                // if the key released was pressed before the head key, we are in a rolling writing mode, hence choose tap
+                                var released_key_was_pressed_after_head = false;
+                                for (data[1..outer_index]) |inner_ev| {
+                                    if (inner_ev.key_index == outer_ev.key_index) {
+                                        released_key_was_pressed_after_head = true;
+                                    }
+                                }
+
+                                if (released_key_was_pressed_after_head) {
                                     try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                                     return ProcessContinuation.DequeueOneAndRunAgain;
                                 } else {
@@ -69,27 +82,13 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                     return ProcessContinuation.DequeueOneAndRunAgain;
                                 }
                             }
-
-                            const next_is_later_than_tt: bool = next_event.time - head_event.time > tap_and_hold.tapping_term_ms;
-                            if (next_is_later_than_tt) {
-                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                return ProcessContinuation.DequeueOneAndRunAgain;
-                            }
-
-                            return ProcessContinuation.Stop;
-                        } else {
-                            if (current_time - head_event.time > tap_and_hold.tapping_term_ms) {
-                                // No more events, tapping term expired
-                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                return ProcessContinuation.DequeueOneAndRunAgain;
-                            } else {
-                                return ProcessContinuation.Stop; // Key pressed, nothing else happened yet and tapping term has not expired
-                            }
-
-                            // more elements exist
+                        }
+                        const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
+                        if (tapping_term_expired) {
+                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
+                            return ProcessContinuation.DequeueOneAndRunAgain;
                         }
 
-                        if (data.len > 1) {}
                         // more events, not including this key and tapping term expired
                         // (permissive hold) another key were both pressed and release
                         //
