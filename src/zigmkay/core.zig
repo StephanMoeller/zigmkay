@@ -49,10 +49,10 @@ pub const KeyDef = union(enum) {
             .retro_tapping = false,
         } };
     }
-    pub fn MT(tap: TapDef, hold: HoldDef, tapping_term_ms: u64) KeyDef {
+    pub fn MT(tap: TapDef, hold_mods: Modifiers, tapping_term_ms: u64) KeyDef {
         return KeyDef{ .tap_hold = .{
             .tap = tap,
-            .hold = hold,
+            .hold = HoldDef{ .hold_modifiers = hold_mods },
             .tapping_term_ms = tapping_term_ms,
             .retro_tapping = false,
         } };

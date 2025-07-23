@@ -76,10 +76,10 @@ test "MT perm hold - other key is tap, case F" {
 }
 test "MT - multiple holds, release in same order" {
     const tapping_term: u64 = 250;
-    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
-    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_term);
-    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } }, tapping_term);
-    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{ .left_gui = true } }, tapping_term);
+    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
+    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
+    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
+    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, .{ .left_gui = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
@@ -124,10 +124,10 @@ test "MT - multiple holds, release in same order" {
 
 test "MT - multiple holds, release in reverse order" {
     const tapping_term: u64 = 250;
-    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_term);
-    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_term);
-    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } }, tapping_term);
-    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, core.HoldDef{ .hold_modifiers = .{ .left_gui = true } }, tapping_term);
+    const key_a = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
+    const key_b = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
+    const key_c = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
+    const key_d = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = d }, .{ .left_gui = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};

@@ -6,7 +6,7 @@ const init_test = @import("processing.test_helpers.zig").init_test;
 test "MT tap within tapping term - process with both in queue" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -30,7 +30,7 @@ test "MT tap within tapping term - process with both in queue" {
 test "MT tap within tapping term - process with multiple calls" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_shift = true } }, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -56,7 +56,7 @@ test "MT tap within tapping term - process with multiple calls" {
 test "MT hold case: release after tapping term => hold" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -82,7 +82,7 @@ test "MT hold case: release after tapping term => hold" {
 test "MT hold case: timeout => hold" {
     var current_time: core.TimeSinceBoot = 100;
     const tapping_terms_ms: u16 = 250;
-    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, core.HoldDef{ .hold_modifiers = .{ .left_alt = true } }, tapping_terms_ms);
+    const mo_layer1_cWithLeftAlt = comptime core.KeyDef.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
