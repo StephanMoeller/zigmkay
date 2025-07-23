@@ -55,6 +55,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     },
                     .tap_hold => |tap_and_hold| {
                         for (data[1..], 1..) |outer_ev, outer_index| {
+                            if (outer_ev.time < head_event.time) {
+                                @panic("this should no happen!");
+                            }
                             const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms;
                             if (tapping_term_expired) {
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
@@ -63,6 +66,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             if (!outer_ev.pressed) {
                                 // if released key was the pressed one, choose tap
                                 if (outer_ev.key_index == head_event.key_index) {
+                                    warn("case 0", .{});
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                                     return ProcessContinuation.DequeueOneAndRunAgain;
                                 }
@@ -92,6 +96,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             return ProcessContinuation.DequeueOneAndRunAgain;
                         }
 
+                        warn("case 2", .{});
                         return ProcessContinuation.Stop;
                     },
                     .transparent => {

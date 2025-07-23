@@ -54,12 +54,25 @@ test "Rolling - tap/hold keys" {
     try o.press_key(2, 4);
     try o.release_key(1, 5);
     try o.press_key(3, 6);
-    try o.release_key(2, 5);
-    try o.release_key(3, 6);
+    try o.release_key(2, 7);
+    try o.release_key(3, 8);
 
     const current_time: core.TimeSinceBoot = 100;
-    try std.testing.expectEqual(1, 2);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = d }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = d }, try o.actions_queue.dequeue());
+
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
 
 const a = 0x04;
