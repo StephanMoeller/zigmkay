@@ -9,9 +9,9 @@ pub const key_count = 28;
 pub const keymap = [_][key_count]core.KeyDef{
 // layer 0
     .{ 
-              T(kc.W),  T(kc.R), LG(kc.P), T(kc.B),      T(kc.K), LG(kc.L),  T(kc.O),     T(kc.U),
-    T(kc.F), LA(kc.A), LC(kc.S), LS(kc.T), T(kc.G),      T(kc.M), LS(kc.N), LC(kc.E),    LA(kc.I),  T(kc.Y),
-              T(kc.X),  T(kc.C),  T(kc.D),                         T(kc.H), T(kc.COMMA),  T(kc.DOT),
+               T(kc.W),   T(kc.R), GUI(kc.P), T(kc.B),      T(kc.K), GUI(kc.L),   T(kc.O),       T(kc.U),
+    T(kc.F), ALT(kc.A), CTL(kc.S), SFT(kc.T), T(kc.G),      T(kc.M), SFT(kc.N), CTL(kc.E),     ALT(kc.I),  T(kc.Y),
+               T(kc.X),   T(kc.C),   T(kc.D),                         T(kc.H),    T(kc.COMMA),   T(kc.DOT),
           LT(2, kc.ENTER), core.KeyDef.NONE(), core.KeyDef.NONE(), LT(1, kc.SPACE)
     },
 
@@ -53,15 +53,15 @@ fn LT(layer_index: core.LayerIndex, keycode: u8) core.KeyDef {
 fn T(keycode: u8) core.KeyDef {
     return core.KeyDef.TAP(keycode);
 }
-fn LG(keycode: u8) core.KeyDef {
+fn GUI(keycode: u8) core.KeyDef {
     return core.KeyDef.MT(core.TapDef{ .tap_keycode = keycode }, .{ .left_gui = true }, tapping_term_us);
 }
-fn LC(keycode: u8) core.KeyDef {
+fn CTL(keycode: u8) core.KeyDef {
     return core.KeyDef.MT(core.TapDef{ .tap_keycode = keycode }, .{ .left_ctrl = true }, tapping_term_us);
 }
-fn LA(keycode: u8) core.KeyDef {
+fn ALT(keycode: u8) core.KeyDef {
     return core.KeyDef.MT(core.TapDef{ .tap_keycode = keycode }, .{ .left_alt = true }, tapping_term_us);
 }
-fn LS(keycode: u8) core.KeyDef {
+fn SFT(keycode: u8) core.KeyDef {
     return core.KeyDef.MT(core.TapDef{ .tap_keycode = keycode }, .{ .left_shift = true }, tapping_term_us);
 }
