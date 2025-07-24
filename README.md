@@ -32,7 +32,10 @@ TODO
 The following is an overview over what is done and what is missing.
 
 ## Scanning
-- Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
+- (done) poc for scanning a unibody
+- (done) debounce handling
+- TODO Generalization of pin config
+- TODO Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 ## Processor
 - (done) tap-only keys
@@ -49,10 +52,14 @@ The following is an overview over what is done and what is missing.
 - TODO Tri-layer functionality for two layers => 3rd layer
 - TODO Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
 - TODO Autofire: allow fast reacting autofire on certain keys, eg arrow keys
+- TODO Custom code support
 - TODO Trrs
 
 ## Hardware
 - Support trrs connections
+
+## Overall
+- Design how custom code should be included 
 
 # Guide
 (todo)
