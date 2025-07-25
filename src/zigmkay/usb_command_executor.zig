@@ -17,7 +17,7 @@ pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     var prev_action_time: microzig.drivers.time.Absolute = undefined;
     var first_call = true;
-    var next_tick_delay: u64 = 0; // 10ms between each state change
+    const next_tick_delay: u64 = 20000;
     pub fn HouseKeepAndProcessCommands(self: *const UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         if (first_call) {
@@ -42,7 +42,6 @@ pub const UsbCommandExecutor = struct {
             const command = output_command_queue.dequeue() catch unreachable;
             switch (command) {
                 .KeyCodePress => |keycode| {
-                    next_tick_delay = 20000;
                     var idx: usize = 1;
                     while (idx < data.len) {
                         if (data[idx] == keycode) {
@@ -57,7 +56,6 @@ pub const UsbCommandExecutor = struct {
                     }
                 },
                 .KeyCodeRelease => |keycode| {
-                    next_tick_delay = 20000;
                     var idx: usize = 1;
                     while (idx < data.len) {
                         if (data[idx] == keycode) {
@@ -68,15 +66,15 @@ pub const UsbCommandExecutor = struct {
                     }
                 },
                 .ModifiersChanged => |modifiers| {
-                    next_tick_delay = 20000;
                     data[0] = modifiers.toByte();
                 },
                 .ActivateBootMode => {
                     rp2xxx.rom.reset_to_usb_boot()(0, 0);
                 },
             }
-        }
 
-        usb_if.send_keyboard_report(usb_dev, &data);
+            unreachable; // - only call this one every 1 ms
+            usb_if.send_keyboard_report(usb_dev, &data);
+        }
     }
 };
