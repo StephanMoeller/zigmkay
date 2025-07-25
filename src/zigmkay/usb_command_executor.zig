@@ -26,14 +26,6 @@ pub const UsbCommandExecutor = struct {
         }
         usb_dev.task(false) catch unreachable; // Process pending USB housekeeping
 
-        // TODO: extract this logic into seperate class and unit test it
-        // TODO: support for modifiers: both stand-alone presses and keycaps with modifiers activated
-        //
-        //
-        // This is an 'if' and not a 'while loop', ensuring not to delay too much before scanning the matrix again by only prossessing one item in the output queue per cycle.
-        // Highest priority is to capture as many changes as possible in the matrix. also if this means slower execution of these
-
-        // This waiting ensures, that there will be no more usb updates that per x time, but the send_keyboard_report will be called every time anyway to ensure data keeps being sent to the host
         const current_time = time.get_time_since_boot();
         const diff = current_time.diff(prev_action_time);
 
@@ -73,7 +65,6 @@ pub const UsbCommandExecutor = struct {
                 },
             }
 
-            unreachable; // - only call this one every 1 ms
             usb_if.send_keyboard_report(usb_dev, &data);
         }
     }

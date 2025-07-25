@@ -101,9 +101,9 @@ pub var DEVICE_CONFIGURATION: usb.DeviceConfiguration = .{
     .config_descriptor = &usb_config_descriptor,
     .lang_descriptor = "\x04\x03\x09\x04", // length || string descriptor (0x03) || Engl (0x0409)
     .descriptor_strings = &.{
-        &usb.utils.utf8_to_utf16_le("RaspPi"),
-        &usb.utils.utf8_to_utf16_le("LedWiz clone"),
-        &usb.utils.utf8_to_utf16_le("cafebabe"),
+        &usb.utils.utf8_to_utf16_le("ZigMkay"),
+        &usb.utils.utf8_to_utf16_le("Keyboard"),
+        &usb.utils.utf8_to_utf16_le("Keyboard"),
         &usb.utils.utf8_to_utf16_le("Accelerometer"),
         &usb.utils.utf8_to_utf16_le("Flippers"),
     },
