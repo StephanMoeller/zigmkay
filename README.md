@@ -54,6 +54,8 @@ The following is an overview over what is done and what is missing.
 - TODO Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 - TODO Custom code support
 - TODO Trrs
+- TODO Allow a key press to go into boot mode
+- TODO Allow log printing through the usb interface as text to the host
 
 ## Hardware
 - Support trrs connections
