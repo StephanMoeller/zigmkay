@@ -17,7 +17,7 @@ pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     var prev_action_time: microzig.drivers.time.Absolute = undefined;
     var first_call = true;
-    var next_tick_delay: u64 = 0;
+    var next_tick_delay: u64 = 0; // 10ms between each state change
     pub fn HouseKeepAndProcessCommands(self: *const UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue) !void {
         _ = self;
         if (first_call) {
@@ -57,7 +57,7 @@ pub const UsbCommandExecutor = struct {
                     }
                 },
                 .KeyCodeRelease => |keycode| {
-                    next_tick_delay = 5000;
+                    next_tick_delay = 20000;
                     var idx: usize = 1;
                     while (idx < data.len) {
                         if (data[idx] == keycode) {
