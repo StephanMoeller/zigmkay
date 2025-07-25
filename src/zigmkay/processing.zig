@@ -57,7 +57,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     .tap_hold => |tap_and_hold| {
                         for (data[1..], 1..) |outer_ev, outer_index| {
                             if (outer_ev.time < head_event.time) {
-                                @panic("this should no happen!");
+                                @panic("this should never happen!");
                             }
                             const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms;
                             if (tapping_term_expired) {
