@@ -127,5 +127,21 @@ test "peek_all" {
 }
 
 test "peek" {
-    unreachable;
+    var queue = q.GenericQueue(u32, 5).Create();
+    try std.testing.expectEqual(null, queue.peek());
+    try queue.enqueue(1);
+
+    try std.testing.expectEqual(1, queue.peek());
+    try std.testing.expectEqual(1, queue.peek());
+    _ = try queue.enqueue(2);
+    _ = try queue.enqueue(3);
+    _ = try queue.enqueue(4);
+
+    try std.testing.expectEqual(1, queue.peek());
+
+    _ = try queue.dequeue();
+    _ = try queue.dequeue();
+
+    try std.testing.expectEqual(2, queue.Count());
+    try std.testing.expectEqual(3, queue.peek());
 }

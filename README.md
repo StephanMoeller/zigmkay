@@ -62,6 +62,7 @@ The following is an overview over what is done and what is missing.
 
 ## Overall
 - Design how custom code should be included 
+- Look into performance and memory usage optimization
 
 # Guide
 (todo)
