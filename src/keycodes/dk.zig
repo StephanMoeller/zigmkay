@@ -1,3 +1,4 @@
+pub const BOOT = 0x000;
 pub const A = 0x0004;
 pub const B = 0x0005;
 pub const C = 0x0006;

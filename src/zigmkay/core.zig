@@ -1,5 +1,5 @@
 const generic_queue = @import("generic_queue.zig");
-
+pub const special_keycode_BOOT: u8 = 0x000;
 // Features that must be expressable with KeyDef:
 // - Tap for letter
 // TODO Tap for letter with a modifier on the letter alone
@@ -77,7 +77,7 @@ pub const MatrixStateChange = struct { pressed: bool, key_index: KeyIndex, time:
 pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, queue_capacities);
 
 // USB output
-pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers };
+pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers, ActivateBootMode };
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, queue_capacities);
 
 pub const TimeSinceBoot = u64;

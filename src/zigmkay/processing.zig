@@ -152,6 +152,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
         fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
+            if (tap.tap_keycode == core.special_keycode_BOOT) {
+                try output_queue.enqueue(core.OutputCommand.ActivateBootMode);
+                return;
+            }
+
             if (tap.tap_modifiers) |tap_modifiers| {
                 warn("tap with modifier - all done at once", .{});
                 // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards

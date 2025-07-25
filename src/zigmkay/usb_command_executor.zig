@@ -71,6 +71,9 @@ pub const UsbCommandExecutor = struct {
                     next_tick_delay = 20000;
                     data[0] = modifiers.toByte();
                 },
+                .ActivateBootMode => {
+                    rp2xxx.rom.reset_to_usb_boot()(0, 0);
+                },
             }
         }
 

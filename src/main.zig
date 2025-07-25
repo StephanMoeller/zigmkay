@@ -1,4 +1,3 @@
-const std = @import("std");
 const zigmkay = @import("zigmkay/zigmkay.zig");
 const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
@@ -24,12 +23,6 @@ pub fn main() !void {
             &matrix_change_queue, // output queue
             current_time,
         );
-
-        if (matrix_change_queue.peek()) |e| {
-            if (e.key_index == 0) {
-                rp2xxx.rom.reset_to_usb_boot()(0, 0);
-            }
-        }
 
         // Decide actions
         try processor.Process(
