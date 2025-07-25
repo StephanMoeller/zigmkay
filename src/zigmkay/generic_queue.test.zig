@@ -125,3 +125,7 @@ test "peek_all" {
         try std.testing.expectEqual(4, all[1]);
     }
 }
+
+test "peek" {
+    unreachable;
+}

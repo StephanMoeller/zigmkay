@@ -25,6 +25,12 @@ pub fn main() !void {
             current_time,
         );
 
+        if (matrix_change_queue.peek()) |e| {
+            if (e.key_index == 0) {
+                rp2xxx.rom.reset_to_usb_boot()(0, 0);
+            }
+        }
+
         // Decide actions
         try processor.Process(
             &matrix_change_queue, // input queue

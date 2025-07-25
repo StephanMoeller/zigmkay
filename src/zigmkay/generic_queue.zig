@@ -37,5 +37,12 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
         pub fn peek_all(self: *Self) []T {
             return self.data[0..self.size];
         }
+        pub fn peek(self: *Self) ?T {
+            if (self.size > 0) {
+                return self.data[0];
+            } else {
+                return null;
+            }
+        }
     };
 }
