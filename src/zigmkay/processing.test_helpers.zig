@@ -25,3 +25,6 @@ pub fn TAP(keycode: u8) core.KeyDef {
 pub fn TAP_WITH_MOD(keycode: u8, modifiers: core.Modifiers) core.KeyDef {
     return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
 }
+pub fn HOLD_MOD(modifiers: core.Modifiers) core.KeyDef {
+    return core.KeyDef{ .hold_only = .{ .hold_modifiers = modifiers } };
+}

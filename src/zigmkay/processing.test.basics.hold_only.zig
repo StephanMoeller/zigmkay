@@ -28,7 +28,7 @@ const TestObjects = struct {
 
 test "HOLD_MOD - single hold" {
     const current_time: core.TimeSinceBoot = 100;
-    const hold_left_shift = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
+    const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true });
     const base_layer = comptime [_]core.KeyDef{ hold_left_shift, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
 
@@ -56,8 +56,8 @@ test "HOLD_MOD - multiple holds" {
     // multiple mod hold presses at the same time
 
     const current_time: core.TimeSinceBoot = 100;
-    const hold_left_shift = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
-    const hold_left_alt = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_alt = true });
+    const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true });
+    const hold_left_alt = comptime helpers.HOLD_MOD(core.Modifiers{ .left_alt = true });
     const base_layer = comptime [_]core.KeyDef{ hold_left_shift, hold_left_alt, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
 
@@ -89,8 +89,8 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
 
     const current_time: core.TimeSinceBoot = 100;
     const c_with_left_gui = comptime helpers.TAP_WITH_MOD(0x06, .{ .left_gui = true });
-    const hold_left_shift = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
-    const hold_left_alt = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_alt = true });
+    const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true });
+    const hold_left_alt = comptime helpers.HOLD_MOD(core.Modifiers{ .left_alt = true });
     const base_layer = comptime [_]core.KeyDef{ hold_left_shift, hold_left_alt, c_with_left_gui, D, E };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
