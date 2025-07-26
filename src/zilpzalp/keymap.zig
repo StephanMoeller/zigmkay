@@ -53,6 +53,7 @@ fn LT(layer_index: core.LayerIndex, keycode: u8) core.KeyDef {
         .tapping_term_ms = tapping_term_ms,
     } };
 }
+// T for 'Tap-only'
 fn T(keycode: u8) core.KeyDef {
     return core.KeyDef{
         .tap_only = core.TapDef{ .tap_keycode = keycode },

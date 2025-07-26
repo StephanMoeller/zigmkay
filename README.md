@@ -65,4 +65,28 @@ The following is an overview over what is done and what is missing.
 - Look into performance and memory usage optimization
 
 # Guide
-(todo)
+```c
+pub fn main() !void {
+    // Data queues
+    var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
+    var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
+
+    // Logic
+    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
+    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap){};
+    const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
+
+    while (true) {
+        const current_time = time.get_time_since_boot().to_us();
+
+        // Detect matrix changes
+        try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
+
+        // Decide actions
+        try processor.Process(&matrix_change_queue, &usb_command_queue, current_time);
+
+        // Execute actions
+        try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
+    }
+}
+```

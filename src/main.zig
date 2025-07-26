@@ -7,8 +7,6 @@ const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
 
 pub fn main() !void {
-    var tick_count: u64 = 0;
-
     // Data queues
     var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
@@ -18,36 +16,17 @@ pub fn main() !void {
     var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
-    // Cycle
-    // TODO: if one of the three steps throws an error, show this using the led's instead of allowing the entire keyboard to stall
-
-    const start_time = time.get_time_since_boot().to_us();
-    var has_printed = false;
     while (true) {
         const current_time = time.get_time_since_boot().to_us();
 
-        // TODO: Make the pin setup detached from the scanner to make the scanner reusable for all rp2xxx stuff - not only the zilpzalp
-        try matrix_scanner.DetectKeyboardChanges(
-            &matrix_change_queue, // output queue
-            current_time,
-        );
+        // Detect matrix changes
+        try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Decide actions
-        try processor.Process(
-            &matrix_change_queue, // input queue
-            &usb_command_queue, // output queue
-            current_time,
-        );
+        try processor.Process(&matrix_change_queue, &usb_command_queue, current_time);
 
         // Execute actions
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
-
-        tick_count += 1;
-
-        if (!has_printed and (current_time - start_time) / 1000 > 1000) {
-            try print_num(tick_count, &usb_command_queue);
-            has_printed = true;
-        }
     }
 }
 const keys = @import("keycodes/dk.zig");
