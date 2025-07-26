@@ -14,7 +14,7 @@ pub fn main() !void {
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     // Logic
-    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 30 });
+    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
     var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
