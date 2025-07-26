@@ -26,7 +26,7 @@ pub const KeyDef = union(enum) {
     tap_only: TapDef,
     hold_only: HoldDef,
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool = false },
-    tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u8, repeat_interval_ms: u8 },
+    tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u16, repeat_interval_ms: u16 },
 };
 const TransparentLayerValue = 15;
 
@@ -67,6 +67,7 @@ pub const LayerActivations = struct {
         return self.layers[layer_index];
     }
 };
+
 pub const Modifiers = packed struct {
     left_ctrl: bool = false,
     left_shift: bool = false,
@@ -77,9 +78,6 @@ pub const Modifiers = packed struct {
     right_alt: bool = false,
     right_gui: bool = false,
 
-    pub fn toByte(self: Modifiers) u8 {
-        return @bitCast(self);
-    }
     pub fn add(self: *const Modifiers, other: Modifiers) Modifiers {
         const self_bytes = self.toByte();
         const other_bytes = other.toByte();
@@ -90,6 +88,9 @@ pub const Modifiers = packed struct {
         const self_bytes = self.toByte();
         const other_bytes = other.toByte();
         return Modifiers.fromByte(self_bytes & ~other_bytes);
+    }
+    pub fn toByte(self: Modifiers) u8 {
+        return @bitCast(self);
     }
     pub fn fromByte(byte_val: u8) Modifiers {
         return @bitCast(byte_val);

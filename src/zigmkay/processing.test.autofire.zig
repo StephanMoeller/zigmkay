@@ -24,21 +24,80 @@ const G = helpers.TAP(g);
 const dummy_time = core.TimeStamp{ .time_us_since_boot = 0 };
 
 // test stuff
-test "Autofire" {
-    const current_time: core.TimeSinceBoot = 100;
-    const base_layer = comptime [_]core.KeyDef{ A, B, C, D };
+test "Autofire - case A" {
+    // release before start, expect only one
+    const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
+        .initial_delay_ms = 1000,
+        .repeat_interval_ms = 500,
+        .tap = .{ .tap_keycode = a, .tap_modifiers = .{ .left_alt = true } },
+    } };
+    const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
+        .initial_delay_ms = 1000,
+        .repeat_interval_ms = 500,
+        .tap = .{ .tap_keycode = a, .tap_modifiers = .{ .left_alt = true } },
+    } };
+    const start_time_us: core.TimeSinceBoot = 100;
+    const base_layer = comptime [_]core.KeyDef{ auto_fire_a, auto_fire_b, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1000); // 1 ms later
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 999 * 1000); // 999 ms later
 
-    // expect B to be fired as press
-    try std.testing.expectEqual(1, o.actions_queue.Count());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
+    // Now release the key - and expect no autofire
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1001 * 1000); // 1001 ms later
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 2000 * 1000); // 2000 ms later
+
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
-    try std.testing.expectEqual(0, 1); // todo
+}
+
+test "Autofire - case B" {
+    // holding down and activating autofire
+    const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
+        .initial_delay_ms = 1000,
+        .repeat_interval_ms = 500,
+        .tap = .{ .tap_keycode = a },
+    } };
+    const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
+        .initial_delay_ms = 1000,
+        .repeat_interval_ms = 500,
+        .tap = .{ .tap_keycode = a },
+    } };
+    const start_time_us: core.TimeSinceBoot = 100;
+    const base_layer = comptime [_]core.KeyDef{ auto_fire_a, auto_fire_b, C, D };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+
+    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1000); // 1 ms later
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 999 * 1000); // 999 ms later
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1001 * 1000);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1499 * 1000);
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1501 * 1000);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+
+    // todo: add some more here
+    unreachable;
 }
