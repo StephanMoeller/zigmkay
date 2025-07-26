@@ -25,7 +25,7 @@ pub const KeyDef = union(enum) {
     transparent,
     tap_only: TapDef,
     hold_only: HoldDef,
-    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool },
+    tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool = false },
     tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u8, repeat_interval_ms: u8 },
 };
 const TransparentLayerValue = 15;
@@ -45,8 +45,6 @@ pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, Mo
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, queue_capacities);
 
 pub const TimeSinceBoot = u64;
-
-// TODO: this can be optimized to store everything as one u32 field
 
 pub const LayerActivations = struct {
     layers: [32]bool = [_]bool{false} ** 32,
@@ -96,14 +94,4 @@ pub const Modifiers = packed struct {
     pub fn fromByte(byte_val: u8) Modifiers {
         return @bitCast(byte_val);
     }
-};
-pub const HID_ModifierMasks = enum(u8) {
-    left_control = 0x01,
-    left_shift = 0x02,
-    left_alt = 0x04,
-    left_meta = 0x08,
-    right_control = 0x10,
-    right_shift = 0x20,
-    right_alt = 0x40,
-    right_meta = 0x80,
 };

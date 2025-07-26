@@ -22,9 +22,9 @@ const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 const Expectation = enum { Hold, Tap };
 const PermissiveHoldParameters = struct {
-    target_release_delta: core.TimeSinceBoot,
-    other_press_delta: core.TimeSinceBoot,
-    other_release_delta: core.TimeSinceBoot,
+    target_release_delta_ms: core.TimeSinceBoot,
+    other_press_delta_ms: core.TimeSinceBoot,
+    other_release_delta_ms: core.TimeSinceBoot,
     expectation: Expectation,
     tapping_terms_ms: core.TappingTermType,
 };
@@ -50,11 +50,11 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
 
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(target_key_index, current_time);
-    current_time = start_time + config.other_press_delta;
+    current_time = start_time + config.other_press_delta_ms * 1000;
     try o.press_key(other_key_index, current_time);
-    current_time = start_time + config.other_release_delta;
+    current_time = start_time + config.other_release_delta_ms * 1000;
     try o.release_key(other_key_index, current_time);
-    current_time = start_time + config.target_release_delta;
+    current_time = start_time + config.target_release_delta_ms * 1000;
     try o.release_key(target_key_index, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -74,22 +74,22 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 test "MT perm hold - other key is tap, case A" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 3, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 1, .other_release_delta_ms = 2, .target_release_delta_ms = 3, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case B" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 1, .other_release_delta = 2, .target_release_delta = 251, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 1, .other_release_delta_ms = 2, .target_release_delta_ms = 251, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case C" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 247, .other_release_delta = 248, .target_release_delta = 249, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 247, .other_release_delta_ms = 248, .target_release_delta_ms = 249, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case D" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 248, .other_release_delta = 252, .target_release_delta = 253, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 248, .other_release_delta_ms = 252, .target_release_delta_ms = 253, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case E" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 252, .other_release_delta = 500, .target_release_delta = 501, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 252, .other_release_delta_ms = 500, .target_release_delta_ms = 501, .expectation = Expectation.Hold });
 }
 test "MT perm hold - other key is tap, case F" {
-    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta = 500, .other_release_delta = 600, .target_release_delta = 650, .expectation = Expectation.Hold });
+    try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 500, .other_release_delta_ms = 600, .target_release_delta_ms = 650, .expectation = Expectation.Hold });
 }
 test "MT - multiple holds, release in same order" {
     const tapping_term: u64 = 250;

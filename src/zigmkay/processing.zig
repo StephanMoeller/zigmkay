@@ -63,7 +63,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                             if (outer_ev.time < head_event.time) {
                                 @panic("this should never happen!");
                             }
-                            const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms;
+                            const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
                             if (tapping_term_expired) {
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                                 return ProcessContinuation.DequeueOneAndRunAgain;
@@ -97,7 +97,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
                         // No decision made while looping through all events, finally check if time just passed without anything happened
                         // In this case, it's a hold.
-                        const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms;
+                        const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
                         if (tapping_term_expired) {
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                             return ProcessContinuation.DequeueOneAndRunAgain;
