@@ -88,7 +88,7 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
     // hold mods combined with modified taps - ensure tap mods will be applied temporarily and then cancelled again after the tap while hold mods are kept
 
     const current_time: core.TimeSinceBoot = 100;
-    const c_with_left_gui = comptime core.KeyDef.TAP_WITH_MOD(0x06, .{ .left_gui = true });
+    const c_with_left_gui = comptime helpers.TAP_WITH_MOD(0x06, .{ .left_gui = true });
     const hold_left_shift = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_shift = true });
     const hold_left_alt = comptime core.KeyDef.HOLD_MOD(core.Modifiers{ .left_alt = true });
     const base_layer = comptime [_]core.KeyDef{ hold_left_shift, hold_left_alt, c_with_left_gui, D, E };

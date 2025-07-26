@@ -22,3 +22,6 @@ pub fn init_test(comptime keymap_dimensions: core.KeymapDimensions, comptime key
 pub fn TAP(keycode: u8) core.KeyDef {
     return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
 }
+pub fn TAP_WITH_MOD(keycode: u8, modifiers: core.Modifiers) core.KeyDef {
+    return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
+}
