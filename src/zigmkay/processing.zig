@@ -50,6 +50,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
+                    .tap_with_autofire => |tap_with_autofire| {
+                        _ = tap_with_autofire;
+                        unreachable;
+                    },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, head_key_def, head_event, output_usb_commands);
                         return ProcessContinuation.DequeueOneAndRunAgain;
