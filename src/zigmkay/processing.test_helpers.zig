@@ -28,3 +28,6 @@ pub fn TAP_WITH_MOD(keycode: u8, modifiers: core.Modifiers) core.KeyDef {
 pub fn HOLD_MOD(modifiers: core.Modifiers) core.KeyDef {
     return core.KeyDef{ .hold_only = .{ .hold_modifiers = modifiers } };
 }
+pub fn MO(layer: core.LayerIndex) core.KeyDef {
+    return core.KeyDef{ .hold_only = .{ .hold_layer = layer } };
+}

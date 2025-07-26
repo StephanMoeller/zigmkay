@@ -25,9 +25,9 @@ test "TRANSPARENT case 1" {
     // Transparent key - ensure key on lower active layers used - case A - expect fallback to next active layer
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
-    const mo2_key = comptime core.KeyDef.MO(2);
-    const mo3_key = comptime core.KeyDef.MO(3);
+    const mo1_key = comptime helpers.MO(1);
+    const mo2_key = comptime helpers.MO(2);
+    const mo3_key = comptime helpers.MO(3);
     const base_layer = comptime [_]core.KeyDef{ A, mo1_key, mo2_key, A, A, A };
     const layer_1 = comptime [_]core.KeyDef{ B, B, B, mo3_key, B, B };
     const layer_2 = comptime [_]core.KeyDef{ C, C, C, C, C, C };
@@ -56,9 +56,9 @@ test "TRANSPARENT case 2" {
     // Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
-    const mo2_key = comptime core.KeyDef.MO(2);
-    const mo3_key = comptime core.KeyDef.MO(3);
+    const mo1_key = comptime helpers.MO(1);
+    const mo2_key = comptime helpers.MO(2);
+    const mo3_key = comptime helpers.MO(3);
     const base_layer = comptime [_]core.KeyDef{ A, mo1_key, mo2_key, A, A, A };
     const layer_1 = comptime [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, mo3_key, B, B };
     const layer_2 = comptime [_]core.KeyDef{ C, C, C, C, C, C };
@@ -88,9 +88,9 @@ test "TRANSPARENT case 3" {
     // Layers - transparent key - ensure transparent key on base layer won't do anything
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
-    const mo2_key = comptime core.KeyDef.MO(2);
-    const mo3_key = comptime core.KeyDef.MO(3);
+    const mo1_key = comptime helpers.MO(1);
+    const mo2_key = comptime helpers.MO(2);
+    const mo3_key = comptime helpers.MO(3);
     const base_layer = comptime [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), mo1_key, mo2_key, mo3_key, A, A };
     const layer_1 = comptime [_]core.KeyDef{ core.KeyDef.TRANSPARENT(), B, B, B, B, B };
     const layer_2 = comptime [_]core.KeyDef{ C, C, C, C, C, C };
@@ -115,7 +115,7 @@ test "NONE key" {
     // Expect nothing to happen
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
+    const mo1_key = comptime helpers.MO(1);
     const base_layer = comptime [_]core.KeyDef{ A, A, mo1_key };
     const layer_1 = comptime [_]core.KeyDef{ core.KeyDef.NONE(), D, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };

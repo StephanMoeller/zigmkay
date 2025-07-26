@@ -134,7 +134,7 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
 }
 test "Layers - simple switch" {
     const current_time: core.TimeSinceBoot = 100;
-    const mo_key = comptime core.KeyDef.MO(1);
+    const mo_key = comptime helpers.MO(1);
     const base_layer = comptime [_]core.KeyDef{ A, B, mo_key, D };
     const other_layer = comptime [_]core.KeyDef{ E, F, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
@@ -155,7 +155,7 @@ test "Layers - simple switch" {
 }
 test "Layers - complex switch" {
     const current_time: core.TimeSinceBoot = 100;
-    const mo_key = comptime core.KeyDef.MO(1);
+    const mo_key = comptime helpers.MO(1);
     const base_layer = comptime [_]core.KeyDef{ A, B, mo_key, D };
     const other_layer = comptime [_]core.KeyDef{ E, F, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
@@ -229,7 +229,7 @@ test "Layers - ensure correct release key" {
     // Specifically test that a key pressed existing on layer A is also what is released even though the layer changed between press and release
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo_key = comptime core.KeyDef.MO(1);
+    const mo_key = comptime helpers.MO(1);
     const base_layer = comptime [_]core.KeyDef{ A, B, mo_key, D };
     const other_layer = comptime [_]core.KeyDef{ E, F, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, other_layer };
@@ -271,8 +271,8 @@ test "Layers - multiple layers case 1" {
     // multiple layer switches, hold 1, hold 2, release 2, release 1
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
-    const mo2_key = comptime core.KeyDef.MO(2);
+    const mo1_key = comptime helpers.MO(1);
+    const mo2_key = comptime helpers.MO(2);
     const base_layer = comptime [_]core.KeyDef{ A, B, mo1_key, D };
     const layer_1 = comptime [_]core.KeyDef{ E, F, A, mo2_key };
     const layer_2 = comptime [_]core.KeyDef{ C, G, C, C };
@@ -335,8 +335,8 @@ test "Layers - multiple layers case 2" {
     //Layers - multiple layer switches, hold 1, hold 2, release 1, release 2
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo1_key = comptime core.KeyDef.MO(1);
-    const mo2_key = comptime core.KeyDef.MO(2);
+    const mo1_key = comptime helpers.MO(1);
+    const mo2_key = comptime helpers.MO(2);
     const base_layer = comptime [_]core.KeyDef{ A, B, mo1_key, D };
     const layer_1 = comptime [_]core.KeyDef{ E, F, A, mo2_key };
     const layer_2 = comptime [_]core.KeyDef{ C, G, C, C };
@@ -399,7 +399,7 @@ test "MO - invalid layer id" {
     // ensure nothing breaks if referencing too high layer index
 
     const current_time: core.TimeSinceBoot = 100;
-    const mo4_key = comptime core.KeyDef.MO(4);
+    const mo4_key = comptime helpers.MO(4);
     const base_layer = comptime [_]core.KeyDef{ A, A, A, mo4_key };
     const layer_1 = comptime [_]core.KeyDef{ B, B, B, B };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
