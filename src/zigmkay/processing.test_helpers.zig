@@ -47,3 +47,9 @@ pub fn MT(tap: core.TapDef, hold_mods: core.Modifiers, tapping_term_ms: core.Tap
         .retro_tapping = false,
     } };
 }
+pub fn NONE() core.KeyDef {
+    return core.KeyDef.none;
+}
+pub fn TRANSPARENT() core.KeyDef {
+    return core.KeyDef.transparent;
+}

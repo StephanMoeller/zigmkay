@@ -27,13 +27,6 @@ pub const KeyDef = union(enum) {
     hold_only: HoldDef,
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool },
     tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u8, repeat_interval_ms: u8 },
-
-    pub fn NONE() KeyDef {
-        return KeyDef.none;
-    }
-    pub fn TRANSPARENT() KeyDef {
-        return KeyDef.transparent;
-    }
 };
 const TransparentLayerValue = 15;
 
