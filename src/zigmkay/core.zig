@@ -28,10 +28,6 @@ pub const KeyDef = union(enum) {
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool },
     tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u8, repeat_interval_ms: u8 },
 
-    pub fn TAP(keycode: u8) KeyDef {
-        return KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
-    }
-
     pub fn TAP_WITH_MOD(keycode: u8, modifiers: Modifiers) KeyDef {
         return KeyDef{ .tap_only = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
     }

@@ -18,3 +18,7 @@ pub fn init_test(comptime keymap_dimensions: core.KeymapDimensions, comptime key
         }
     };
 }
+
+pub fn TAP(keycode: u8) core.KeyDef {
+    return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
+}
