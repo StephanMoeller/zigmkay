@@ -28,22 +28,6 @@ pub const KeyDef = union(enum) {
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool },
     tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u8, repeat_interval_ms: u8 },
 
-    pub fn LT(layer: LayerIndex, tap_keycode: u8, tap_modifiers: Modifiers, tapping_term_ms: TappingTermType) KeyDef {
-        return KeyDef{ .tap_hold = .{
-            .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
-            .hold = .{ .hold_layer = layer },
-            .tapping_term_ms = tapping_term_ms,
-            .retro_tapping = false,
-        } };
-    }
-    pub fn MT(tap: TapDef, hold_mods: Modifiers, tapping_term_ms: TappingTermType) KeyDef {
-        return KeyDef{ .tap_hold = .{
-            .tap = tap,
-            .hold = HoldDef{ .hold_modifiers = hold_mods },
-            .tapping_term_ms = tapping_term_ms,
-            .retro_tapping = false,
-        } };
-    }
     pub fn NONE() KeyDef {
         return KeyDef.none;
     }

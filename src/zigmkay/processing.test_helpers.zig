@@ -31,3 +31,19 @@ pub fn HOLD_MOD(modifiers: core.Modifiers) core.KeyDef {
 pub fn MO(layer: core.LayerIndex) core.KeyDef {
     return core.KeyDef{ .hold_only = .{ .hold_layer = layer } };
 }
+pub fn LT(layer: core.LayerIndex, tap_keycode: u8, tap_modifiers: core.Modifiers, tapping_term_ms: core.TappingTermType) core.KeyDef {
+    return core.KeyDef{ .tap_hold = .{
+        .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
+        .hold = .{ .hold_layer = layer },
+        .tapping_term_ms = tapping_term_ms,
+        .retro_tapping = false,
+    } };
+}
+pub fn MT(tap: core.TapDef, hold_mods: core.Modifiers, tapping_term_ms: core.TappingTermType) core.KeyDef {
+    return core.KeyDef{ .tap_hold = .{
+        .tap = tap,
+        .hold = core.HoldDef{ .hold_modifiers = hold_mods },
+        .tapping_term_ms = tapping_term_ms,
+        .retro_tapping = false,
+    } };
+}
