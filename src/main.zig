@@ -1,4 +1,7 @@
 const zigmkay = @import("zigmkay/zigmkay.zig");
+const dk = @import("keycodes/dk.zig");
+
+const std = @import("std");
 const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
@@ -42,42 +45,87 @@ pub fn main() !void {
         tick_count += 1;
 
         if (!has_printed and (current_time - start_time) / 1000 > 1000) {
-            try print(tick_count, &usb_command_queue);
+            try print_num(tick_count, &usb_command_queue);
             has_printed = true;
         }
     }
 }
 const keys = @import("keycodes/dk.zig");
-pub fn print(num: u64, queue: *zigmkay.core.OutputCommandQueue) !void {
-    var remaining = num;
-    // 0x001E
-    while (remaining > 0) {
-        var keycode: u8 = 0;
-        const digit = remaining % 10;
-        if (digit == 1) keycode = keys.N1;
-        if (digit == 2) keycode = keys.N2;
-        if (digit == 3) keycode = keys.N3;
-        if (digit == 4) keycode = keys.N4;
-        if (digit == 5) keycode = keys.N5;
-        if (digit == 6) keycode = keys.N6;
-        if (digit == 7) keycode = keys.N7;
-        if (digit == 8) keycode = keys.N8;
-        if (digit == 9) keycode = keys.N9;
-        if (digit == 0) keycode = keys.N0;
-
+pub fn print(str: []u8, queue: *zigmkay.core.OutputCommandQueue) !void {
+    var map: [256]u8 = [1]u8{dk.DOT} ** 256;
+    map['a'] = dk.A;
+    map['b'] = dk.B;
+    map['c'] = dk.C;
+    map['d'] = dk.D;
+    map['e'] = dk.E;
+    map['f'] = dk.F;
+    map['g'] = dk.G;
+    map['h'] = dk.H;
+    map['i'] = dk.I;
+    map['j'] = dk.J;
+    map['k'] = dk.K;
+    map['l'] = dk.L;
+    map['m'] = dk.M;
+    map['n'] = dk.N;
+    map['o'] = dk.O;
+    map['p'] = dk.P;
+    map['q'] = dk.Q;
+    map['r'] = dk.R;
+    map['s'] = dk.S;
+    map['t'] = dk.T;
+    map['u'] = dk.U;
+    map['v'] = dk.V;
+    map['w'] = dk.W;
+    map['x'] = dk.X;
+    map['y'] = dk.Y;
+    map['z'] = dk.Z;
+    map['A'] = dk.A;
+    map['B'] = dk.B;
+    map['C'] = dk.C;
+    map['D'] = dk.D;
+    map['E'] = dk.E;
+    map['F'] = dk.F;
+    map['G'] = dk.G;
+    map['H'] = dk.H;
+    map['I'] = dk.I;
+    map['J'] = dk.J;
+    map['K'] = dk.K;
+    map['L'] = dk.L;
+    map['M'] = dk.M;
+    map['N'] = dk.N;
+    map['O'] = dk.O;
+    map['P'] = dk.P;
+    map['Q'] = dk.Q;
+    map['R'] = dk.R;
+    map['S'] = dk.S;
+    map['T'] = dk.T;
+    map['U'] = dk.U;
+    map['V'] = dk.V;
+    map['W'] = dk.W;
+    map['X'] = dk.X;
+    map['Y'] = dk.Y;
+    map['Z'] = dk.Z;
+    map['1'] = dk.N1;
+    map['2'] = dk.N2;
+    map['3'] = dk.N3;
+    map['4'] = dk.N4;
+    map['5'] = dk.N5;
+    map['6'] = dk.N6;
+    map['7'] = dk.N7;
+    map['8'] = dk.N8;
+    map['9'] = dk.N9;
+    map['0'] = dk.N0;
+    map[' '] = dk.SPACE;
+    map['.'] = dk.DOT;
+    for (str) |char| {
+        const keycode = map[char];
         try queue.enqueue(.{ .KeyCodePress = keycode });
         try queue.enqueue(.{ .KeyCodeRelease = keycode });
-
-        try queue.enqueue(.{ .KeyCodePress = keys.SPACE });
-        try queue.enqueue(.{ .KeyCodeRelease = keys.SPACE });
-
-        try queue.enqueue(.{ .KeyCodePress = keys.DOT });
-        try queue.enqueue(.{ .KeyCodeRelease = keys.DOT });
-
-        try queue.enqueue(.{ .KeyCodePress = keys.SPACE });
-        try queue.enqueue(.{ .KeyCodeRelease = keys.SPACE });
-        remaining /= 10;
     }
-    try queue.enqueue(.{ .KeyCodePress = keys.ENTER });
-    try queue.enqueue(.{ .KeyCodeRelease = keys.ENTER });
+}
+fn print_num(num: u64, queue: *zigmkay.core.OutputCommandQueue) !void {
+    const max_len = 20;
+    var buf: [max_len]u8 = undefined;
+    const numAsString = try std.fmt.bufPrint(&buf, "{}", .{num});
+    try print(numAsString, queue);
 }
