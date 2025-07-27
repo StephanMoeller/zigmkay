@@ -21,6 +21,7 @@ TODO
 - Readable pin mapping definition
 - (upcomming) less custom code: Hook into tap-enter, tap-exit, hold-enter and hold-exit times. In qmk you react to key presses and key releases, so if you want a custom behaviour on tap, but standard on hold, you must handle both tap and hold in your custom code. in zigmkay you let zigmkay decide if tap or hold is chosen, and only run your code in one of the cases. 
 - Only dependencies is zig, which must be downloaded first, and microzig which will be auto-fetched when compiling (i think that is the time this happens)
+- Autofire per setting - allows for very fast autofire, eg on arrow keys while other keys remain unchanged. This feature does not support combination with hold functions.
 
 # When not to choose zigmkay
 - wireless: zigmkay is not planned to be wireless ever.
@@ -48,11 +49,11 @@ The following is an overview over what is done and what is missing.
 - (done) Tap/Hold feature: double modifier holds (fixed automatically by improved logic)
 - (done) Tap/Hold feature: tripple modifier holds (fixed automatically by improved logic)
 - (done) Allow a key press to go into boot mode
+- (done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
 - TODO Tri-layer functionality for two layers => 3rd layer
 - TODO Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
-- TODO Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 - TODO Custom code support
 - TODO Trrs
 - TODO Allow log printing through the usb interface as text to the host
