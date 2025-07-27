@@ -51,7 +51,7 @@ fn AF(keycode: u8) core.KeyDef {
         .tap_with_autofire = .{
             .tap = .{ .tap_keycode = keycode },
             .repeat_interval_ms = 50,
-            .initial_delay_ms = 75,
+            .initial_delay_ms = 100,
         },
     };
 }
