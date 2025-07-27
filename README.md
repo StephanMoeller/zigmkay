@@ -33,23 +33,23 @@ TODO
 The following is an overview over what is done and what is missing.
 
 ## Scanning
-- (done) poc for scanning a unibody
-- (done) debounce handling
+- <del> (done) poc for scanning a unibody </del>
+- <del> (done) debounce handling </del>
 - TODO Generalization of pin config
 - TODO Sort array by either row or cols depending on the direction of the current and keep track of the key position indexes
 
 ## Processor
 - <del> (done) tap-only keys </del>
-- (done) hold-only keys
-- (done) Transparent key support
-- (done) None key support
-- (done) Tap/Hold - both layer and modifiers are supported. Currently only simple cases where the key is held for more than tapping term period and where it is tapped quickly
-- (done) Tap/Hold feature: retrotapping - bool per key 
-- (done) Tap/Hold feature: permissive hold - on for all, not possible to disable as I have never seen anyone wanting this off
-- (done) Tap/Hold feature: double modifier holds (fixed automatically by improved logic)
-- (done) Tap/Hold feature: tripple modifier holds (fixed automatically by improved logic)
-- (done) Allow a key press to go into boot mode
-- (done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys
+- <del> done) hold-only keys </del>
+- <del> done) Transparent key support </del>
+- <del> done) None key support </del>
+- <del> done) Tap/Hold - both layer and modifiers are supported. Currently only simple cases where the key is held for more than tapping term period and where it is tapped quickly </del>
+- <del> done) Tap/Hold feature: retrotapping - bool per key  </del>
+- <del> done) Tap/Hold feature: permissive hold - on for all, not possible to disable as I have never seen anyone wanting this off </del>
+- <del> done) Tap/Hold feature: double modifier holds (fixed automatically by improved logic) </del>
+- <del> done) Tap/Hold feature: tripple modifier holds (fixed automatically by improved logic) </del>
+- <del> done) Allow a key press to go into boot mode </del>
+- <del> done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys </del>
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO Custom code support
 - TODO Tri-layer functionality for two layers => 3rd layer
