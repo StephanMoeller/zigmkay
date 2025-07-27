@@ -9,9 +9,9 @@ pub const key_count = 28;
 pub const keymap = [_][key_count]core.KeyDef{
 // layer 0
     .{ 
-               T(kc.W),   T(kc.R), GUI(kc.P), T(kc.B),      T(kc.K), GUI(kc.L),   T(kc.O),       T(kc.U),
-    T(kc.F), ALT(kc.A), CTL(kc.S), SFT(kc.T), T(kc.G),      T(kc.M), SFT(kc.N), CTL(kc.E),     ALT(kc.I),  T(kc.Y),
-               T(kc.X),   T(kc.C),   T(kc.D),                         T(kc.H),    T(kc.COMMA),   T(kc.DOT),
+              AF(kc.W), GUI(kc.R),   T(kc.P), AF(kc.B),      T(kc.K),   T(kc.L), GUI(kc.O),        T(kc.U),
+    T(kc.F), ALT(kc.A), CTL(kc.S), SFT(kc.T),  T(kc.G),      T(kc.M), SFT(kc.N), CTL(kc.E),      ALT(kc.I), T(kc.Y),
+               T(kc.X),   T(kc.C),   T(kc.D),                           T(kc.H),    T(kc.COMMA), T(kc.DOT),
           LT(2, kc.ENTER), NONE, NONE, LT(1, kc.SPACE)
     },
 
@@ -50,8 +50,8 @@ fn AF(keycode: u8) core.KeyDef {
     return core.KeyDef{
         .tap_with_autofire = .{
             .tap = .{ .tap_keycode = keycode },
-            .repeat_interval_ms = 25,
-            .initial_delay_ms = 70,
+            .repeat_interval_ms = 50,
+            .initial_delay_ms = 75,
         },
     };
 }
