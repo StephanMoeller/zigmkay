@@ -26,8 +26,9 @@ pub const KeyDef = union(enum) {
     tap_only: TapDef,
     hold_only: HoldDef,
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool = false },
-    tap_with_autofire: struct { tap: TapDef, initial_delay_ms: u16, repeat_interval_ms: u16 },
+    tap_with_autofire: AutoFireDef,
 };
+pub const AutoFireDef = struct { tap: TapDef, initial_delay_ms: u64, repeat_interval_ms: u64 };
 const TransparentLayerValue = 15;
 
 pub const KeyIndex = usize;

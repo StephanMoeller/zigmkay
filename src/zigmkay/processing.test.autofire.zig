@@ -29,12 +29,12 @@ test "Autofire - case A" {
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay_ms = 1000,
         .repeat_interval_ms = 500,
-        .tap = .{ .tap_keycode = a, .tap_modifiers = .{ .left_alt = true } },
+        .tap = .{ .tap_keycode = a },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay_ms = 1000,
         .repeat_interval_ms = 500,
-        .tap = .{ .tap_keycode = a, .tap_modifiers = .{ .left_alt = true } },
+        .tap = .{ .tap_keycode = a },
     } };
 
     const start_time_us: core.TimeSinceBoot = 100;
@@ -46,18 +46,23 @@ test "Autofire - case A" {
 
     try o.press_key(key_a_idx, start_time_us);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 50);
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1000); // 1 ms later
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 998 * 1000); // 999 ms later
+    try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // Now release the key - and expect no autofire
     try o.release_key(key_a_idx, start_time_us + 999 + 1000);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 1001 * 1000); // 1001 ms later
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, start_time_us + 2000 * 1000); // 2000 ms later
-
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());

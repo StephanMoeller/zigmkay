@@ -13,6 +13,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         var modifiers: core.Modifiers = .{};
         var previous_matrix_change: core.MatrixStateChange = undefined;
 
+        var current_autofire: ?core.AutoFireDef = null;
+        var next_autofire_trigger_time: core.TimeSinceBoot = 0;
+
         var last_consumed_key_index: core.KeyIndex = 0;
         pub fn Process(
             self: *Self,
@@ -20,6 +23,18 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
+            warn("current time: {}", .{current_time});
+            warn("checking autofire which has time {}", .{next_autofire_trigger_time});
+            if (current_autofire) |autofire| {
+                warn("auto", .{});
+                if (next_autofire_trigger_time > current_time) {
+                    warn("triggering", .{});
+                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
+                    try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                    next_autofire_trigger_time += autofire.repeat_interval_ms * 1000;
+                }
+            }
+
             while (ProcessContinuation.DequeueOneAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
                 const consumed_event = try input_matrix_changes.dequeue();
                 last_consumed_key_index = consumed_event.key_index;
@@ -27,6 +42,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         }
 
         const ProcessContinuation = enum { DequeueOneAndRunAgain, Stop };
+
         fn process_next(
             self: *Self,
             input_matrix_changes: *core.MatrixStateChangeQueue,
@@ -42,7 +58,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
             // Only decide for the head
             const head_event = data[0];
-
+            current_autofire = null; // any press or release cancels any previous autofire
             if (head_event.pressed) {
                 const head_key_def = determine_key_def(self, head_event.key_index);
                 switch (head_key_def) {
@@ -51,7 +67,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .tap_with_autofire => |tap_with_autofire| {
-                        try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
+                        try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                        warn("starting autofire now", .{});
+                        current_autofire = tap_with_autofire;
+                        next_autofire_trigger_time = current_time + tap_with_autofire.initial_delay_ms * 1000;
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .hold_only => |hold| {
@@ -119,18 +138,15 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
                 switch (release_map[head_event.key_index]) {
                     .None => {
-                        warn("empty slot was released at key_index {}", .{head_event.key_index});
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .ReleaseTap => |tap_def| {
-                        warn("1 released a", .{});
                         try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
                         release_map[head_event.key_index] = KeyReleaseAction.None;
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .ReleaseHold => |hold_def| {
                         const hold = hold_def.hold;
-                        warn("1 released B", .{});
                         if (hold.hold_modifiers != null) {
                             // Cancel the hold modifier(s)
                             modifiers = modifiers.remove(hold.hold_modifiers.?);
@@ -222,9 +238,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             return pressed_key_def;
         }
         fn warn(comptime msg: []const u8, args: anytype) void {
-            _ = msg;
-            _ = args;
-            //std.log.warn(msg, args);
+            //_ = msg;
+            //_ = args;
+            std.log.warn(msg, args);
         }
     };
 }
