@@ -51,12 +51,17 @@ The following is an overview over what is done and what is missing.
 - (done) Allow a key press to go into boot mode
 - (done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 - TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
-- TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
+- TODO Custom code support
 - TODO Tri-layer functionality for two layers => 3rd layer
 - TODO Tri-layer functionality for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
-- TODO Custom code support
 - TODO Trrs
+
+Nice to have
 - TODO Allow log printing through the usb interface as text to the host
+
+Stuff that I do not use myself:
+- TODO One shot mods (should these be ignored if the next key tapped has its own tapping-modifier(s) applied to it?)
+
 
 ## Hardware
 - Support trrs connections
