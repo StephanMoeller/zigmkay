@@ -17,9 +17,9 @@ pub const keymap = [_][key_count]core.KeyDef{
 
     // Layer 1: arrows keys and symbols
     .{ 
-             _______, _______, _______, _______,             _______, _______,     T(kc.UP),    _______,
-    _______, _______, _______, _______, _______,             _______, T(kc.LEFT), T(kc.DOWN), T(kc.RIGHT), _______,
-             _______, _______, _______,                               _______,     _______,     _______,
+             _______, _______, _______, _______,             _______,     _______,   AF(kc.UP),      _______,
+    _______, _______, _______, _______, _______,             _______, AF(kc.LEFT), AF(kc.DOWN), AF(kc.RIGHT), _______,
+             _______, _______, _______,                                   _______,     _______,      _______,
                        LT(1, kc.SPACE), _______,    _______, _______
     }, 
 
@@ -46,12 +46,23 @@ pub const kc_bs = kc.BACKSPACE;
 pub const kc_del = kc.DELETE;
 const tapping_term_ms = 250;
 
+fn AF(keycode: u8) core.KeyDef {
+    return core.KeyDef{
+        .tap_with_autofire = .{
+            .tap = .{ .tap_keycode = keycode },
+            .repeat_interval_ms = 25,
+            .initial_delay_ms = 70,
+        },
+    };
+}
 fn LT(layer_index: core.LayerIndex, keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_hold = .{
-        .tap = core.TapDef{ .tap_keycode = keycode },
-        .hold = .{ .hold_layer = layer_index },
-        .tapping_term_ms = tapping_term_ms,
-    } };
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = core.TapDef{ .tap_keycode = keycode },
+            .hold = .{ .hold_layer = layer_index },
+            .tapping_term_ms = tapping_term_ms,
+        },
+    };
 }
 // T for 'Tap-only'
 fn T(keycode: u8) core.KeyDef {
@@ -60,32 +71,40 @@ fn T(keycode: u8) core.KeyDef {
     };
 }
 fn GUI(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_hold = .{
-        .tap = core.TapDef{ .tap_keycode = keycode },
-        .hold = core.HoldDef{ .hold_modifiers = .{ .left_gui = true } },
-        .tapping_term_ms = tapping_term_ms,
-    } };
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = core.TapDef{ .tap_keycode = keycode },
+            .hold = core.HoldDef{ .hold_modifiers = .{ .left_gui = true } },
+            .tapping_term_ms = tapping_term_ms,
+        },
+    };
 }
 fn CTL(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_hold = .{
-        .tap = core.TapDef{ .tap_keycode = keycode },
-        .hold = core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } },
-        .tapping_term_ms = tapping_term_ms,
-    } };
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = core.TapDef{ .tap_keycode = keycode },
+            .hold = core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } },
+            .tapping_term_ms = tapping_term_ms,
+        },
+    };
 }
 fn ALT(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_hold = .{
-        .tap = core.TapDef{ .tap_keycode = keycode },
-        .hold = core.HoldDef{ .hold_modifiers = .{ .left_alt = true } },
-        .tapping_term_ms = tapping_term_ms,
-    } };
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = core.TapDef{ .tap_keycode = keycode },
+            .hold = core.HoldDef{ .hold_modifiers = .{ .left_alt = true } },
+            .tapping_term_ms = tapping_term_ms,
+        },
+    };
 }
 fn SFT(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_hold = .{
-        .tap = core.TapDef{ .tap_keycode = keycode },
-        .hold = core.HoldDef{ .hold_modifiers = .{ .left_shift = true } },
-        .tapping_term_ms = tapping_term_ms,
-    } };
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = core.TapDef{ .tap_keycode = keycode },
+            .hold = core.HoldDef{ .hold_modifiers = .{ .left_shift = true } },
+            .tapping_term_ms = tapping_term_ms,
+        },
+    };
 }
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;

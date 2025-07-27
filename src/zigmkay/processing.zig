@@ -239,9 +239,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             return pressed_key_def;
         }
         fn warn(comptime msg: []const u8, args: anytype) void {
-            //_ = msg;
-            //_ = args;
-            std.log.warn(msg, args);
+            _ = msg;
+            _ = args;
+            //std.log.warn(msg, args);
         }
     };
 }
