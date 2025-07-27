@@ -25,19 +25,20 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         ) !void {
             warn("current time: {}", .{current_time});
             warn("checking autofire which has time {}", .{next_autofire_trigger_time});
-            if (current_autofire) |autofire| {
-                warn("auto", .{});
-                if (next_autofire_trigger_time > current_time) {
-                    warn("triggering", .{});
-                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
-                    try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                    next_autofire_trigger_time += autofire.repeat_interval_ms * 1000;
-                }
-            }
 
             while (ProcessContinuation.DequeueOneAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
                 const consumed_event = try input_matrix_changes.dequeue();
                 last_consumed_key_index = consumed_event.key_index;
+            }
+
+            if (current_autofire) |autofire| {
+                warn("current_autofire is not null", .{});
+                if (next_autofire_trigger_time < current_time) {
+                    warn("triggering next_autofire_trigger_time: {}, current time: {}", .{ next_autofire_trigger_time, current_time });
+                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
+                    try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                    next_autofire_trigger_time += autofire.repeat_interval_ms * 1000;
+                }
             }
         }
 
@@ -68,9 +69,9 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     },
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                        warn("starting autofire now", .{});
                         current_autofire = tap_with_autofire;
                         next_autofire_trigger_time = current_time + tap_with_autofire.initial_delay_ms * 1000;
+                        warn("starting autofire now. Current time: {}, next fire time set to {}, autofire set to {}", .{ current_time, next_autofire_trigger_time, tap_with_autofire.tap.tap_keycode });
                         return ProcessContinuation.DequeueOneAndRunAgain;
                     },
                     .hold_only => |hold| {
