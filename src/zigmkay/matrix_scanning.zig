@@ -7,7 +7,7 @@ const time = rp2xxx.time;
 // PIN CONFIGURATION: define the pins as row and col pins and specify a direction (validate that they point in the right direction)
 pub fn CreateMatrixScanner(settings: ScannerSettings) Scanner {
     pin_config.apply();
-    return Scanner{ .debounce = settings.debounce };
+    return Scanner{ .debounce_us = settings.debounce.ms * 1000 };
 }
 
 // PIN CONFIGURATION
@@ -50,7 +50,7 @@ pub const ScannerSettings = struct{
 var current_states: [pinsToKeysMapping.len]bool = [1]bool{false} ** (pinsToKeysMapping.len);
 var current_states_last_changed: [pinsToKeysMapping.len]u64 = [1]u64{0} ** (pinsToKeysMapping.len);
 pub const Scanner = struct {
-    debounce: core.TimeSpan,
+    debounce_us: u64,
     pub fn DetectKeyboardChanges(self: *const Scanner, output_queue: *core.MatrixStateChangeQueue, current_time: core.TimeSinceBoot) !void {
         // if
         for (pinsToKeysMapping, 0..) |mapping, key_index| {
@@ -68,7 +68,7 @@ pub const Scanner = struct {
                 const last_changed_time = current_states_last_changed[key_index];
                 const now = time.get_time_since_boot().to_us();
 
-                if (now - last_changed_time > self.debounce.ms * 1000) {
+                if (now - last_changed_time > self.debounce_us) {
                     current_states[key_index] = pressed;
                     current_states_last_changed[key_index] = now;
 
