@@ -44,8 +44,8 @@ pub const Combo2Def = struct {
 };
 pub const AutoFireDef = struct {
     tap: TapDef,
-    initial_delay_ms: u16,
-    repeat_interval_ms: u16,
+    initial_delay: TimeSpan,
+    repeat_interval: TimeSpan,
 };
 
 pub const TimeSpan = struct {

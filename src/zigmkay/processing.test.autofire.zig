@@ -27,14 +27,14 @@ const dummy_time = core.TimeStamp{ .time_us_since_boot = 0 };
 test "Autofire - case A" {
     // release before start, expect only one
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
         .tap = .{ .tap_keycode = a },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
-        .tap = .{ .tap_keycode = a },
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
+        .tap = .{ .tap_keycode = b },
     } };
 
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
@@ -75,15 +75,16 @@ test "Autofire - case A" {
 test "Autofire - case B" {
     // holding down and activating autofire
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
         .tap = .{ .tap_keycode = a },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
-        .tap = .{ .tap_keycode = a },
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
+        .tap = .{ .tap_keycode = b },
     } };
+
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const base_layer = comptime [_]core.KeyDef{ auto_fire_a, auto_fire_b, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
@@ -131,13 +132,13 @@ test "Autofire - case B" {
 test "Autofire - case C" {
     // holding down and activating autofire, pressing another autofire key - expect new key to autofire
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
         .tap = .{ .tap_keycode = a },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
-        .initial_delay_ms = 1000,
-        .repeat_interval_ms = 500,
+        .initial_delay = .{ .ms = 1000 },
+        .repeat_interval = .{ .ms = 500 },
         .tap = .{ .tap_keycode = b },
     } };
 

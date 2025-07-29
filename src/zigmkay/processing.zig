@@ -45,7 +45,7 @@ pub fn CreateProcessorType(
                 if (next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
                     const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
                     try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                    next_autofire_trigger_time = next_autofire_trigger_time.add_ms(autofire.repeat_interval_ms);
+                    next_autofire_trigger_time = next_autofire_trigger_time.add(autofire.repeat_interval);
                 }
             }
         }
@@ -118,7 +118,7 @@ pub fn CreateProcessorType(
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                         current_autofire = tap_with_autofire;
-                        next_autofire_trigger_time = current_time.add_ms(tap_with_autofire.initial_delay_ms);
+                        next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
                         warn("starting autofire now. Current time: {}, next fire time set to {}, autofire set to {}", .{ current_time, next_autofire_trigger_time, tap_with_autofire.tap.tap_keycode });
                         warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
