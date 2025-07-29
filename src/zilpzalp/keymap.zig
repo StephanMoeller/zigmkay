@@ -6,7 +6,7 @@ pub const key_count = 28;
 
 // zig fmt: off
 
-const combo_timeout_ms: core.ComboTimeout = 30;
+const combo_timeout: core.ComboTimeout = 30;
 pub const keymap = [_][key_count]core.KeyDef{
 // layer 0
     .{ 
@@ -35,27 +35,26 @@ pub const keymap = [_][key_count]core.KeyDef{
     // Layer 3: backspace
     .{ 
              _______, _______, _______, _______,             _______, T(kc.SPACE), T(kc.SPACE), T(kc.SPACE),
-    _______, _______, _______, _______, _______,             _______, T(kc_bs),    T(kc_bs),    T(kc_bs),    _______,
-             _______, _______, _______,                               T(kc_del),   T(kc_del),   T(kc_del),
+    _______, _______, _______, _______, _______,             _______, T(kc.BS),    T(kc.BS),    T(kc.BS),    _______,
+             _______, _______, _______,                               T(kc.DEL),   T(kc.DEL),   T(kc.DEL),
                        _______, _______,    _______, T(kc.N0)
     }
 
 };
 // zig fmt: on
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
-pub const kc_bs = kc.BACKSPACE;
-pub const kc_del = kc.DELETE;
-const tapping_term_ms = 250;
+const tapping_term = core.TimeSpan{ .ms = 250 };
 
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 0, 1 }, 0, kc.J),
     Combo_Tap(.{ 9, 10 }, 0, kc.Z),
+    Combo_Tap(.{ 10, 11 }, 0, kc.V),
 };
 fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode: u8) core.Combo2Def {
     return core.Combo2Def{
         .key_indexes = key_indexes,
         .layer = layer,
-        .timeout_ms = combo_timeout_ms,
+        .timeout = tapping_term,
         .key_def = core.KeyDef{ .tap_only = .{ .tap_keycode = keycode } },
     };
 }
@@ -64,8 +63,8 @@ fn AF(keycode: u8) core.KeyDef {
     return core.KeyDef{
         .tap_with_autofire = .{
             .tap = .{ .tap_keycode = keycode },
-            .repeat_interval_ms = 50,
-            .initial_delay_ms = 100,
+            .repeat_interval = .{ .ms = 50 },
+            .initial_delay = .{ .ms = 100 },
         },
     };
 }
@@ -74,7 +73,7 @@ fn LT(layer_index: core.LayerIndex, keycode: u8) core.KeyDef {
         .tap_hold = .{
             .tap = core.TapDef{ .tap_keycode = keycode },
             .hold = .{ .hold_layer = layer_index },
-            .tapping_term_ms = tapping_term_ms,
+            .tapping_term = tapping_term,
         },
     };
 }
@@ -89,7 +88,7 @@ fn GUI(keycode: u8) core.KeyDef {
         .tap_hold = .{
             .tap = core.TapDef{ .tap_keycode = keycode },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_gui = true } },
-            .tapping_term_ms = tapping_term_ms,
+            .tapping_term = tapping_term,
         },
     };
 }
@@ -98,7 +97,7 @@ fn CTL(keycode: u8) core.KeyDef {
         .tap_hold = .{
             .tap = core.TapDef{ .tap_keycode = keycode },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } },
-            .tapping_term_ms = tapping_term_ms,
+            .tapping_term = tapping_term,
         },
     };
 }
@@ -107,7 +106,7 @@ fn ALT(keycode: u8) core.KeyDef {
         .tap_hold = .{
             .tap = core.TapDef{ .tap_keycode = keycode },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_alt = true } },
-            .tapping_term_ms = tapping_term_ms,
+            .tapping_term = tapping_term,
         },
     };
 }
@@ -116,7 +115,7 @@ fn SFT(keycode: u8) core.KeyDef {
         .tap_hold = .{
             .tap = core.TapDef{ .tap_keycode = keycode },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_shift = true } },
-            .tapping_term_ms = tapping_term_ms,
+            .tapping_term = tapping_term,
         },
     };
 }

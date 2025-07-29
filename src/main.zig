@@ -13,12 +13,12 @@ pub fn main() !void {
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     // Logic
-    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
+    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce = .{ .ms = 5 } });
     var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap, keyboard.combos[0..]){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {
-        const current_time = time.get_time_since_boot().to_us();
+        const current_time = core.TimeSinceBoot{ .time_since_boot_us = time.get_time_since_boot().to_us() };
 
         // Detect matrix changes
         try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
