@@ -213,8 +213,6 @@ pub fn CreateProcessorType(
                                 }
                                 release_map[head_event.key_index] = ReleaseMapEntry.None;
 
-                                // handle retro tapping
-                                // TODO: RETRO on combos - ensure works no matter what key was released first
                                 if (release_info.action_id_when_pressed == action_id - 1) {
                                     if (hold_def.retro_tap) |tap| {
                                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
