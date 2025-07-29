@@ -44,8 +44,8 @@ pub const Combo2Def = struct {
 };
 pub const AutoFireDef = struct {
     tap: TapDef,
-    initial_delay_ms: u64,
-    repeat_interval_ms: u64,
+    initial_delay_ms: u16,
+    repeat_interval_ms: u16,
 };
 
 pub const TimeoutMs = struct {
@@ -60,7 +60,7 @@ const TransparentLayerValue = 15;
 
 pub const KeyIndex = u8;
 pub const LayerIndex = u8;
-pub const TappingTermType = u64;
+pub const TappingTermType = u16;
 pub const ComboTimeout = u64;
 
 const queue_capacities = 250;
