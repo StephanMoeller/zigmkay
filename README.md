@@ -51,7 +51,7 @@ The following is an overview over what is done and what is missing.
 - (done) Allow a key press to go into boot mode
 - (done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys
 - (done) Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
-- TODO Custom code support
+- --work in progress-- Custom code support
 - TODO Example of how to make a tri-layer functionality with custom code
 
 ## Hardware
