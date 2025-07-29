@@ -59,7 +59,7 @@ pub const TimeoutMs = struct {
 const TransparentLayerValue = 15;
 
 pub const KeyIndex = u8;
-pub const LayerIndex = u8;
+pub const LayerIndex = u4;
 pub const TappingTermType = u16;
 pub const ComboTimeout = u64;
 
