@@ -71,7 +71,9 @@ pub const Scanner = struct {
                 if (now - last_changed_time > self.debounce_us) {
                     current_states[key_index] = pressed;
                     current_states_last_changed[key_index] = now;
-                    try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index, .time = current_time });
+
+                    const key_index_with_type: core.KeyIndex = @intCast(key_index);
+                    try output_queue.enqueue(.{ .pressed = pressed, .key_index = key_index_with_type, .time = current_time });
                     //p.led_red.put(read_value);
                     //p.led_green.put(1 - read_value);
                     //p.led_blue.put(1);

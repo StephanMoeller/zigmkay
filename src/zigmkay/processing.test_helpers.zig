@@ -17,10 +17,10 @@ pub fn init_test_with_combos(
         matrix_change_queue: zigmkay.core.MatrixStateChangeQueue = zigmkay.core.MatrixStateChangeQueue.Create(),
         actions_queue: zigmkay.core.OutputCommandQueue = zigmkay.core.OutputCommandQueue.Create(),
         processor: ProcessorType = ProcessorType{},
-        pub fn press_key(self: *Self, key_index: usize, time: core.TimeSinceBoot) !void {
+        pub fn press_key(self: *Self, key_index: zigmkay.core.KeyIndex, time: core.TimeSinceBoot) !void {
             try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = true, .key_index = key_index });
         }
-        pub fn release_key(self: *Self, key_index: usize, time: core.TimeSinceBoot) !void {
+        pub fn release_key(self: *Self, key_index: zigmkay.core.KeyIndex, time: core.TimeSinceBoot) !void {
             try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
         }
     };
