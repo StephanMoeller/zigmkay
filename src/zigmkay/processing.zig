@@ -246,8 +246,8 @@ pub fn CreateProcessorType(
                     warn("combo a", .{});
                     continue; // this combo's layers is not active
                 }
-                if (combo_to_test.timeout_ms < time_elapsed_ms) {
-                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed_ms, combo_to_test.timeout_ms });
+                if (combo_to_test.timeout.ms < time_elapsed_ms) {
+                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed_ms, combo_to_test.timeout.ms });
                     continue; // This combo has timed out
                 }
                 if (combo_to_test.key_indexes[0] != head_event.key_index and combo_to_test.key_indexes[1] != head_event.key_index) {

@@ -38,7 +38,7 @@ pub const KeyDef = union(enum) {
 
 pub const Combo2Def = struct {
     key_indexes: [2]KeyIndex,
-    timeout_ms: ComboTimeout,
+    timeout: TimeSpan,
     layer: LayerIndex,
     key_def: KeyDef,
 };
@@ -48,20 +48,14 @@ pub const AutoFireDef = struct {
     repeat_interval_ms: u16,
 };
 
-pub const TimeoutMs = struct {
-    timeout_ms: u16 = 0,
-    fn to_microseconds(self: *TimeoutMs) u64 {
-        var timeout_us: u64 = self.timeout_ms;
-        timeout_us = timeout_us * 1000;
-        return timeout_us;
-    }
+pub const TimeSpan = struct {
+    ms: u16 = 0,
 };
 const TransparentLayerValue = 15;
 
 pub const KeyIndex = u8;
 pub const LayerIndex = u4;
 pub const TappingTermType = u16;
-pub const ComboTimeout = u64;
 
 const queue_capacities = 250;
 
@@ -83,6 +77,9 @@ pub const TimeSinceBoot = struct {
     }
     pub fn add_ms(self: *const TimeSinceBoot, delta_ms: u64) TimeSinceBoot {
         return .{ .time_since_boot_us = self.time_since_boot_us + delta_ms * 1000 };
+    }
+    pub fn add(self: *const TimeSinceBoot, delta: TimeSpan) TimeSinceBoot {
+        return self.add_ms(delta.ms);
     }
 };
 
