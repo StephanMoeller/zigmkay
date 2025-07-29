@@ -50,7 +50,7 @@ The following is an overview over what is done and what is missing.
 - (done) Tap/Hold feature: tripple modifier holds (fixed automatically by improved logic)
 - (done) Allow a key press to go into boot mode
 - (done) Autofire: allow fast reacting autofire on certain keys, eg arrow keys
-- TODO Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
+- (done) Combos - should support tap/hold just like single keys, as it is implemented in zmk. Should also be defined by matrix key indexes+layers just like in zmk, instead of by keycodes like qmk does.
 - TODO Custom code support
 - TODO Tri-layer functionality for two layers => 3rd layer
 - TODO Tri-layer functiona                           lity for a shift key and a layer key => maybe this should not be a layer A + layer B = layer C but instead dual-hold => layer C/or mod changing
