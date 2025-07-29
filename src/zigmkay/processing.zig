@@ -134,7 +134,7 @@ pub fn CreateProcessorType(
                             if (outer_ev.time.time_since_boot_us < head_event.time.time_since_boot_us) {
                                 @panic("this should never happen!");
                             }
-                            const tapping_term_expired = outer_ev.time.time_since_boot_us > head_event.time.add_ms(tap_and_hold.tapping_term_ms).time_since_boot_us;
+                            const tapping_term_expired = outer_ev.time.time_since_boot_us > head_event.time.add(tap_and_hold.tapping_term).time_since_boot_us;
                             if (tapping_term_expired) {
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -168,7 +168,7 @@ pub fn CreateProcessorType(
 
                         // No decision made while looping through all events, finally check if time just passed without anything happened
                         // In this case, it's a hold.
-                        const tapping_term_expired = head_event.time.add_ms(tap_and_hold.tapping_term_ms).time_since_boot_us < current_time.time_since_boot_us;
+                        const tapping_term_expired = current_time.time_since_boot_us > head_event.time.add(tap_and_hold.tapping_term).time_since_boot_us;
                         if (tapping_term_expired) {
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };

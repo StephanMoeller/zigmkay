@@ -26,7 +26,7 @@ const PermissiveHoldParameters = struct {
     other_press_delta_ms: u64,
     other_release_delta_ms: u64,
     expectation: Expectation,
-    tapping_terms_ms: core.TappingTermType,
+    tapping_terms_ms: u16,
 };
 
 fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
@@ -34,7 +34,7 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
     const key_with_permissive_hold = core.KeyDef{ .tap_hold = .{
         .tap = .{ .tap_keycode = c },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
-        .tapping_term_ms = config.tapping_terms_ms,
+        .tapping_term = core.TimeSpan{ .ms = config.tapping_terms_ms },
         .retro_tapping = false,
     } };
 
@@ -95,7 +95,7 @@ test "MT perm hold - other key is tap, case F" {
 }
 test "MT - multiple holds, release in same order" {
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
-    const tapping_term: u64 = 250;
+    const tapping_term = core.TimeSpan{ .ms = 250 };
     const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
     const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
     const key_c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
@@ -150,7 +150,7 @@ test "MT - multiple holds, release in same order" {
 }
 
 test "MT - multiple holds, release in reverse order" {
-    const tapping_term: u64 = 250;
+    const tapping_term = core.TimeSpan{ .ms = 250 };
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
     const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);

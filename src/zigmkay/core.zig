@@ -24,7 +24,7 @@ pub const HoldDef = struct {
 pub const TapHoldDef = struct {
     tap: TapDef,
     hold: HoldDef,
-    tapping_term_ms: TappingTermType,
+    tapping_term: TimeSpan,
     retro_tapping: bool = false,
 };
 pub const KeyDef = union(enum) {
@@ -55,7 +55,6 @@ const TransparentLayerValue = 15;
 
 pub const KeyIndex = u8;
 pub const LayerIndex = u4;
-pub const TappingTermType = u16;
 
 const queue_capacities = 250;
 

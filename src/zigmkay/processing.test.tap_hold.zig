@@ -5,13 +5,13 @@ const core = zigmkay.core;
 const helpers = @import("processing.test_helpers.zig");
 const init_test = helpers.init_test;
 
-const a = 0x04;
-const b = 0x05;
-const c = 0x06;
-const d = 0x07;
-const e = 0x08;
-const f = 0x09;
-const g = 0x10;
+const a = 4;
+const b = 5;
+const c = 6;
+const d = 7;
+const e = 8;
+const f = 9;
+const g = 10;
 
 const A = helpers.TAP(a);
 const B = helpers.TAP(b);
@@ -22,8 +22,8 @@ const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 test "MT tap within tapping term - process with both in queue" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
-    const tapping_terms_ms: core.TappingTermType = 250;
-    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
+    const tapping_term: core.TimeSpan = .{ .ms = 250 };
+    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -46,8 +46,8 @@ test "MT tap within tapping term - process with both in queue" {
 }
 test "MT tap within tapping term - process with multiple calls" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
-    const tapping_terms_ms: core.TappingTermType = 250;
-    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
+    const tapping_term: core.TimeSpan = .{ .ms = 250 };
+    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -72,8 +72,8 @@ test "MT tap within tapping term - process with multiple calls" {
 }
 test "MT hold case: release after tapping term => hold" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
-    const tapping_terms_ms: core.TappingTermType = 250;
-    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
+    const tapping_term: core.TimeSpan = .{ .ms = 250 };
+    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -84,7 +84,7 @@ test "MT hold case: release after tapping term => hold" {
     try o.press_key(0, current_time);
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time = current_time.add_ms(tapping_terms_ms + 1);
+    current_time = current_time.add_ms(tapping_term.ms + 1);
     try o.release_key(0, current_time);
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -98,8 +98,8 @@ test "MT hold case: release after tapping term => hold" {
 
 test "MT hold case: timeout => hold" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
-    const tapping_terms_ms: core.TappingTermType = 250;
-    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
+    const tapping_term: core.TimeSpan = .{ .ms = 250 };
+    const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ mo_layer1_cWithLeftAlt, B, A };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -111,7 +111,7 @@ test "MT hold case: timeout => hold" {
 
     // Now ensure that a tap will happen when releasing within tapping term
 
-    current_time = current_time.add_ms(tapping_terms_ms + 1); // within tapping term
+    current_time = current_time.add_ms(tapping_term.ms + 1); // within tapping term
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
