@@ -1,13 +1,17 @@
 const std = @import("std");
 const core = @import("core.zig");
 
-pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
+pub fn CreateProcessorType(
+    comptime keymap_dimensions: core.KeymapDimensions,
+    comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
+    comptime combos: []const core.Combo2Def,
+) type {
     return struct {
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
 
         // release_map is used to keep track of what to do when a key is released as the layer activations may have changed since is was pressed
-        var release_map: [28]KeyReleaseAction = [_]KeyReleaseAction{KeyReleaseAction.None} ** 28;
+        var release_map: [28]ReleaseMapEntry = [_]ReleaseMapEntry{ReleaseMapEntry.None} ** 28;
 
         // The currently activated modifiers
         var modifiers: core.Modifiers = .{};
@@ -16,25 +20,29 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
         var current_autofire: ?core.AutoFireDef = null;
         var next_autofire_trigger_time: core.TimeSinceBoot = 0;
 
-        var last_consumed_key_index: core.KeyIndex = 0;
+        var action_id: u64 = 0;
         pub fn Process(
             self: *Self,
             input_matrix_changes: *core.MatrixStateChangeQueue,
             output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
-            warn("current time: {}", .{current_time});
-            warn("checking autofire which has time {}", .{next_autofire_trigger_time});
-
-            while (ProcessContinuation.DequeueOneAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
-                const consumed_event = try input_matrix_changes.dequeue();
-                last_consumed_key_index = consumed_event.key_index;
+            while (true) {
+                switch (try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
+                    .DequeueAndRunAgain => |dequeue_info| {
+                        warn("change count {}", .{input_matrix_changes.peek_all().len});
+                        action_id += 1;
+                        warn("dequeing {}", .{dequeue_info.dequeue_count});
+                        try input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
+                    },
+                    .Stop => break,
+                }
             }
 
+            while (ProcessContinuation.DequeueAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {}
+
             if (current_autofire) |autofire| {
-                warn("current_autofire is not null", .{});
                 if (next_autofire_trigger_time < current_time) {
-                    warn("triggering next_autofire_trigger_time: {}, current time: {}", .{ next_autofire_trigger_time, current_time });
                     const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
                     try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
                     next_autofire_trigger_time += autofire.repeat_interval_ms * 1000;
@@ -42,7 +50,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
         }
 
-        const ProcessContinuation = enum { DequeueOneAndRunAgain, Stop };
+        const ProcessContinuation = union(enum) {
+            DequeueAndRunAgain: struct { dequeue_count: u8 },
+            Stop,
+        };
 
         fn process_next(
             self: *Self,
@@ -61,32 +72,72 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             const head_event = data[0];
             current_autofire = null; // any press or release cancels any previous autofire
             if (head_event.pressed) {
-                const head_key_def = determine_key_def(self, head_event.key_index);
+                const combo_result = decide_combo(self, data, current_time);
+                warn("combo result: {any}", .{combo_result});
+                var head_key_def: core.KeyDef = undefined;
+                var next_element_start_index: usize = undefined;
+                switch (combo_result) {
+                    .Undecided => {
+                        return ProcessContinuation.Stop;
+                    },
+                    .NoCombo => {
+                        head_key_def = determine_key_def(self, head_event.key_index);
+                        next_element_start_index = 1;
+                    },
+                    .Combo => |combo| {
+                        head_key_def = combo.key_def;
+                        next_element_start_index = combo.key_indexes.len;
+                        //head_key_def = combo.key_def;
+                    },
+                }
+
+                const dequeue_count: u8 = @intCast(next_element_start_index);
+                // yes:
+                //   is the first the only one pressed?
+                //   yes:
+                //      has any combos that is is part of timed out?
+                //      => not combo
+                //   no:
+                //      was the next key pressed part of a combo with the first key?
+                //      yes:
+                //          was the next key a press and within the timeout?
+                //          => pick combo
+                //      no: not combo
+                //  no:
+                //      => not combo
+
+                //const head_key_def = if (combo != null) combo.key_def else determine_key_def(self, head_event.key_index);
+
                 switch (head_key_def) {
                     .tap_only => |tap| {
                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+
+                        warn("case 0, dequeue count: {}", .{dequeue_count});
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                         current_autofire = tap_with_autofire;
                         next_autofire_trigger_time = current_time + tap_with_autofire.initial_delay_ms * 1000;
                         warn("starting autofire now. Current time: {}, next fire time set to {}, autofire set to {}", .{ current_time, next_autofire_trigger_time, tap_with_autofire.tap.tap_keycode });
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+                        warn("case 1", .{});
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, head_key_def, head_event, output_usb_commands);
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+
+                        warn("case 2", .{});
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_hold => |tap_and_hold| {
-                        for (data[1..], 1..) |outer_ev, outer_index| {
+                        for (data[next_element_start_index..], next_element_start_index..) |outer_ev, outer_index| {
                             if (outer_ev.time < head_event.time) {
                                 @panic("this should never happen!");
                             }
                             const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
                             if (tapping_term_expired) {
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                return ProcessContinuation.DequeueOneAndRunAgain;
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                             }
 
                             const key_was_released = !outer_ev.pressed;
@@ -95,11 +146,11 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                                 if (outer_ev.key_index == head_event.key_index) {
                                     warn("case 0", .{});
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                                    return ProcessContinuation.DequeueOneAndRunAgain;
+                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                                 }
                                 // if the key released was pressed before the head key, we are in a rolling writing mode, hence choose tap
                                 var released_key_was_pressed_after_head = false;
-                                for (data[1..outer_index]) |inner_ev| {
+                                for (data[next_element_start_index..outer_index]) |inner_ev| {
                                     if (inner_ev.key_index == outer_ev.key_index) {
                                         released_key_was_pressed_after_head = true;
                                     }
@@ -107,10 +158,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
 
                                 if (released_key_was_pressed_after_head) {
                                     try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                                    return ProcessContinuation.DequeueOneAndRunAgain;
+                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                                 } else {
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
-                                    return ProcessContinuation.DequeueOneAndRunAgain;
+                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                                 }
                             }
                         }
@@ -120,7 +171,7 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                         const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
                         if (tapping_term_expired) {
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
-                            return ProcessContinuation.DequeueOneAndRunAgain;
+                            return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                         }
 
                         warn("case 2", .{});
@@ -128,10 +179,10 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                     },
                     .transparent => {
                         // only happening if the base layer has a transparent key - in this case handle as none
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .none => {
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                 }
             } else {
@@ -139,36 +190,85 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
                 switch (release_map[head_event.key_index]) {
                     .None => {
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+                        warn("no release at {}", .{head_event.key_index});
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                     },
-                    .ReleaseTap => |tap_def| {
-                        try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
-                        release_map[head_event.key_index] = KeyReleaseAction.None;
-                        return ProcessContinuation.DequeueOneAndRunAgain;
-                    },
-                    .ReleaseHold => |hold_def| {
-                        const hold = hold_def.hold;
-                        if (hold.hold_modifiers != null) {
-                            // Cancel the hold modifier(s)
-                            modifiers = modifiers.remove(hold.hold_modifiers.?);
-                            try output_usb_commands.enqueue(.{ .ModifiersChanged = modifiers });
-                        }
-                        if (hold.hold_layer != null) {
-                            self.layers_activations.deactivate(hold.hold_layer.?);
-                        }
-                        release_map[head_event.key_index] = KeyReleaseAction.None;
+                    .Release => |release_info| {
+                        switch (release_info.release_action) {
+                            .ReleaseTap => |tap_def| {
+                                try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
+                                release_map[head_event.key_index] = ReleaseMapEntry.None;
+                                warn("release tap_def at key index {}", .{head_event.key_index});
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
+                            },
+                            .ReleaseHold => |hold_def| {
+                                const hold = hold_def.hold;
+                                if (hold.hold_modifiers != null) {
+                                    // Cancel the hold modifier(s)
+                                    modifiers = modifiers.remove(hold.hold_modifiers.?);
+                                    try output_usb_commands.enqueue(.{ .ModifiersChanged = modifiers });
+                                }
+                                if (hold.hold_layer != null) {
+                                    self.layers_activations.deactivate(hold.hold_layer.?);
+                                }
+                                release_map[head_event.key_index] = ReleaseMapEntry.None;
 
-                        // handle retro tapping
-                        if (last_consumed_key_index == head_event.key_index) {
-                            if (hold_def.retro_tap) |tap| {
-                                try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                            }
-                        }
+                                // handle retro tapping
+                                // TODO: RETRO on combos - ensure works no matter what key was released first
+                                if (release_info.action_id_when_pressed == action_id - 1) {
+                                    if (hold_def.retro_tap) |tap| {
+                                        try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                                    }
+                                }
 
-                        return ProcessContinuation.DequeueOneAndRunAgain;
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
+                            },
+                        }
                     },
                 }
             }
+        }
+
+        fn decide_combo(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ComboDecision {
+            //var combo: ?core.Combo2Def = null;
+
+            if (data.len > 1 and data[1].pressed == false) {
+                warn("combo 1", .{});
+                return ComboDecision.NoCombo; // next key is not a press - no cases will ever return in a combo then
+            }
+
+            const head_event = data[0];
+            const time_elapsed: u64 = (if (data.len > 1) data[1].time else current_time) - head_event.time;
+
+            for (combos) |combo_to_test| {
+                if (!self.layers_activations.is_layer_active(combo_to_test.layer)) {
+                    warn("combo a", .{});
+                    continue; // this combo's layers is not active
+                }
+                if (combo_to_test.timeout_ms * 1000 < time_elapsed) {
+                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed, combo_to_test.timeout_ms });
+                    continue; // This combo has timed out
+                }
+                if (combo_to_test.key_indexes[0] != head_event.key_index and combo_to_test.key_indexes[1] != head_event.key_index) {
+                    warn("combo b", .{});
+                    continue; // head not part of this combo
+                }
+                if (data.len > 1) {
+                    const next_key_index = data[1];
+                    if (combo_to_test.key_indexes[0] != next_key_index.key_index and combo_to_test.key_indexes[1] != next_key_index.key_index) {
+                        warn("combo d", .{});
+                        continue; // Next event is not part of this combo
+                    }
+
+                    return ComboDecision{ .Combo = combo_to_test };
+                } else {
+                    // there are no more events - but this combo could be relevant
+                    return ComboDecision{ .Undecided = {} };
+                }
+            }
+
+            warn("combo 2", .{});
+            return ComboDecision.NoCombo;
         }
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
@@ -179,19 +279,21 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
             }
 
             if (tap.tap_modifiers) |tap_modifiers| {
-                warn("tap with modifier - all done at once", .{});
                 // temporarily apply the modifiers on the key def and then switch back to the current modifiers afterwards
                 try output_queue.enqueue(.{ .ModifiersChanged = tap_modifiers });
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                 try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
                 try output_queue.enqueue(.{ .ModifiersChanged = modifiers });
             } else {
-                warn("tap without modifier - release set - key: {}, at index: {}", .{ tap.tap_keycode, event.key_index });
-
                 try output_queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
                 switch (release_mode) {
                     .AwaitKeyReleased => {
-                        release_map[event.key_index] = KeyReleaseAction{ .ReleaseTap = tap };
+                        release_map[event.key_index] = .{
+                            .Release = .{
+                                .release_action = KeyReleaseAction{ .ReleaseTap = tap },
+                                .action_id_when_pressed = action_id,
+                            },
+                        };
                     },
                     .ForceInstant => {
                         try output_queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
@@ -221,11 +323,17 @@ pub fn CreateProcessorType(comptime keymap_dimensions: core.KeymapDimensions, co
                 else => {},
             }
 
-            release_map[event.key_index] = KeyReleaseAction{ .ReleaseHold = .{ .hold = hold, .retro_tap = retro_tap } };
+            release_map[event.key_index] = .{
+                .Release = .{
+                    .release_action = KeyReleaseAction{ .ReleaseHold = .{ .hold = hold, .retro_tap = retro_tap } },
+                    .action_id_when_pressed = action_id,
+                },
+            };
         }
+
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {
             // Find key on active position
-            var pressed_key_def = keymap[0][key_index];
+            var pressed_key_def = keymap[0][key_index]; // Start out picking the key from the base layer
 
             var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
             while (layer_index > 0) {
@@ -256,7 +364,18 @@ const RA = 0x00E6;
 const RG = 0x00E7;
 
 const KeyReleaseAction = union(enum) {
-    None,
     ReleaseTap: core.TapDef,
     ReleaseHold: struct { hold: core.HoldDef, retro_tap: ?core.TapDef },
+};
+const ReleaseMapEntry = union(enum) {
+    Release: struct {
+        action_id_when_pressed: u64,
+        release_action: KeyReleaseAction,
+    },
+    None,
+};
+const ComboDecision = union(enum) {
+    NoCombo,
+    Undecided,
+    Combo: core.Combo2Def,
 };

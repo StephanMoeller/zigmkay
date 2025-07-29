@@ -1,9 +1,16 @@
 const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
-pub fn init_test(comptime keymap_dimensions: core.KeymapDimensions, comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef) type {
+
+const no_combos: [0]core.Combo2Def = [0]core.Combo2Def{};
+pub fn init_test_with_combos(
+    comptime keymap_dimensions: core.KeymapDimensions,
+    comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
+    comptime combos: []const core.Combo2Def,
+) type {
     const ProcessorType = zigmkay.processing.CreateProcessorType(
         keymap_dimensions,
         keymap,
+        combos,
     );
     return struct {
         const Self = @This();
@@ -17,6 +24,12 @@ pub fn init_test(comptime keymap_dimensions: core.KeymapDimensions, comptime key
             try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
         }
     };
+}
+pub fn init_test(
+    comptime keymap_dimensions: core.KeymapDimensions,
+    comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
+) type {
+    return init_test_with_combos(keymap_dimensions, keymap, no_combos[0..]);
 }
 
 pub fn TAP(keycode: u8) core.KeyDef {

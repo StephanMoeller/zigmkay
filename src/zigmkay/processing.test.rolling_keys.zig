@@ -22,7 +22,6 @@ const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 // test stuff
 test "Rolling - only tap keys" {
-    const current_time: core.TimeSinceBoot = 100;
     const base_layer = comptime [_]core.KeyDef{ A, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
@@ -33,10 +32,10 @@ test "Rolling - only tap keys" {
     try o.press_key(2, 4);
     try o.release_key(1, 5);
     try o.press_key(3, 6);
-    try o.release_key(2, 5);
-    try o.release_key(3, 6);
+    try o.release_key(2, 7);
+    try o.release_key(3, 8);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, 9);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());

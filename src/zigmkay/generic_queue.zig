@@ -20,6 +20,13 @@ pub fn GenericQueue(comptime T: type, comptime max_capacity: usize) type {
             self.data[self.size] = element;
             self.size += 1;
         }
+        pub fn dequeue_count(self: *Self, count: u8) DequeueError!void {
+            var i = count;
+            while (i > 0) {
+                _ = try dequeue(self);
+                i -= 1;
+            }
+        }
         pub fn dequeue(self: *Self) DequeueError!T {
             if (self.size == 0) {
                 return DequeueError.NoElements;

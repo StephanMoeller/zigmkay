@@ -31,6 +31,8 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/processing.test.autofire.zig",
         "src/zigmkay/processing.test.struct_sizes.zig",
         "src/zigmkay/processing.test.rolling_keys.zig",
+        "src/zigmkay/processing.test.combos_single.zig",
+        "src/zigmkay/processing.test.combos_advanced.zig",
         "src/zigmkay/generic_queue.test.zig",
     };
 

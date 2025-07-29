@@ -1,6 +1,7 @@
 const zigmkay = @import("zigmkay/zigmkay.zig");
 const dk = @import("keycodes/dk.zig");
 
+const core = zigmkay.core;
 const std = @import("std");
 const keyboard = @import("zilpzalp/keymap.zig");
 const rp2xxx = @import("microzig").hal;
@@ -13,7 +14,10 @@ pub fn main() !void {
 
     // Logic
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce_ms = 5 });
-    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap){};
+
+    //const combos: [0]zigmkay.core.Combo2Def = [0]zigmkay.core.Combo2Def{};
+
+    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap, keyboard.combos[0..]){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {

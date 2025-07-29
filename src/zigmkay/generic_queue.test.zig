@@ -26,6 +26,20 @@ test "queue" {
     try std.testing.expectEqual(0, queue.Count());
 }
 
+test "dequeue_count" {
+    var queue = q.GenericQueue(i32, 10).Create();
+    try std.testing.expectEqual(0, queue.Count());
+    try queue.enqueue(10);
+    try queue.enqueue(11);
+    try queue.enqueue(12);
+
+    try std.testing.expectEqual(3, queue.Count());
+    try queue.dequeue_count(2);
+
+    try std.testing.expectEqual(1, queue.Count());
+    try std.testing.expectEqual(12, queue.dequeue());
+}
+
 test "enqueue error" {
     var queue = q.GenericQueue(i32, 5).Create();
     try std.testing.expectEqual(0, queue.Count());

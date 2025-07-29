@@ -28,12 +28,19 @@ pub const KeyDef = union(enum) {
     tap_hold: struct { tap: TapDef, hold: HoldDef, tapping_term_ms: TappingTermType, retro_tapping: bool = false },
     tap_with_autofire: AutoFireDef,
 };
+pub const Combo2Def = struct {
+    key_indexes: [2]KeyIndex,
+    timeout_ms: ComboTimeout,
+    layer: LayerIndex,
+    key_def: KeyDef,
+};
 pub const AutoFireDef = struct { tap: TapDef, initial_delay_ms: u64, repeat_interval_ms: u64 };
 const TransparentLayerValue = 15;
 
 pub const KeyIndex = usize;
 pub const LayerIndex = usize;
 pub const TappingTermType = u64;
+pub const ComboTimeout = u64;
 
 const queue_capacities = 250;
 

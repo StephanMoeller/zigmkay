@@ -6,6 +6,7 @@ pub const key_count = 28;
 
 // zig fmt: off
 
+const combo_timeout_ms: core.ComboTimeout = 30;
 pub const keymap = [_][key_count]core.KeyDef{
 // layer 0
     .{ 
@@ -45,6 +46,19 @@ pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_cou
 pub const kc_bs = kc.BACKSPACE;
 pub const kc_del = kc.DELETE;
 const tapping_term_ms = 250;
+
+pub const combos = [_]core.Combo2Def{
+    Combo_Tap(.{ 0, 1 }, 0, kc.J),
+    Combo_Tap(.{ 9, 10 }, 0, kc.Z),
+};
+fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode: u8) core.Combo2Def {
+    return core.Combo2Def{
+        .key_indexes = key_indexes,
+        .layer = layer,
+        .timeout_ms = combo_timeout_ms,
+        .key_def = core.KeyDef{ .tap_only = .{ .tap_keycode = keycode } },
+    };
+}
 
 fn AF(keycode: u8) core.KeyDef {
     return core.KeyDef{
