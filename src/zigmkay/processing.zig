@@ -5,6 +5,7 @@ pub fn CreateProcessorType(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
     comptime combos: []const core.Combo2Def,
+    comptime custom: *const core.CustomFunctions,
 ) type {
     return struct {
         const Self = @This();
@@ -218,7 +219,7 @@ pub fn CreateProcessorType(
                                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                                     }
                                 }
-
+                                if (custom.on_hold_exit) |func| func(&self.layers_activations);
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                             },
                         }
@@ -272,6 +273,12 @@ pub fn CreateProcessorType(
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
         fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
+            // features:
+            //      modifiers must be changeable
+            //      layers must be changeable
+            //      firing key_presses and key_releases should be possible
+            //      running code on ticks
+
             if (tap.tap_keycode == core.special_keycode_BOOT) {
                 try output_queue.enqueue(core.OutputCommand.ActivateBootMode);
                 return;
@@ -321,13 +328,14 @@ pub fn CreateProcessorType(
                 },
                 else => {},
             }
-
             release_map[event.key_index] = .{
                 .Release = .{
                     .release_action = KeyReleaseAction{ .ReleaseHold = .{ .hold = hold, .retro_tap = retro_tap } },
                     .action_id_when_pressed = action_id,
                 },
             };
+
+            if (custom.on_hold_enter) |func| func(&self.layers_activations);
         }
 
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {

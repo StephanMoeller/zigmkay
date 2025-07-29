@@ -14,7 +14,8 @@ pub fn main() !void {
 
     // Logic
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScanner(.{ .debounce = .{ .ms = 5 } });
-    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap, keyboard.combos[0..]){};
+
+    var processor = zigmkay.processing.CreateProcessorType(keyboard.dimensions, &keyboard.keymap, keyboard.combos[0..], &keyboard.custom_functions){};
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
 
     while (true) {
@@ -30,6 +31,7 @@ pub fn main() !void {
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue);
     }
 }
+
 const keys = @import("keycodes/dk.zig");
 const map = build_map();
 pub fn build_map() [256]u8 {

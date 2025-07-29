@@ -90,6 +90,12 @@ pub const LayerActivations = struct {
         self.layers[layer_index] = false;
     }
 
+    pub fn set_layer_state(self: *LayerActivations, layer_index: usize, state: bool) void {
+        if (layer_index == 0)
+            return;
+        self.layers[layer_index] = state;
+    }
+
     pub fn is_layer_active(self: *const LayerActivations, layer_index: usize) bool {
         if (layer_index == 0)
             return true;
@@ -124,4 +130,8 @@ pub const Modifiers = packed struct {
     pub fn fromByte(byte_val: u8) Modifiers {
         return @bitCast(byte_val);
     }
+};
+pub const CustomFunctions = struct {
+    on_hold_enter: ?fn (*LayerActivations) void,
+    on_hold_exit: ?fn (*LayerActivations) void,
 };

@@ -2,15 +2,18 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const no_combos: [0]core.Combo2Def = [0]core.Combo2Def{};
-pub fn init_test_with_combos(
+const no_functions: core.CustomFunctions = .{ .on_hold_exit = null, .on_hold_enter = null };
+pub fn init_test_full(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
     comptime combos: []const core.Combo2Def,
+    comptime custom_functions: *const core.CustomFunctions,
 ) type {
     const ProcessorType = zigmkay.processing.CreateProcessorType(
         keymap_dimensions,
         keymap,
         combos,
+        custom_functions,
     );
     return struct {
         const Self = @This();
@@ -25,11 +28,18 @@ pub fn init_test_with_combos(
         }
     };
 }
+pub fn init_test_with_combos(
+    comptime keymap_dimensions: core.KeymapDimensions,
+    comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
+    comptime combos: []const core.Combo2Def,
+) type {
+    return init_test_full(keymap_dimensions, keymap, combos, &no_functions);
+}
 pub fn init_test(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
 ) type {
-    return init_test_with_combos(keymap_dimensions, keymap, no_combos[0..]);
+    return init_test_full(keymap_dimensions, keymap, no_combos[0..], &no_functions);
 }
 
 pub fn TAP(keycode: u8) core.KeyDef {

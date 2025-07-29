@@ -27,7 +27,7 @@ const TestObjects = struct {
 };
 
 test "HOLD_MOD - single hold" {
-    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
+    const current_time: core.TimeSinceBoot = .from_absolute_us(100);
     const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true });
     const base_layer = comptime [_]core.KeyDef{ hold_left_shift, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};

@@ -13,7 +13,7 @@ pub const keymap = [_][key_count]core.KeyDef{
               AF(kc.W), GUI(kc.R),   T(kc.P), AF(kc.B),      T(kc.K),   T(kc.L), GUI(kc.O),        T(kc.U),
     T(kc.F), ALT(kc.A), CTL(kc.S), SFT(kc.T),  T(kc.G),      T(kc.M), SFT(kc.N), CTL(kc.E),      ALT(kc.I), T(kc.Y),
                T(kc.X),   T(kc.C),   T(kc.D),                           T(kc.H),    T(kc.COMMA), T(kc.DOT),
-          LT(2, kc.ENTER), NONE, NONE, LT(1, kc.SPACE)
+                                 LT(2, kc.ENTER), NONE,      NONE, LT(1, kc.SPACE)
     },
 
     // Layer 1: arrows keys and symbols
@@ -21,7 +21,7 @@ pub const keymap = [_][key_count]core.KeyDef{
              _______, _______, _______, _______,             _______,     _______,   AF(kc.UP),      _______,
     _______, _______, _______, _______, _______,             _______, AF(kc.LEFT), AF(kc.DOWN), AF(kc.RIGHT), _______,
              _______, _______, _______,                                   _______,     _______,      _______,
-                       LT(1, kc.SPACE), _______,    _______, _______
+                       LT(2, kc.SPACE), _______,    _______, _______
     }, 
 
     // Layer 2: numbers
@@ -29,7 +29,7 @@ pub const keymap = [_][key_count]core.KeyDef{
           T(kc.BOOT), _______, _______, _______,             _______, T(kc.N7), T(kc.N8), T(kc.N9),
     _______, _______, _______, _______, _______,             _______, T(kc.N4), T(kc.N5), T(kc.N6), T(kc.N6),
              _______, _______, _______,                               T(kc.N1), T(kc.N2), T(kc.N3),
-                               _______, _______,    _______, T(kc.N0)
+                               _______, _______,    _______, LT(1, kc.N0)
     },
 
     // Layer 3: backspace
@@ -121,3 +121,13 @@ fn SFT(keycode: u8) core.KeyDef {
 }
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
+fn on_hold_enter(layers: *core.LayerActivations) void {
+    layers.set_layer_state(4, layers.is_layer_active(1) and layers.is_layer_active(2));
+}
+fn on_hold_exit(layers: *core.LayerActivations) void {
+    layers.set_layer_state(4, layers.is_layer_active(1) and layers.is_layer_active(2));
+}
+pub const custom_functions = core.CustomFunctions{
+    .on_hold_enter = on_hold_enter,
+    .on_hold_exit = on_hold_exit,
+};
