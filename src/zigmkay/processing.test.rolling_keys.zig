@@ -22,20 +22,29 @@ const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 // test stuff
 test "Rolling - only tap keys" {
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const base_layer = comptime [_]core.KeyDef{ A, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
 
-    try o.press_key(0, 1);
-    try o.press_key(1, 2);
-    try o.release_key(0, 3);
-    try o.press_key(2, 4);
-    try o.release_key(1, 5);
-    try o.press_key(3, 6);
-    try o.release_key(2, 7);
-    try o.release_key(3, 8);
+    try o.press_key(0, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(1, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(0, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(2, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(1, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(3, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(2, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(3, current_time);
+    current_time = current_time.add_us(1);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, 9);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -53,6 +62,7 @@ test "Rolling - only tap keys" {
 }
 
 test "Rolling - tap/hold keys" {
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term: u64 = 250;
     const _a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
     const _b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_shift = true }, tapping_term);
@@ -64,16 +74,23 @@ test "Rolling - tap/hold keys" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    try o.press_key(0, 1);
-    try o.press_key(1, 2);
-    try o.release_key(0, 3);
-    try o.press_key(2, 4);
-    try o.release_key(1, 5);
-    try o.press_key(3, 6);
-    try o.release_key(2, 7);
-    try o.release_key(3, 8);
+    current_time = current_time.add_us(1);
+    try o.press_key(0, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(1, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(0, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(2, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(1, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(3, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(2, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(3, current_time);
 
-    const current_time: core.TimeSinceBoot = 100;
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
@@ -93,6 +110,7 @@ test "Rolling - tap/hold keys" {
 
 test "Rolling - with sudden shift usage" {
     // This test is supposed to spell out abCda with rolling behaviour combined with
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term: u64 = 250;
     const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{}, tapping_term);
     const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{}, tapping_term);
@@ -112,20 +130,31 @@ test "Rolling - with sudden shift usage" {
     const _e_with_shift = 4;
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    try o.press_key(_a, 1);
-    try o.press_key(_b, 2);
-    try o.release_key(_a, 3);
-    try o.release_key(_b, 5);
-    try o.press_key(_e_with_shift, 4);
-    try o.press_key(_c, 6);
-    try o.release_key(_c, 7);
-    try o.release_key(_e_with_shift, 8);
-    try o.press_key(_d, 9);
-    try o.press_key(_a, 10);
-    try o.release_key(_d, 11);
-    try o.release_key(_a, 12);
+    current_time = current_time.add_us(1);
+    try o.press_key(_a, current_time);
+    current_time = current_time.add_us(2);
+    try o.press_key(_b, current_time);
+    current_time = current_time.add_us(3);
+    try o.release_key(_a, current_time);
+    current_time = current_time.add_us(5);
+    try o.release_key(_b, current_time);
+    current_time = current_time.add_us(4);
+    try o.press_key(_e_with_shift, current_time);
+    current_time = current_time.add_us(6);
+    try o.press_key(_c, current_time);
+    current_time = current_time.add_us(7);
+    try o.release_key(_c, current_time);
+    current_time = current_time.add_us(8);
+    try o.release_key(_e_with_shift, current_time);
+    current_time = current_time.add_us(9);
+    try o.press_key(_d, current_time);
+    current_time = current_time.add_us(10);
+    try o.press_key(_a, current_time);
+    current_time = current_time.add_us(11);
+    try o.release_key(_d, current_time);
+    current_time = current_time.add_us(12);
+    try o.release_key(_a, current_time);
 
-    const current_time: core.TimeSinceBoot = 100;
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press

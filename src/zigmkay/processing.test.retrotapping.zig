@@ -28,7 +28,7 @@ const Expectation = enum {
 const RetroTestParameters = struct {
     retro_enabled: bool,
     tapping_terms_ms: core.TappingTermType,
-    release_delta_time_ms: core.TimeSinceBoot,
+    release_delta_time_ms: u64,
     expectation: Expectation,
     press_other_before_release: bool,
 };
@@ -37,7 +37,7 @@ fn run_retrotest_test(comptime config: RetroTestParameters) !void {
     // key pressed
     // same key released within tapping term
     // expect tap (as this is the normal tap condition)
-    var current_time: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const key_with_retro_tapping = core.KeyDef{ .tap_hold = .{
         .tap = .{ .tap_keycode = c },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
@@ -58,7 +58,7 @@ fn run_retrotest_test(comptime config: RetroTestParameters) !void {
     }
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time += config.release_delta_time_ms * 1000; // within tapping term
+    current_time = current_time.add_ms(config.release_delta_time_ms); // within tapping term
     try o.release_key(0, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 

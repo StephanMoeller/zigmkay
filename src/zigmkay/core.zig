@@ -47,6 +47,15 @@ pub const AutoFireDef = struct {
     initial_delay_ms: u64,
     repeat_interval_ms: u64,
 };
+
+pub const TimeoutMs = struct {
+    timeout_ms: u16 = 0,
+    fn to_microseconds(self: *TimeoutMs) u64 {
+        var timeout_us: u64 = self.timeout_ms;
+        timeout_us = timeout_us * 1000;
+        return timeout_us;
+    }
+};
 const TransparentLayerValue = 15;
 
 pub const KeyIndex = u8;
@@ -64,7 +73,18 @@ pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange,
 pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers, ActivateBootMode };
 pub const OutputCommandQueue = generic_queue.GenericQueue(OutputCommand, queue_capacities);
 
-pub const TimeSinceBoot = u64;
+pub const TimeSinceBoot = struct {
+    time_since_boot_us: u64,
+    pub fn from_absolute_us(time_us: u64) TimeSinceBoot {
+        return .{ .time_since_boot_us = time_us };
+    }
+    pub fn add_us(self: *const TimeSinceBoot, delta_us: u64) TimeSinceBoot {
+        return .{ .time_since_boot_us = self.time_since_boot_us + delta_us };
+    }
+    pub fn add_ms(self: *const TimeSinceBoot, delta_ms: u64) TimeSinceBoot {
+        return .{ .time_since_boot_us = self.time_since_boot_us + delta_ms * 1000 };
+    }
+};
 
 pub const LayerActivations = struct {
     layers: [32]bool = [_]bool{false} ** 32,

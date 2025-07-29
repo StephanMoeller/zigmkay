@@ -22,16 +22,15 @@ const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 const Expectation = enum { Hold, Tap };
 const PermissiveHoldParameters = struct {
-    target_release_delta_ms: core.TimeSinceBoot,
-    other_press_delta_ms: core.TimeSinceBoot,
-    other_release_delta_ms: core.TimeSinceBoot,
+    target_release_delta_ms: u64,
+    other_press_delta_ms: u64,
+    other_release_delta_ms: u64,
     expectation: Expectation,
     tapping_terms_ms: core.TappingTermType,
 };
 
 fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
-    const start_time = 100;
-    var current_time: core.TimeSinceBoot = start_time;
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const key_with_permissive_hold = core.KeyDef{ .tap_hold = .{
         .tap = .{ .tap_keycode = c },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
@@ -50,11 +49,14 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
 
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(target_key_index, current_time);
-    current_time = start_time + config.other_press_delta_ms * 1000;
+    current_time = current_time.add_ms(config.other_press_delta_ms);
     try o.press_key(other_key_index, current_time);
-    current_time = start_time + config.other_release_delta_ms * 1000;
+    current_time = current_time.add_ms(config.other_release_delta_ms);
+
     try o.release_key(other_key_index, current_time);
-    current_time = start_time + config.target_release_delta_ms * 1000;
+
+    current_time = current_time.add_ms(config.target_release_delta_ms);
+
     try o.release_key(target_key_index, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -92,6 +94,7 @@ test "MT perm hold - other key is tap, case F" {
     try run_permissive_hold_test(.{ .tapping_terms_ms = 250, .other_press_delta_ms = 500, .other_release_delta_ms = 600, .target_release_delta_ms = 650, .expectation = Expectation.Hold });
 }
 test "MT - multiple holds, release in same order" {
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term: u64 = 250;
     const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
     const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
@@ -109,19 +112,26 @@ test "MT - multiple holds, release in same order" {
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // should be seen as modifiers:
-    try o.press_key(_a, 1);
-    try o.press_key(_b, 2);
-    try o.press_key(_c, 3);
+    current_time = current_time.add_us(1);
+    try o.press_key(_a, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(_b, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(_c, current_time);
+    current_time = current_time.add_us(1);
     // should be seen as a tap:
-    try o.press_key(_d, 3);
-    try o.release_key(_d, 3);
-
+    try o.press_key(_d, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(_d, current_time);
     // modifier releases
-    try o.release_key(_a, 3);
-    try o.release_key(_b, 3);
-    try o.release_key(_c, 3);
+    current_time = current_time.add_us(1);
+    try o.release_key(_a, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(_b, current_time);
+    current_time = current_time.add_us(1);
+    try o.release_key(_c, current_time);
 
-    const current_time: core.TimeSinceBoot = 100;
+    current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect B to be fired as press
@@ -141,6 +151,7 @@ test "MT - multiple holds, release in same order" {
 
 test "MT - multiple holds, release in reverse order" {
     const tapping_term: u64 = 250;
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
     const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
     const key_c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
@@ -157,20 +168,22 @@ test "MT - multiple holds, release in reverse order" {
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // should be seen as modifiers:
-    try o.press_key(_a, 1);
-    try o.press_key(_b, 2);
-    try o.press_key(_c, 3);
+    current_time = current_time.add_us(1);
+    try o.press_key(_a, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(_b, current_time);
+    current_time = current_time.add_us(1);
+    try o.press_key(_c, current_time);
     // should be seen as a tap:
-    try o.press_key(_d, 3);
-    try o.release_key(_d, 3);
+    try o.press_key(_d, current_time);
+    try o.release_key(_d, current_time);
 
     // modifier releases
-    try o.release_key(_c, 3);
-    try o.release_key(_b, 3);
-    try o.release_key(_a, 3);
+    try o.release_key(_c, current_time);
+    try o.release_key(_b, current_time);
+    try o.release_key(_a, current_time);
 
-    const current_time: core.TimeSinceBoot = 100;
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, core.TimeSinceBoot.from_absolute_us(100));
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());

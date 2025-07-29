@@ -24,7 +24,7 @@ const G = helpers.TAP(g);
 test "TRANSPARENT case 1" {
     // Transparent key - ensure key on lower active layers used - case A - expect fallback to next active layer
 
-    const current_time: core.TimeSinceBoot = 100;
+    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const mo1_key = comptime helpers.MO(1);
     const mo2_key = comptime helpers.MO(2);
     const mo3_key = comptime helpers.MO(3);
@@ -35,12 +35,12 @@ test "TRANSPARENT case 1" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -55,7 +55,7 @@ test "TRANSPARENT case 1" {
 test "TRANSPARENT case 2" {
     // Layers - transparent key - ensure key on lower active layers used - case B - transparent on lower layers as well, expect fallback to base layer
 
-    const current_time: core.TimeSinceBoot = 100;
+    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const mo1_key = comptime helpers.MO(1);
     const mo2_key = comptime helpers.MO(2);
     const mo3_key = comptime helpers.MO(3);
@@ -66,12 +66,12 @@ test "TRANSPARENT case 2" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -87,7 +87,7 @@ test "TRANSPARENT case 2" {
 test "TRANSPARENT case 3" {
     // Layers - transparent key - ensure transparent key on base layer won't do anything
 
-    const current_time: core.TimeSinceBoot = 100;
+    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const mo1_key = comptime helpers.MO(1);
     const mo2_key = comptime helpers.MO(2);
     const mo3_key = comptime helpers.MO(3);
@@ -98,12 +98,12 @@ test "TRANSPARENT case 3" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1 and 3
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 1 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 3 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 3 });
 
     // Tap a transparent key at position 0 which is transparent - expect layer 1's key do be pushed
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -114,18 +114,18 @@ test "TRANSPARENT case 3" {
 test "NONE key" {
     // Expect nothing to happen
 
-    const current_time: core.TimeSinceBoot = 100;
+    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const mo1_key = comptime helpers.MO(1);
     const base_layer = comptime [_]core.KeyDef{ A, A, mo1_key };
     const layer_1 = comptime [_]core.KeyDef{ helpers.NONE(), D, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Hold for layer switch 1
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 2 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 2 });
 
     // Tap a transparent key at position 0 which is NONE - expect nothing to happen
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = true, .key_index = 0 });
-    try o.matrix_change_queue.enqueue(.{ .time = 100, .pressed = false, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
+    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 

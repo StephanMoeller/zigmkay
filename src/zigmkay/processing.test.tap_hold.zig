@@ -21,7 +21,7 @@ const E = helpers.TAP(e);
 const F = helpers.TAP(f);
 const G = helpers.TAP(g);
 test "MT tap within tapping term - process with both in queue" {
-    var current_time: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_terms_ms: core.TappingTermType = 250;
     const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
 
@@ -34,7 +34,7 @@ test "MT tap within tapping term - process with both in queue" {
     try o.press_key(0, current_time);
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time += 10; // within tapping term
+    current_time = current_time.add_us(10); // within tapping term
     try o.release_key(0, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -45,7 +45,7 @@ test "MT tap within tapping term - process with both in queue" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 test "MT tap within tapping term - process with multiple calls" {
-    var current_time: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_terms_ms: core.TappingTermType = 250;
     const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_shift = true }, tapping_terms_ms);
 
@@ -60,7 +60,7 @@ test "MT tap within tapping term - process with multiple calls" {
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time += 10; // within tapping term
+    current_time = current_time.add_us(10); // within tapping term
     try o.release_key(0, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
@@ -71,7 +71,7 @@ test "MT tap within tapping term - process with multiple calls" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
 test "MT hold case: release after tapping term => hold" {
-    var current_time_us: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_terms_ms: core.TappingTermType = 250;
     const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
 
@@ -81,13 +81,13 @@ test "MT hold case: release after tapping term => hold" {
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
-    try o.press_key(0, current_time_us);
+    try o.press_key(0, current_time);
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time_us += tapping_terms_ms * 1000 + 1; // within tapping term
-    try o.release_key(0, current_time_us);
+    current_time = current_time.add_ms(tapping_terms_ms + 1);
+    try o.release_key(0, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time_us);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
@@ -97,7 +97,7 @@ test "MT hold case: release after tapping term => hold" {
 }
 
 test "MT hold case: timeout => hold" {
-    var current_time_us: core.TimeSinceBoot = 100;
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_terms_ms: core.TappingTermType = 250;
     const mo_layer1_cWithLeftAlt = comptime helpers.MT(core.TapDef{ .tap_keycode = c, .tap_modifiers = null }, .{ .left_alt = true }, tapping_terms_ms);
 
@@ -107,12 +107,13 @@ test "MT hold case: timeout => hold" {
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
-    try o.press_key(0, current_time_us);
+    try o.press_key(0, current_time);
 
     // Now ensure that a tap will happen when releasing within tapping term
-    current_time_us += tapping_terms_ms * 1000 + 1; // within tapping term
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time_us);
+    current_time = current_time.add_ms(tapping_terms_ms + 1); // within tapping term
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());

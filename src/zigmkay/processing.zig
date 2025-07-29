@@ -18,7 +18,7 @@ pub fn CreateProcessorType(
         var previous_matrix_change: core.MatrixStateChange = undefined;
 
         var current_autofire: ?core.AutoFireDef = null;
-        var next_autofire_trigger_time: core.TimeSinceBoot = 0;
+        var next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0);
 
         var action_id: u64 = 0;
         pub fn Process(
@@ -42,10 +42,10 @@ pub fn CreateProcessorType(
             while (ProcessContinuation.DequeueAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {}
 
             if (current_autofire) |autofire| {
-                if (next_autofire_trigger_time < current_time) {
+                if (next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
                     const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
                     try apply_tap(autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
-                    next_autofire_trigger_time += autofire.repeat_interval_ms * 1000;
+                    next_autofire_trigger_time = next_autofire_trigger_time.add_ms(autofire.repeat_interval_ms);
                 }
             }
         }
@@ -118,7 +118,7 @@ pub fn CreateProcessorType(
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                         current_autofire = tap_with_autofire;
-                        next_autofire_trigger_time = current_time + tap_with_autofire.initial_delay_ms * 1000;
+                        next_autofire_trigger_time = current_time.add_ms(tap_with_autofire.initial_delay_ms);
                         warn("starting autofire now. Current time: {}, next fire time set to {}, autofire set to {}", .{ current_time, next_autofire_trigger_time, tap_with_autofire.tap.tap_keycode });
                         warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -131,10 +131,10 @@ pub fn CreateProcessorType(
                     },
                     .tap_hold => |tap_and_hold| {
                         for (data[next_element_start_index..], next_element_start_index..) |outer_ev, outer_index| {
-                            if (outer_ev.time < head_event.time) {
+                            if (outer_ev.time.time_since_boot_us < head_event.time.time_since_boot_us) {
                                 @panic("this should never happen!");
                             }
-                            const tapping_term_expired = outer_ev.time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
+                            const tapping_term_expired = outer_ev.time.time_since_boot_us > head_event.time.add_ms(tap_and_hold.tapping_term_ms).time_since_boot_us;
                             if (tapping_term_expired) {
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -168,7 +168,7 @@ pub fn CreateProcessorType(
 
                         // No decision made while looping through all events, finally check if time just passed without anything happened
                         // In this case, it's a hold.
-                        const tapping_term_expired = current_time - head_event.time > tap_and_hold.tapping_term_ms * 1000;
+                        const tapping_term_expired = head_event.time.add_ms(tap_and_hold.tapping_term_ms).time_since_boot_us < current_time.time_since_boot_us;
                         if (tapping_term_expired) {
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_usb_commands);
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -238,15 +238,16 @@ pub fn CreateProcessorType(
             }
 
             const head_event = data[0];
-            const time_elapsed: u64 = (if (data.len > 1) data[1].time else current_time) - head_event.time;
+            const next_event_time: core.TimeSinceBoot = (if (data.len > 1) data[1].time else current_time);
+            const time_elapsed_ms = (next_event_time.time_since_boot_us - head_event.time.time_since_boot_us) / 1000;
 
             for (combos) |combo_to_test| {
                 if (!self.layers_activations.is_layer_active(combo_to_test.layer)) {
                     warn("combo a", .{});
                     continue; // this combo's layers is not active
                 }
-                if (combo_to_test.timeout_ms * 1000 < time_elapsed) {
-                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed, combo_to_test.timeout_ms });
+                if (combo_to_test.timeout_ms < time_elapsed_ms) {
+                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed_ms, combo_to_test.timeout_ms });
                     continue; // This combo has timed out
                 }
                 if (combo_to_test.key_indexes[0] != head_event.key_index and combo_to_test.key_indexes[1] != head_event.key_index) {
