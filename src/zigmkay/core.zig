@@ -9,8 +9,8 @@ pub const special_keycode_BOOT: u8 = 0x000;
 // TODO Hold for momentary layer switch
 // TODO Combine any tap with any hold
 pub const KeymapDimensions = struct {
-    key_count: usize,
-    layer_count: usize,
+    key_count: KeyIndex,
+    layer_count: LayerIndex,
 };
 pub const TapDef = struct {
     tap_keycode: u8 = 0,
