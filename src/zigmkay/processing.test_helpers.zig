@@ -2,7 +2,10 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const no_combos: [0]core.Combo2Def = [0]core.Combo2Def{};
-const no_functions: core.CustomFunctions = .{ .on_hold_exit = null, .on_hold_enter = null };
+fn on_event(e: core.ProcessorEvent) void {
+    _ = e;
+}
+const no_functions: core.CustomFunctions = .{ .on_event = on_event };
 pub fn init_test_full(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,

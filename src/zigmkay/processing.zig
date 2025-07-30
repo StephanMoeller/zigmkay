@@ -156,11 +156,14 @@ pub fn CreateProcessorType(
                     .Release => |release_info| {
                         switch (release_info.release_action) {
                             .ReleaseTap => |tap_def| {
+                                custom.on_event(.{ .OnTapExitBefore = {} });
                                 try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
                                 release_map[head_event.key_index] = ReleaseMapEntry.None;
+                                custom.on_event(.{ .OnTapExitAfter = {} });
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                             },
                             .ReleaseHold => |hold_def| {
+                                custom.on_event(.{ .OnHoldExitBefore = {} });
                                 const hold = hold_def.hold;
                                 if (hold.hold_modifiers != null) {
                                     // Cancel the hold modifier(s)
@@ -177,7 +180,7 @@ pub fn CreateProcessorType(
                                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                                     }
                                 }
-                                if (custom.on_hold_exit) |func| func(&self.layers_activations);
+                                custom.on_event(.{ .OnHoldExitAfter = {} });
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                             },
                         }
@@ -226,6 +229,7 @@ pub fn CreateProcessorType(
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
         fn apply_tap(tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
+            custom.on_event(.{ .OnTapEnterBefore = {} });
             // features:
             //      modifiers must be changeable
             //      layers must be changeable
@@ -259,9 +263,11 @@ pub fn CreateProcessorType(
                     },
                 }
             }
+            custom.on_event(.{ .OnTapEnterAfter = {} });
         }
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            custom.on_event(.{ .OnHoldEnterBefore = {} });
             warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
@@ -287,8 +293,7 @@ pub fn CreateProcessorType(
                     .action_id_when_pressed = action_id,
                 },
             };
-
-            if (custom.on_hold_enter) |func| func(&self.layers_activations);
+            custom.on_event(.{ .OnHoldEnterAfter = {} });
         }
 
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {

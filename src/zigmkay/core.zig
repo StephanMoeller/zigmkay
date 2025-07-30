@@ -132,6 +132,16 @@ pub const Modifiers = packed struct {
     }
 };
 pub const CustomFunctions = struct {
-    on_hold_enter: ?fn (*LayerActivations) void,
-    on_hold_exit: ?fn (*LayerActivations) void,
+    on_event: fn (event: ProcessorEvent) void,
+};
+pub const ProcessorEvent = union(enum) {
+    Tick,
+    OnTapEnterBefore,
+    OnTapEnterAfter,
+    OnTapExitBefore,
+    OnTapExitAfter,
+    OnHoldEnterBefore,
+    OnHoldEnterAfter,
+    OnHoldExitBefore,
+    OnHoldExitAfter,
 };
