@@ -117,7 +117,7 @@ const _______ = core.KeyDef.transparent;
 fn on_hold_enter(layers: *core.LayerActivations) void {
     layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
 }
-fn on_hold_exit(key: *const core.KeyDef, layers: *core.LayerActivations, modifiers: *core.ModifiersC) void {
+fn on_hold_exit(key: *const core.KeyDef, layers: *core.LayerActivations, modifiers: *core.Modifiers) void {
     _ = key;
     _ = modifiers;
     // requirement: one should be able to apply mods, fire key codes and undo the mods again.

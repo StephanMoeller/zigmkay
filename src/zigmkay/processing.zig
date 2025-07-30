@@ -71,27 +71,18 @@ pub fn CreateProcessorType(
             const head_event = data[0];
             current_autofire = null; // any press or release cancels any previous autofire
             if (head_event.pressed) {
-                const combo_result = decide_combo(self, data, current_time);
-                warn("combo result: {any}", .{combo_result});
                 var head_key_def: core.KeyDef = undefined;
-                var next_element_start_index: usize = undefined;
-                switch (combo_result) {
-                    .Undecided => {
-                        return ProcessContinuation.Stop;
-                    },
-                    .SingleKey => |key_def| {
-                        head_key_def = key_def;
-                        next_element_start_index = 1;
-                    },
-                    .Combo => |key_def| {
-                        head_key_def = key_def;
-                        next_element_start_index = 2;
-                        //head_key_def = combo.key_def;
-                    },
+                var dequeue_count: u2 = undefined;
+                if (decide_combo_or_single(self, data, current_time)) |res| {
+                    head_key_def = res.key_def;
+                    dequeue_count = res.consumed_event_count;
+                } else {
+                    return ProcessContinuation.Stop;
                 }
 
-                const dequeue_count: u8 = @intCast(next_element_start_index);
                 switch (head_key_def) {
+                    .transparent => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } }, // only happening if the base layer has a transparent key
+                    .none => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } },
                     .tap_only => |tap| {
                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
 
@@ -109,7 +100,7 @@ pub fn CreateProcessorType(
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_hold => |tap_and_hold| {
-                        for (data[next_element_start_index..], next_element_start_index..) |outer_ev, outer_index| {
+                        for (data[dequeue_count..], dequeue_count..) |outer_ev, outer_index| {
                             if (outer_ev.time.time_since_boot_us < head_event.time.time_since_boot_us) {
                                 @panic("this should never happen!");
                             }
@@ -128,7 +119,7 @@ pub fn CreateProcessorType(
                                 }
                                 // if the key released was pressed before the head key, we are in a rolling writing mode, hence choose tap
                                 var released_key_was_pressed_after_head = false;
-                                for (data[next_element_start_index..outer_index]) |inner_ev| {
+                                for (data[dequeue_count..outer_index]) |inner_ev| {
                                     if (inner_ev.key_index == outer_ev.key_index) {
                                         released_key_was_pressed_after_head = true;
                                     }
@@ -153,13 +144,6 @@ pub fn CreateProcessorType(
                         }
 
                         return ProcessContinuation.Stop;
-                    },
-                    .transparent => {
-                        // only happening if the base layer has a transparent key - in this case handle as none
-                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
-                    },
-                    .none => {
-                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                 }
             } else {
@@ -202,13 +186,13 @@ pub fn CreateProcessorType(
             }
         }
 
-        fn decide_combo(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ComboDecision {
+        fn decide_combo_or_single(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ?NextKeyFindResult {
 
             //var combo: ?core.Combo2Def = null;
-
             const head_event = data[0];
             if (data.len > 1 and data[1].pressed == false) {
-                return ComboDecision{ .SingleKey = determine_key_def(self, head_event.key_index) }; // next key is not a press - no cases will ever return in a combo then
+                // next key is not a press - no cases will ever return in a combo then
+                return NextKeyFindResult{ .key_def = determine_key_def(self, head_event.key_index), .consumed_event_count = 1 };
             }
 
             const next_event_time: core.TimeSinceBoot = (if (data.len > 1) data[1].time else current_time);
@@ -230,14 +214,14 @@ pub fn CreateProcessorType(
                         continue; // Next event is not part of this combo
                     }
 
-                    return ComboDecision{ .Combo = combo_to_test.key_def };
+                    return NextKeyFindResult{ .key_def = combo_to_test.key_def, .consumed_event_count = 2 };
                 } else {
                     // there are no more events - but this combo could be relevant
-                    return ComboDecision{ .Undecided = {} };
+                    return null;
                 }
             }
 
-            return ComboDecision{ .SingleKey = determine_key_def(self, head_event.key_index) };
+            return NextKeyFindResult{ .key_def = determine_key_def(self, head_event.key_index), .consumed_event_count = 1 };
         }
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
@@ -349,6 +333,10 @@ const ReleaseMapEntry = union(enum) {
         release_action: KeyReleaseAction,
     },
     None,
+};
+const NextKeyFindResult = struct {
+    key_def: core.KeyDef,
+    consumed_event_count: u2,
 };
 const ComboDecision = union(enum) {
     SingleKey: core.KeyDef,
