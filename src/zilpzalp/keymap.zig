@@ -8,31 +8,24 @@ pub const key_count = 28;
 
 const combo_timeout: core.ComboTimeout = 30;
 pub const keymap = [_][key_count]core.KeyDef{
-// layer 0
     .{ 
               AF(kc.W), GUI(kc.R),   T(kc.P), AF(kc.B),      T(kc.K),   T(kc.L), GUI(kc.O),        T(kc.U),
     T(kc.F), ALT(kc.A), CTL(kc.S), SFT(kc.T),  T(kc.G),      T(kc.M), SFT(kc.N), CTL(kc.E),      ALT(kc.I), T(kc.Y),
                T(kc.X),   T(kc.C),   T(kc.D),                           T(kc.H),    T(kc.COMMA), T(kc.DOT),
                                  LT(2, kc.ENTER), NONE,      NONE, LT(1, kc.SPACE)
     },
-
-    // Layer 1: arrows keys and symbols
     .{ 
              _______, _______, _______, _______,             _______,     _______,   AF(kc.UP),      _______,
     _______, _______, _______, _______, _______,             _______, AF(kc.LEFT), AF(kc.DOWN), AF(kc.RIGHT), _______,
              _______, _______, _______,                                   _______,     _______,      _______,
                        LT(2, kc.SPACE), _______,    _______, _______
     }, 
-
-    // Layer 2: numbers
     .{ 
           T(kc.BOOT), _______, _______, _______,             _______, T(kc.N7), T(kc.N8), T(kc.N9),
     _______, _______, _______, _______, _______,             _______, T(kc.N4), T(kc.N5), T(kc.N6), T(kc.N6),
              _______, _______, _______,                               T(kc.N1), T(kc.N2), T(kc.N3),
                                _______, _______,    _______, LT(1, kc.N0)
     },
-
-    // Layer 3: backspace
     .{ 
              _______, _______, _______, _______,             _______, T(kc.SPACE), T(kc.SPACE), T(kc.SPACE),
     _______, _______, _______, _______, _______,             _______, T(kc.BS),    T(kc.BS),    T(kc.BS),    _______,
@@ -122,10 +115,13 @@ fn SFT(keycode: u8) core.KeyDef {
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 fn on_hold_enter(layers: *core.LayerActivations) void {
-    layers.set_layer_state(4, layers.is_layer_active(1) and layers.is_layer_active(2));
+    layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
 }
-fn on_hold_exit(layers: *core.LayerActivations) void {
-    layers.set_layer_state(4, layers.is_layer_active(1) and layers.is_layer_active(2));
+fn on_hold_exit(key: *const core.KeyDef, layers: *core.LayerActivations, modifiers: *core.ModifiersC) void {
+    _ = key;
+    _ = modifiers;
+    // requirement: one should be able to apply mods, fire key codes and undo the mods again.
+    layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
 }
 pub const custom_functions = core.CustomFunctions{
     .on_hold_enter = on_hold_enter,
