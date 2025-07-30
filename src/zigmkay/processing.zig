@@ -31,9 +31,7 @@ pub fn CreateProcessorType(
             while (true) {
                 switch (try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
                     .DequeueAndRunAgain => |dequeue_info| {
-                        warn("change count {}", .{input_matrix_changes.peek_all().len});
                         action_id += 1;
-                        warn("dequeing {}", .{dequeue_info.dequeue_count});
                         try input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
                     },
                     .Stop => break,
@@ -81,53 +79,33 @@ pub fn CreateProcessorType(
                     .Undecided => {
                         return ProcessContinuation.Stop;
                     },
-                    .NoCombo => {
-                        head_key_def = determine_key_def(self, head_event.key_index);
+                    .SingleKey => |key_def| {
+                        head_key_def = key_def;
                         next_element_start_index = 1;
                     },
-                    .Combo => |combo| {
-                        head_key_def = combo.key_def;
-                        next_element_start_index = combo.key_indexes.len;
+                    .Combo => |key_def| {
+                        head_key_def = key_def;
+                        next_element_start_index = 2;
                         //head_key_def = combo.key_def;
                     },
                 }
 
                 const dequeue_count: u8 = @intCast(next_element_start_index);
-                // yes:
-                //   is the first the only one pressed?
-                //   yes:
-                //      has any combos that is is part of timed out?
-                //      => not combo
-                //   no:
-                //      was the next key pressed part of a combo with the first key?
-                //      yes:
-                //          was the next key a press and within the timeout?
-                //          => pick combo
-                //      no: not combo
-                //  no:
-                //      => not combo
-
-                //const head_key_def = if (combo != null) combo.key_def else determine_key_def(self, head_event.key_index);
-
                 switch (head_key_def) {
                     .tap_only => |tap| {
                         try apply_tap(tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
 
-                        warn("case 0, dequeue count: {}", .{dequeue_count});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(tap_with_autofire.tap, head_event, output_usb_commands, TapReleaseMode.ForceInstant);
                         current_autofire = tap_with_autofire;
                         next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
-                        warn("starting autofire now. Current time: {}, next fire time set to {}, autofire set to {}", .{ current_time, next_autofire_trigger_time, tap_with_autofire.tap.tap_keycode });
-                        warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, head_key_def, head_event, output_usb_commands);
 
-                        warn("case 2", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_hold => |tap_and_hold| {
@@ -145,7 +123,6 @@ pub fn CreateProcessorType(
                             if (key_was_released) {
                                 // if released key was the pressed one, choose tap
                                 if (outer_ev.key_index == head_event.key_index) {
-                                    warn("case 0", .{});
                                     try apply_tap(tap_and_hold.tap, head_event, output_usb_commands, TapReleaseMode.AwaitKeyReleased);
                                     return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                                 }
@@ -175,7 +152,6 @@ pub fn CreateProcessorType(
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                         }
 
-                        warn("case 2", .{});
                         return ProcessContinuation.Stop;
                     },
                     .transparent => {
@@ -191,7 +167,6 @@ pub fn CreateProcessorType(
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
                 switch (release_map[head_event.key_index]) {
                     .None => {
-                        warn("no release at {}", .{head_event.key_index});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                     },
                     .Release => |release_info| {
@@ -199,7 +174,6 @@ pub fn CreateProcessorType(
                             .ReleaseTap => |tap_def| {
                                 try output_usb_commands.enqueue(core.OutputCommand{ .KeyCodeRelease = tap_def.tap_keycode });
                                 release_map[head_event.key_index] = ReleaseMapEntry.None;
-                                warn("release tap_def at key index {}", .{head_event.key_index});
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
                             },
                             .ReleaseHold => |hold_def| {
@@ -229,46 +203,41 @@ pub fn CreateProcessorType(
         }
 
         fn decide_combo(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ComboDecision {
+
             //var combo: ?core.Combo2Def = null;
 
+            const head_event = data[0];
             if (data.len > 1 and data[1].pressed == false) {
-                warn("combo 1", .{});
-                return ComboDecision.NoCombo; // next key is not a press - no cases will ever return in a combo then
+                return ComboDecision{ .SingleKey = determine_key_def(self, head_event.key_index) }; // next key is not a press - no cases will ever return in a combo then
             }
 
-            const head_event = data[0];
             const next_event_time: core.TimeSinceBoot = (if (data.len > 1) data[1].time else current_time);
             const time_elapsed_ms = (next_event_time.time_since_boot_us - head_event.time.time_since_boot_us) / 1000;
 
             for (combos) |combo_to_test| {
                 if (!self.layers_activations.is_layer_active(combo_to_test.layer)) {
-                    warn("combo a", .{});
                     continue; // this combo's layers is not active
                 }
                 if (combo_to_test.timeout.ms < time_elapsed_ms) {
-                    warn("combo c, time_elapsed_ms: {}, combo to test: {}", .{ time_elapsed_ms, combo_to_test.timeout.ms });
                     continue; // This combo has timed out
                 }
                 if (combo_to_test.key_indexes[0] != head_event.key_index and combo_to_test.key_indexes[1] != head_event.key_index) {
-                    warn("combo b", .{});
                     continue; // head not part of this combo
                 }
                 if (data.len > 1) {
                     const next_key_index = data[1];
                     if (combo_to_test.key_indexes[0] != next_key_index.key_index and combo_to_test.key_indexes[1] != next_key_index.key_index) {
-                        warn("combo d", .{});
                         continue; // Next event is not part of this combo
                     }
 
-                    return ComboDecision{ .Combo = combo_to_test };
+                    return ComboDecision{ .Combo = combo_to_test.key_def };
                 } else {
                     // there are no more events - but this combo could be relevant
                     return ComboDecision{ .Undecided = {} };
                 }
             }
 
-            warn("combo 2", .{});
-            return ComboDecision.NoCombo;
+            return ComboDecision{ .SingleKey = determine_key_def(self, head_event.key_index) };
         }
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
@@ -382,7 +351,7 @@ const ReleaseMapEntry = union(enum) {
     None,
 };
 const ComboDecision = union(enum) {
-    NoCombo,
+    SingleKey: core.KeyDef,
     Undecided,
-    Combo: core.Combo2Def,
+    Combo: core.KeyDef,
 };
