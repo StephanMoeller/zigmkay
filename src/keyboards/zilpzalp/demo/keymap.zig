@@ -1,6 +1,6 @@
-const kc = @import("../keycodes/dk.zig");
+const kc = @import("../../../keycodes/dk.zig");
 const std = @import("std");
-const core = @import("../zigmkay/core.zig");
+const core = @import("../../../zigmkay/core.zig");
 
 pub const key_count = 28;
 
@@ -114,7 +114,7 @@ fn SFT(keycode: u8) core.KeyDef {
 }
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
-fn on_event(event: *core.ProcessorEvent) void {
+fn on_event(event: core.ProcessorEvent) void {
     _ = event;
 }
 pub const custom_functions = core.CustomFunctions{
