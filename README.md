@@ -3,7 +3,9 @@ ZigMKay can run on all keyboards that have an mcu supported by the microzig libr
 
 To get started, follow these steps:
 
-1. Install zig. Follow these instructions: https://ziglang.org/learn/getting-started/ - The objective is to be able to call "zig version" and get the zig version displayed. That means you have installed zig correctly and it can be found in your path
+1. Install zig. 
+Follow these instructions: https://ziglang.org/learn/getting-started/ - The objective is to be able to call "zig version" and get the zig version displayed. That means you have installed zig correctly and it can be found in your path
+
 2. 
 
 # License 
