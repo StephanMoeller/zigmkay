@@ -24,6 +24,7 @@ pub fn CreateProcessorType(
             current_time: core.TimeSinceBoot,
         ) !void {
             _ = self.stats.register_tick(current_time);
+            on_event(self, core.ProcessorEvent.Tick, output_usb_commands);
             while (true) {
                 switch (try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
                     .DequeueAndRunAgain => |dequeue_info| {

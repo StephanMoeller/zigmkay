@@ -41,14 +41,14 @@ const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-              AF(dk.W), GUI(dk.R),   T(dk.P),  T(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U),
+              AF(dk.W), GUI(dk.R),   T(dk.P),  AF(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U),
     T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),      T(dk.M), SFT(dk.N), CTL(dk.E),      ALT(dk.I), T(dk.Y),
                T(dk.X),   T(dk.C),   T(dk.D),                           T(dk.H),    T(dk.COMMA), T(dk.DOT),
                                  LT(2, us.ENTER), NONE,      NONE, LT(1, us.SPACE)
     },
     .{ 
               T(dk.LABK), T(dk.EQL),  T(dk.RABK), T(dk.PERC),          T(dk.SLSH),  T(us.HOME),     AF(us.UP),   T(us.END),
-    T(dk.AT), T(dk.LCBR), T(dk.LPRN), T(dk.RPRN), T(dk.RCBR),          T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
+    T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),          T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
               T(dk.BSLS), T(dk.LBRC), T(dk.RBRC),                               T(us.TAB),     T(dk.DQUO),     T(us.ESC),
                          LT(2, us.SPACE), _______,          _______, _______
     }, 
