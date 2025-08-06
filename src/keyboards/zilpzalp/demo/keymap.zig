@@ -27,12 +27,16 @@ pub const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO3 = .{ .name = "r6", .direction = .in },
 };
 pub const p = pin_config.pins();
-pub const pin_mappings = [key_count][2]rp2xxx.gpio.Pin{
-                 .{p.c0,p.r0},.{p.c1,p.r0},.{p.c2,p.r0},.{p.c3,p.r0},      .{p.c3,p.r6},.{p.c2,p.r6},.{p.c1,p.r6},.{p.c0,p.r6}, 
-    .{p.c0,p.r2},.{p.c0,p.r1},.{p.c1,p.r1},.{p.c2,p.r1},.{p.c3,p.r1},      .{p.c3,p.r5},.{p.c2,p.r5},.{p.c1,p.r5},.{p.c0,p.r5},.{p.c0,p.r4},
-                 .{p.c1,p.r2},.{p.c2,p.r2},.{p.c3,p.r2},                                .{p.c3,p.r4},.{p.c2,p.r4},.{p.c1,p.r4},
-                                           .{p.c1,p.r3},.{p.c3,p.r3},      .{p.c2,p.r3},.{p.c0,p.r3}
+
+pub const pin_mappings = [key_count][2]usize{
+          .{0,0},.{1,0},.{2,0},.{3,0},      .{3,6},.{2,6},.{1,6},.{0,6}, 
+   .{0,2},.{0,1},.{1,1},.{2,1},.{3,1},      .{3,5},.{2,5},.{1,5},.{0,5},.{0,4},
+          .{1,2},.{2,2},.{3,2},                    .{3,4},.{2,4},.{1,4},
+                        .{1,3},.{3,3},      .{2,3},.{0,3}
 };
+pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.c0, p.c1, p.c2, p.c3 };
+pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5, p.r6 };
+
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{

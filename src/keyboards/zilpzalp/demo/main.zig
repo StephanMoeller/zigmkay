@@ -18,6 +18,8 @@ pub fn main() !void {
     // Matrix scanning
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
         my_zilpzapl_keyboard.dimensions,
+        my_zilpzapl_keyboard.pin_cols[0..],
+        my_zilpzapl_keyboard.pin_rows[0..],
         my_zilpzapl_keyboard.pin_mappings,
         .{ .debounce = .{ .ms = 25 } },
     ){};
