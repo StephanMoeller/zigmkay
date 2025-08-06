@@ -246,7 +246,7 @@ pub fn CreateProcessorType(
             if (tap.tap_keycode == core.special_keycode_PRINT_STATS) {
                 const max_len = 2000;
                 var buf: [max_len]u8 = undefined;
-                const numAsString = try std.fmt.bufPrint(&buf, "last ticks/sec: {}, highest tick/sec: {}, lowest tick/sec: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
+                const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE: last {}, highest: {}, lowest: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
                 try output_queue.print_string(numAsString);
                 return;
             }

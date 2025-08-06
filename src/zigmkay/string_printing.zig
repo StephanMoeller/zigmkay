@@ -72,6 +72,7 @@ pub fn print_char(char: u8, queue: *core.OutputCommandQueue) !void {
         '0' => KC_0,
         ' ' => KC_SPACE,
         '.' => KC_DOT,
+        '\n' => KC_ENTER,
         else => KC_DOT,
     };
 
@@ -115,5 +116,7 @@ pub const KC_7 = 0x0024;
 pub const KC_8 = 0x0025;
 pub const KC_9 = 0x0026;
 pub const KC_0 = 0x0027;
+pub const KC_ENTER = 0x0028;
 pub const KC_SPACE = 0x002C;
 pub const KC_DOT = 0x0037;
+pub const KC_BACKSLASH = 0x0031;
