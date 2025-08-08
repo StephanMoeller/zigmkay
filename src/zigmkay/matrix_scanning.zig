@@ -55,12 +55,15 @@ pub fn CreateMatrixScannerType(
         const Self = @This();
         pub fn DetectKeyboardChanges(_: *const Self, output_queue: *core.MatrixStateChangeQueue, current_time: core.TimeSinceBoot) !void {
             var previous_col_index: usize = 255;
-            for (pins_with_indexes) |pins_and_index| {
+            for (pins_with_indexes, 0..) |pins_and_index, array_idx| {
                 var col = pin_cols[pins_and_index.col_index];
                 var row = pin_rows[pins_and_index.row_index];
-                col.put(1);
                 // Only sleep if a new col is present now
                 if (previous_col_index != pins_and_index.col_index) {
+                    col.put(1);
+                    if (array_idx > 0) {
+                        pin_cols[previous_col_index].put(0);
+                    }
                     time.sleep_us(settings.pin_raise_wait_us);
                 }
                 previous_col_index = pins_and_index.col_index;
@@ -84,10 +87,13 @@ pub fn CreateMatrixScannerType(
                         //p.led_blue.put(1);
                     }
                 }
-                col.put(0);
             }
+
+            // now turn off the last col
+            pin_cols[pin_cols.len - 1].put(0);
+
             // zig fmt: off
-    }
+     }
     };
 }
 
