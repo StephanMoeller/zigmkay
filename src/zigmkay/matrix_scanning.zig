@@ -73,7 +73,7 @@ pub fn CreateMatrixScannerType(
                 if (pressed != current_states[pins_and_index.key_index]) {
                     // DEBOUNCE HANDLING
                     // This state has changed. If this happened last time very recently, this could be a debounce.
-                    // Then let it be for now. In a furute tick this will be picked up and handled correctly if it is still at the current state by then.
+                    // Then let it be for now. In a future tick this will be picked up and handled correctly if it is still at the current state by then.
                     const last_changed_time = current_states_last_changed[pins_and_index.key_index];
 
                     if (current_time.time_since_boot_us - last_changed_time > settings.debounce.ms * 1000) {
