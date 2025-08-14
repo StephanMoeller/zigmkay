@@ -221,9 +221,9 @@ test "activate with tap/hold on one of the keys, key1, key2" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const combo_timeout = core.TimeSpan{ .ms = 30 };
 
-    const a_shift = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, .{ .ms = 150 });
-    const b_shift = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_shift = true }, .{ .ms = 150 });
-    const c_shift = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_shift = true }, .{ .ms = 150 });
+    const a_shift = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{ .left_shift = true }, .{ .ms = 150 });
+    const b_shift = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{ .left_shift = true }, .{ .ms = 150 });
+    const c_shift = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .left_shift = true }, .{ .ms = 150 });
     const base_layer = comptime [_]core.KeyDef{ a_shift, b_shift, c_shift };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };

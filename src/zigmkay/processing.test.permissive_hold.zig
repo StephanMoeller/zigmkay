@@ -32,7 +32,7 @@ const PermissiveHoldParameters = struct {
 fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const key_with_permissive_hold = core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = c },
+        .tap = .{ .key_press = .{ .tap_keycode = c } },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term = core.TimeSpan{ .ms = config.tapping_terms_ms },
         .retro_tapping = false,
@@ -96,10 +96,10 @@ test "MT perm hold - other key is tap, case F" {
 test "MT - multiple holds, release in same order" {
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term = core.TimeSpan{ .ms = 250 };
-    const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
-    const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
-    const key_c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
-    const key_d = comptime helpers.MT(core.TapDef{ .tap_keycode = d }, .{ .left_gui = true }, tapping_term);
+    const key_a = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{ .left_shift = true }, tapping_term);
+    const key_b = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{ .left_alt = true }, tapping_term);
+    const key_c = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .left_ctrl = true }, tapping_term);
+    const key_d = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = d } }, .{ .left_gui = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
@@ -152,10 +152,10 @@ test "MT - multiple holds, release in same order" {
 test "MT - multiple holds, release in reverse order" {
     const tapping_term = core.TimeSpan{ .ms = 250 };
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
-    const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
-    const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_alt = true }, tapping_term);
-    const key_c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_ctrl = true }, tapping_term);
-    const key_d = comptime helpers.MT(core.TapDef{ .tap_keycode = d }, .{ .left_gui = true }, tapping_term);
+    const key_a = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{ .left_shift = true }, tapping_term);
+    const key_b = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{ .left_alt = true }, tapping_term);
+    const key_c = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .left_ctrl = true }, tapping_term);
+    const key_d = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = d } }, .{ .left_gui = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};

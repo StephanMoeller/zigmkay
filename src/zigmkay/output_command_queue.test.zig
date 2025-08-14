@@ -1,9 +1,9 @@
 const std = @import("std");
 const core = @import("core.zig");
-
+const helpers = @import("processing.test_helpers.zig");
 test "press key" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 0x04 });
+    try q.press_key(helpers.TAP(0x04).tap_only.key_press);
 
     try std.testing.expectEqual(1, q.Count());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x04 }, q.dequeue());
@@ -12,7 +12,7 @@ test "press key" {
 
 test "press key with modifier" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 0x04, .tap_modifiers = .{ .left_shift = true } });
+    try q.press_key(helpers.TAP_WITH_MOD(0x04, .{ .left_shift = true }).tap_only.key_press);
 
     try std.testing.expectEqual(4, q.Count());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, q.dequeue());
@@ -24,11 +24,11 @@ test "press key with modifier" {
 
 test "press/release key - simple sequence" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(helpers.TAP(4).tap_only.key_press);
+    try q.release_key(helpers.TAP(4).tap_only.key_press);
 
-    try q.press_key(core.TapDef{ .tap_keycode = 5 });
-    try q.release_key(core.TapDef{ .tap_keycode = 5 });
+    try q.press_key(helpers.TAP(5).tap_only.key_press);
+    try q.release_key(helpers.TAP(5).tap_only.key_press);
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 4 }, q.dequeue());
@@ -41,15 +41,15 @@ test "press/release key - simple sequence" {
 
 test "rolling" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.press_key(core.TapDef{ .tap_keycode = 5 });
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 5 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.press_key(core.TapDef{ .tap_keycode = 6 });
-    try q.release_key(core.TapDef{ .tap_keycode = 5 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 6 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 5 });
 
-    try q.release_key(core.TapDef{ .tap_keycode = 6 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 6 });
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
 
@@ -66,15 +66,15 @@ test "rolling" {
 
 test "rolling with modifiers" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.press_key(core.TapDef{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.press_key(core.TapDef{ .tap_keycode = 6 });
-    try q.release_key(core.TapDef{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 6 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
 
-    try q.release_key(core.TapDef{ .tap_keycode = 6 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 6 });
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
 
@@ -93,11 +93,11 @@ test "rolling with modifiers" {
 
 test "rolling same key code" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 4 }, q.dequeue());
@@ -109,11 +109,11 @@ test "rolling same key code" {
 
 test "rolling same key code - with modifiers in the mix" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 4, .tap_modifiers = .{ .left_shift = true } });
-    try q.press_key(core.TapDef{ .tap_keycode = 4 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4, .tap_modifiers = .{ .left_shift = true } });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.release_key(core.TapDef{ .tap_keycode = 4, .tap_modifiers = .{ .left_shift = true } });
-    try q.release_key(core.TapDef{ .tap_keycode = 4 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4, .tap_modifiers = .{ .left_shift = true } });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, q.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
@@ -126,8 +126,8 @@ test "rolling same key code - with modifiers in the mix" {
 }
 test "release key" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(core.TapDef{ .tap_keycode = 0x04 });
-    try q.release_key(core.TapDef{ .tap_keycode = 0x04 });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 0x04 });
+    try q.release_key(core.KeyCodeFire{ .tap_keycode = 0x04 });
 
     try std.testing.expectEqual(2, q.Count());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x04 }, q.dequeue());

@@ -32,7 +32,7 @@ test "combo is hold/tap: combo released fast => tap" {
         .key_indexes = .{ 1, 2 },
         .layer = 0,
         .timeout = combo_timeout,
-        .key_def = helpers.MT(core.TapDef{ .tap_keycode = h }, .{ .left_shift = true }, .{ .ms = 150 }),
+        .key_def = helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = h } }, .{ .left_shift = true }, .{ .ms = 150 }),
     }};
     const base_layer = comptime [_]core.KeyDef{ A, B, C };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };
@@ -62,7 +62,7 @@ test "combo is hold/tap: combo released slowly => hold" {
         .key_indexes = .{ 1, 2 },
         .layer = 0,
         .timeout = combo_timeout,
-        .key_def = helpers.MT(core.TapDef{ .tap_keycode = h }, .{ .left_shift = true }, .{ .ms = 150 }),
+        .key_def = helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = h } }, .{ .left_shift = true }, .{ .ms = 150 }),
     }};
     const base_layer = comptime [_]core.KeyDef{ A, B, C };
     const layer_1 = comptime [_]core.KeyDef{ D, E, F };

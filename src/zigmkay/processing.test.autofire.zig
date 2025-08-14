@@ -29,12 +29,12 @@ test "Autofire - case A" {
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = b },
+        .tap = .{ .key_press = .{ .tap_keycode = b } },
     } };
 
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
@@ -77,12 +77,12 @@ test "Autofire - case B" {
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = b },
+        .tap = .{ .key_press = .{ .tap_keycode = b } },
     } };
 
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
@@ -134,12 +134,12 @@ test "Autofire - case C" {
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = b },
+        .tap = .{ .key_press = .{ .tap_keycode = b } },
     } };
 
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
@@ -200,12 +200,12 @@ test "Autofire - case D" {
     const auto_fire_a = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
     } };
     const auto_fire_b = comptime core.KeyDef{ .tap_with_autofire = .{
         .initial_delay = .{ .ms = 1000 },
         .repeat_interval = .{ .ms = 500 },
-        .tap = .{ .tap_keycode = b },
+        .tap = .{ .key_press = .{ .tap_keycode = b } },
     } };
 
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);

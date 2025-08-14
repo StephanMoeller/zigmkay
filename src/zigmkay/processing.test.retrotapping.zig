@@ -39,7 +39,7 @@ fn run_retrotest_test(comptime config: RetroTestParameters) !void {
     // expect tap (as this is the normal tap condition)
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const key_with_retro_tapping = core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = c },
+        .tap = .{ .key_press = .{ .tap_keycode = c } },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term = core.TimeSpan{ .ms = config.tapping_term_ms },
         .retro_tapping = config.retro_enabled,

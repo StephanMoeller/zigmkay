@@ -64,10 +64,10 @@ test "Rolling - only tap keys" {
 test "Rolling - tap/hold keys" {
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term = core.TimeSpan{ .ms = 250 };
-    const _a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{ .left_shift = true }, tapping_term);
-    const _b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{ .left_shift = true }, tapping_term);
-    const _c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{ .left_shift = true }, tapping_term);
-    const _d = comptime helpers.MT(core.TapDef{ .tap_keycode = d }, .{ .left_shift = true }, tapping_term);
+    const _a = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{ .left_shift = true }, tapping_term);
+    const _b = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{ .left_shift = true }, tapping_term);
+    const _c = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .left_shift = true }, tapping_term);
+    const _d = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = d } }, .{ .left_shift = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ _a, _b, _c, _d };
 
@@ -112,11 +112,11 @@ test "Rolling - with sudden shift usage" {
     // This test is supposed to spell out abCda with rolling behaviour combined with
     var current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term = core.TimeSpan{ .ms = 250 };
-    const key_a = comptime helpers.MT(core.TapDef{ .tap_keycode = a }, .{}, tapping_term);
-    const key_b = comptime helpers.MT(core.TapDef{ .tap_keycode = b }, .{}, tapping_term);
-    const key_c = comptime helpers.MT(core.TapDef{ .tap_keycode = c }, .{}, tapping_term);
-    const key_d = comptime helpers.MT(core.TapDef{ .tap_keycode = d }, .{}, tapping_term);
-    const key_e = comptime helpers.MT(core.TapDef{ .tap_keycode = e }, .{ .left_shift = true }, tapping_term);
+    const key_a = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{}, tapping_term);
+    const key_b = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{}, tapping_term);
+    const key_c = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{}, tapping_term);
+    const key_d = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = d } }, .{}, tapping_term);
+    const key_e = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = e } }, .{ .left_shift = true }, tapping_term);
 
     const base_layer = comptime [_]core.KeyDef{ key_a, key_b, key_c, key_d, key_e };
 

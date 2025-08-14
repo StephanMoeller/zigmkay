@@ -47,11 +47,17 @@ pub fn init_test(
     return init_test_full(keymap_dimensions, keymap, no_combos[0..], &no_functions);
 }
 
+pub fn ONE_SHOT_LAYER(layer: u8) core.TapDef {
+    return core.TapDef{ .one_shot = .{ .layer = layer } };
+}
+pub fn ONE_SHOT_MOD(mod: core.Modifiers) core.KeyDef {
+    return core.KeyDef{ .tap_only = .{ .one_shot = .{ .hold_modifiers = mod } } };
+}
 pub fn TAP(keycode: u8) core.KeyDef {
-    return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode } };
+    return core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = keycode } } };
 }
 pub fn TAP_WITH_MOD(keycode: u8, modifiers: core.Modifiers) core.KeyDef {
-    return core.KeyDef{ .tap_only = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } };
+    return core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = keycode, .tap_modifiers = modifiers } } };
 }
 pub fn HOLD_MOD(modifiers: core.Modifiers) core.KeyDef {
     return core.KeyDef{ .hold_only = .{ .hold_modifiers = modifiers } };

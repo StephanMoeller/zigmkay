@@ -34,22 +34,22 @@ test "custom code - tap events" {
                 .Tick => {},
                 .OnTapEnterBefore => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = b }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = b }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnTapEnterAfter => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = c }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = c }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnTapExitBefore => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = d }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = d }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnTapExitAfter => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = e }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = e }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 else => {
@@ -70,7 +70,7 @@ test "custom code - tap events" {
     };
 
     const a_with_shift_hold = core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term = core.TimeSpan{ .ms = 250 },
     } };
@@ -94,10 +94,10 @@ test "custom code - tap events" {
     try std.testing.expectEqual(5, MyFunctions.get_event_count());
 
     try std.testing.expectEqual(core.ProcessorEvent.Tick, MyFunctions.dequeue_next_event());
-    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapEnterBefore = .{ .tap = .{ .tap_keycode = a } } }, MyFunctions.dequeue_next_event());
-    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapEnterAfter = .{ .tap = .{ .tap_keycode = a } } }, MyFunctions.dequeue_next_event());
-    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapExitBefore = .{ .tap = .{ .tap_keycode = a } } }, MyFunctions.dequeue_next_event());
-    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapExitAfter = .{ .tap = .{ .tap_keycode = a } } }, MyFunctions.dequeue_next_event());
+    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapEnterBefore = .{ .tap = .{ .key_press = .{ .tap_keycode = a } } } }, MyFunctions.dequeue_next_event());
+    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapEnterAfter = .{ .tap = .{ .key_press = .{ .tap_keycode = a } } } }, MyFunctions.dequeue_next_event());
+    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapExitBefore = .{ .tap = .{ .key_press = .{ .tap_keycode = a } } } }, MyFunctions.dequeue_next_event());
+    try std.testing.expectEqual(core.ProcessorEvent{ .OnTapExitAfter = .{ .tap = .{ .key_press = .{ .tap_keycode = a } } } }, MyFunctions.dequeue_next_event());
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -120,22 +120,22 @@ test "custom code - hold events" {
                 .Tick => {},
                 .OnHoldEnterBefore => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = b }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = b }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnHoldEnterAfter => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = c }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = c }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnHoldExitBefore => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = d }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = d }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 .OnHoldExitAfter => |data| {
                     // ensure c press will happen before the a
-                    output_queue.press_key(core.TapDef{ .tap_keycode = e }) catch @panic("error should not happen here");
+                    output_queue.press_key(core.KeyCodeFire{ .tap_keycode = e }) catch @panic("error should not happen here");
                     _ = data;
                 },
                 else => {
@@ -156,7 +156,7 @@ test "custom code - hold events" {
     };
 
     const a_with_shift_hold = core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term = core.TimeSpan{ .ms = 250 },
     } };
@@ -223,7 +223,7 @@ test "custom code - ensure tick event" {
     };
 
     const a_with_shift_hold = core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = a },
+        .tap = .{ .key_press = .{ .tap_keycode = a } },
         .hold = .{ .hold_modifiers = .{ .left_shift = true } },
         .tapping_term = core.TimeSpan{ .ms = 250 },
     } };

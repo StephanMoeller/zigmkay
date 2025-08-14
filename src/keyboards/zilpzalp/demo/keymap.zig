@@ -68,7 +68,7 @@ pub const keymap = [_][key_count]core.KeyDef{
 };
 // zig fmt: on
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
-const PrintStats = core.KeyDef{ .tap_only = .{ .tap_keycode = us.KC_PRINT_STATS } };
+const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
 const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 30 };
 pub const combos = [_]core.Combo2Def{
@@ -80,71 +80,71 @@ pub const combos = [_]core.Combo2Def{
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
 // but maybe there should be some sort of helper module containing all of these
-fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, tap: core.TapDef) core.Combo2Def {
+fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode_fire: core.KeyCodeFire) core.Combo2Def {
     return core.Combo2Def{
         .key_indexes = key_indexes,
         .layer = layer,
         .timeout = combo_timeout,
-        .key_def = core.KeyDef{ .tap_only = tap },
+        .key_def = core.KeyDef{ .tap_only = .{ .key_press = keycode_fire } },
     };
 }
 
 // autofire
-fn AF(tap: core.TapDef) core.KeyDef {
+fn AF(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_with_autofire = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .repeat_interval = .{ .ms = 50 },
             .initial_delay = .{ .ms = 100 },
         },
     };
 }
-fn LT(layer_index: core.LayerIndex, tap: core.TapDef) core.KeyDef {
+fn LT(layer_index: core.LayerIndex, keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .hold = .{ .hold_layer = layer_index },
             .tapping_term = tapping_term,
         },
     };
 }
 // T for 'Tap-only'
-fn T(tap: core.TapDef) core.KeyDef {
+fn T(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
-        .tap_only = tap,
+        .tap_only = .{ .key_press = keycode_fire },
     };
 }
-fn GUI(tap: core.TapDef) core.KeyDef {
+fn GUI(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_gui = true } },
             .tapping_term = tapping_term,
         },
     };
 }
-fn CTL(tap: core.TapDef) core.KeyDef {
+fn CTL(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_ctrl = true } },
             .tapping_term = tapping_term,
         },
     };
 }
-fn ALT(tap: core.TapDef) core.KeyDef {
+fn ALT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_alt = true } },
             .tapping_term = tapping_term,
         },
     };
 }
-fn SFT(tap: core.TapDef) core.KeyDef {
+fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
-            .tap = tap,
+            .tap = .{ .key_press = keycode_fire },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_shift = true } },
             .tapping_term = tapping_term,
         },

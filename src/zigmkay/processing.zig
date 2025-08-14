@@ -155,10 +155,15 @@ pub fn CreateProcessorType(
                     .Release => |release_info| {
                         switch (release_info.release_action) {
                             .ReleaseTap => |tap| {
-                                on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } }, output_queue);
-                                try output_queue.release_key(tap);
-                                self.release_map[head_event.key_index] = ReleaseMapEntry.None;
-                                on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } }, output_queue);
+                                switch (tap) {
+                                    .key_press => |keycode_fire| {
+                                        on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } }, output_queue);
+                                        try output_queue.release_key(keycode_fire);
+                                        self.release_map[head_event.key_index] = ReleaseMapEntry.None;
+                                        on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } }, output_queue);
+                                    },
+                                    .one_shot => unreachable,
+                                }
                             },
                             .ReleaseHold => |hold_def| {
                                 const hold = hold_def.hold;
@@ -238,38 +243,44 @@ pub fn CreateProcessorType(
             //      layers must be changeable
             //      firing key_presses and key_releases should be possible
             //      running code on ticks
-
-            if (tap.tap_keycode == core.special_keycode_BOOT) {
-                try output_queue.go_to_boot_mode();
-                return;
-            }
-            if (tap.tap_keycode == core.special_keycode_PRINT_STATS) {
-                const max_len = 2000;
-                var buf: [max_len]u8 = undefined;
-                const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE: last {}, highest: {}, lowest: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
-                try output_queue.print_string(numAsString);
-                return;
-            }
-
-            switch (release_mode) {
-                .AwaitKeyReleased => {
-                    try output_queue.press_key(tap);
-                    self.release_map[event.key_index] = .{
-                        .Release = .{
-                            .release_action = KeyReleaseAction{ .ReleaseTap = tap },
-                            .action_id_when_pressed = self.current_action_id,
+            switch (tap) {
+                .key_press => |keycode_fire| {
+                    if (keycode_fire.tap_keycode == core.special_keycode_BOOT) {
+                        try output_queue.go_to_boot_mode();
+                        return;
+                    }
+                    if (keycode_fire.tap_keycode == core.special_keycode_PRINT_STATS) {
+                        const max_len = 2000;
+                        var buf: [max_len]u8 = undefined;
+                        const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE: last {}, highest: {}, lowest: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
+                        try output_queue.print_string(numAsString);
+                        return;
+                    }
+                    switch (release_mode) {
+                        .AwaitKeyReleased => {
+                            try output_queue.press_key(keycode_fire);
+                            self.release_map[event.key_index] = .{
+                                .Release = .{
+                                    .release_action = KeyReleaseAction{ .ReleaseTap = tap },
+                                    .action_id_when_pressed = self.current_action_id,
+                                },
+                            };
                         },
-                    };
+                        .ForceInstant => {
+                            try output_queue.tap_key(keycode_fire);
+                        },
+                    }
                 },
-                .ForceInstant => {
-                    try output_queue.tap_key(tap);
+                .one_shot => |one_shot_hold| {
+                    warn("one_shot_found", .{});
+                    try fire_hold(self, one_shot_hold, output_queue);
                 },
             }
+
             on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } }, output_queue);
         }
 
-        fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
-            on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } }, output_queue);
+        fn fire_hold(self: *Self, hold: core.HoldDef, output_queue: *core.OutputCommandQueue) !void {
             warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
@@ -280,6 +291,12 @@ pub fn CreateProcessorType(
             if (hold.hold_layer != null) {
                 self.layers_activations.activate(hold.hold_layer.?);
             }
+        }
+
+        fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
+            on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } }, output_queue);
+            warn("hold applied", .{});
+            try fire_hold(self, hold, output_queue);
 
             var retro_tap: ?core.TapDef = null;
             switch (key_def) {

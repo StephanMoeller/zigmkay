@@ -1,16 +1,20 @@
 const generic_queue = @import("generic_queue.zig");
 const std = @import("std");
 const string_printing = @import("string_printing.zig");
-pub const special_keycode_BOOT: u8 = 0x000;
-pub const special_keycode_PRINT_STATS: u8 = 0x001;
+pub const special_keycode_BOOT: u8 = 0x001;
+pub const special_keycode_PRINT_STATS: u8 = 0x002;
 
 pub const KeymapDimensions = struct {
     key_count: KeyIndex,
     layer_count: LayerIndex,
 };
-pub const TapDef = struct {
+pub const KeyCodeFire = struct {
     tap_keycode: u8 = 0,
     tap_modifiers: ?Modifiers = null,
+};
+pub const TapDef = union(enum) {
+    key_press: KeyCodeFire,
+    one_shot: HoldDef,
 };
 pub const HoldDef = struct {
     hold_modifiers: ?Modifiers = null,
@@ -81,11 +85,11 @@ pub const OutputCommandQueue = struct {
         try self.queue.enqueue(OutputCommand.ActivateBootMode);
     }
 
-    pub fn tap_key(self: *OutputCommandQueue, tap: TapDef) !void {
+    pub fn tap_key(self: *OutputCommandQueue, tap: KeyCodeFire) !void {
         try press_key(self, tap);
         try release_key(self, tap);
     }
-    pub fn press_key(self: *OutputCommandQueue, tap: TapDef) !void {
+    pub fn press_key(self: *OutputCommandQueue, tap: KeyCodeFire) !void {
         if (self.currently_pressed_keycodes[tap.tap_keycode]) {
             try self.queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
             self.currently_pressed_keycodes[tap.tap_keycode] = false;
@@ -101,7 +105,7 @@ pub const OutputCommandQueue = struct {
             try self.queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
         }
     }
-    pub fn release_key(self: *OutputCommandQueue, tap: TapDef) !void {
+    pub fn release_key(self: *OutputCommandQueue, tap: KeyCodeFire) !void {
         if (tap.tap_modifiers != null) {
             return; // if modifiers exist, release has already been fire
         }
