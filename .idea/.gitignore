@@ -11,7 +11,7 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/indexLayout.xml
+indexLayout.xml
 /vcs.xml
 /zigbrains.xml
 /.idea/
