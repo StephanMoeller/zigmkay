@@ -68,7 +68,7 @@ test "rolling with modifiers" {
     var q = core.OutputCommandQueue.Create();
     try q.press_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
-    try q.release_key(core.KeyCodeFire{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
+    try q.press_key(core.KeyCodeFire{ .tap_keycode = 5, .tap_modifiers = .{ .left_shift = true } });
     try q.release_key(core.KeyCodeFire{ .tap_keycode = 4 });
 
     try q.press_key(core.KeyCodeFire{ .tap_keycode = 6 });
