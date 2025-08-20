@@ -24,8 +24,8 @@ pub const U = core.KeyCodeFire{ .tap_keycode = us.KC_U }; // U
 pub const I = core.KeyCodeFire{ .tap_keycode = us.KC_I }; // I
 pub const O = core.KeyCodeFire{ .tap_keycode = us.KC_O }; // O
 pub const P = core.KeyCodeFire{ .tap_keycode = us.KC_P }; // P
-pub const ARNG = core.KeyCodeFire{ .tap_keycode = us.KC_LBRC }; // Å
-pub const DIAE = core.KeyCodeFire{ .tap_keycode = us.KC_RBRC }; // ¨ (dead)
+pub const AA = core.KeyCodeFire{ .tap_keycode = us.KC_LEFT_BRACKET }; // Å
+pub const DIAE = core.KeyCodeFire{ .tap_keycode = us.KC_RIGHT_BRACKET }; // ¨ (dead)
 pub const A = core.KeyCodeFire{ .tap_keycode = us.KC_A }; // A
 pub const S = core.KeyCodeFire{ .tap_keycode = us.KC_S }; // S
 pub const D = core.KeyCodeFire{ .tap_keycode = us.KC_D }; // D
@@ -35,8 +35,8 @@ pub const H = core.KeyCodeFire{ .tap_keycode = us.KC_H }; // H
 pub const J = core.KeyCodeFire{ .tap_keycode = us.KC_J }; // J
 pub const K = core.KeyCodeFire{ .tap_keycode = us.KC_K }; // K
 pub const L = core.KeyCodeFire{ .tap_keycode = us.KC_L }; // L
-pub const AE = core.KeyCodeFire{ .tap_keycode = us.KC_SCLN }; // Æ
-pub const OSTR = core.KeyCodeFire{ .tap_keycode = us.KC_QUOT }; // Ø
+pub const AE = core.KeyCodeFire{ .tap_keycode = us.KC_SEMICOLON }; // Æ
+pub const OE = core.KeyCodeFire{ .tap_keycode = us.KC_QUOTE }; // Ø
 pub const QUOT = core.KeyCodeFire{ .tap_keycode = us.KC_NONUS_HASH }; // '
 pub const LABK = core.KeyCodeFire{ .tap_keycode = us.NUBS.tap_keycode }; // <
 pub const Z = core.KeyCodeFire{ .tap_keycode = us.KC_Z }; // Z
@@ -48,7 +48,7 @@ pub const N = core.KeyCodeFire{ .tap_keycode = us.KC_N }; // N
 pub const M = core.KeyCodeFire{ .tap_keycode = us.KC_M }; // M
 pub const COMMA = core.KeyCodeFire{ .tap_keycode = us.KC_COMMA }; // ,
 pub const DOT = core.KeyCodeFire{ .tap_keycode = us.KC_DOT }; // .
-pub const MINS = core.KeyCodeFire{ .tap_keycode = us.KC_SLSH }; // -
+pub const MINS = core.KeyCodeFire{ .tap_keycode = us.KC_SLASH }; // -
 //
 pub const SECT = core.KeyCodeFire{ .tap_keycode = us.KC_GRAVE, .tap_modifiers = .{ .left_shift = true } }; // §
 pub const EXLM = core.KeyCodeFire{ .tap_keycode = us.KC_1, .tap_modifiers = .{ .left_shift = true } }; // !

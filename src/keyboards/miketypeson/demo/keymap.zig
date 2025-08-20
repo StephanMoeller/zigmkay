@@ -45,7 +45,7 @@ pub const keymap = [_][key_count]core.KeyDef{
      AF(dk.Q), AF(dk.W), GUI(dk.R),   T(dk.P),  AF(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U), T(dk.U),
     T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),      T(dk.M), SFT(dk.N), CTL(dk.E),      ALT(dk.I), T(dk.Y),
                T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),       T(dk.J),T(dk.H),    T(dk.COMMA), T(dk.DOT),
-                                 T(us.X),                LT(1, us.SPACE)
+                                 LT(2, us.ENTER),                LT(1, us.SPACE)
     },
     .{ 
     _______, T(dk.LABK), T(dk.EQL),  T(dk.RABK), T(dk.PERC),          T(dk.SLSH),  T(us.HOME),     AF(us.UP),   T(us.END), _______,
@@ -65,7 +65,6 @@ pub const keymap = [_][key_count]core.KeyDef{
              _______, _______, _______, _______,             _______, T(us.DEL),   T(us.DEL),   T(us.DEL),
                                         _______,             T(dk.N0)
     }
-
 };
 // zig fmt: on
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
@@ -75,8 +74,12 @@ const combo_timeout = core.TimeSpan{ .ms = 30 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 0, 1 }, 0, dk.J),
     Combo_Tap(.{ 9, 10 }, 0, dk.Z),
-    Combo_Tap(.{ 10, 11 }, 0, dk.V),
-    Combo_Tap(.{ 8, 17 }, 0, us.BOOT),
+    Combo_Tap(.{ 12, 13 }, 0, dk.V),
+    Combo_Tap(.{ 0, 9 }, 0, us.BOOT),
+    Combo_Tap(.{ 6, 7 }, 0, dk.AE),
+    Combo_Tap(.{ 6, 8 }, 0, dk.OE),
+    Combo_Tap(.{ 7, 8 }, 0, dk.AA),
+    Combo_Tap(.{ 17, 18 }, 0, dk.MINS),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
