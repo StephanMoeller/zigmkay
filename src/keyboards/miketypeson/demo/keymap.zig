@@ -42,7 +42,7 @@ const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-     AF(dk.Q), AF(dk.W), GUI(dk.R),   T(dk.P),  AF(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U), T(dk.U),
+     AF(dk.Q), AF(dk.W), GUI(dk.R),   T(dk.P),  AF(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U), T(dk.QUOT),
     T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),      T(dk.M), SFT(dk.N), CTL(dk.E),      ALT(dk.I), T(dk.Y),
                T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),       T(dk.J),T(dk.H),    T(dk.COMMA), T(dk.DOT),
                                  LT(2, us.ENTER),                LT(1, us.SPACE)
