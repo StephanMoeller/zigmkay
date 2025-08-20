@@ -50,7 +50,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     _______, T(dk.LABK), T(dk.EQL),  T(dk.RABK), T(dk.PERC),          T(dk.SLSH),  T(us.HOME),     AF(us.UP),   T(us.END), _______,
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),   T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
-              T(dk.BSLS), T(dk.LBRC), T(dk.RBRC),  _______,           _______,    T(us.TAB),     T(dk.DQUO),     T(us.ESC),
+              T(dk.HASH), T(dk.LBRC), T(dk.RBRC),  _______,           _______,    T(us.TAB),     T(dk.DQUO),     T(us.ESC),
                                            LT(2, us.SPACE),           _______
     }, 
     .{ 
@@ -60,9 +60,9 @@ pub const keymap = [_][key_count]core.KeyDef{
                             _______,                            LT(1, dk.N0)
     },
     .{ 
-    _______, PrintStats, _______, _______, _______,          _______, T(us.SPACE), T(us.SPACE), T(us.SPACE), _______,
-    _______, _______, _______, _______, _______,             _______, T(us.BS),    T(us.BS),    T(us.BS),    _______,
-             _______, _______, _______, _______,             _______, T(us.DEL),   T(us.DEL),   T(us.DEL),
+    PrintStats, T(us.F7), T(us.F8), T(us.F9), T(us.F10),          _______, T(us.SPACE), T(us.SPACE), T(us.SPACE), _______,
+    T(us.BOOT),    T(us.F4), T(us.F5), T(us.F6), T(us.F11),             _______, T(us.BS),    T(us.BS),    T(us.BS),    _______,
+                T(us.F1), T(us.F2), T(us.F3), T(us.F12),             _______, T(us.DEL),   T(us.DEL),   T(us.DEL),
                                         _______,             T(dk.N0)
     }
 };
@@ -70,16 +70,18 @@ pub const keymap = [_][key_count]core.KeyDef{
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
 const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
 const tapping_term = core.TimeSpan{ .ms = 250 };
-const combo_timeout = core.TimeSpan{ .ms = 30 };
+const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
-    Combo_Tap(.{ 0, 1 }, 0, dk.J),
-    Combo_Tap(.{ 9, 10 }, 0, dk.Z),
+    Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
+    Combo_Tap(.{ 1, 2 }, 0, dk.J),
+    Combo_Tap(.{ 11, 12 }, 0, dk.Z),
     Combo_Tap(.{ 12, 13 }, 0, dk.V),
-    Combo_Tap(.{ 0, 9 }, 0, us.BOOT),
+    Combo_Tap(.{ 23, 24 }, 0, us.BOOT),
     Combo_Tap(.{ 6, 7 }, 0, dk.AE),
     Combo_Tap(.{ 6, 8 }, 0, dk.OE),
     Combo_Tap(.{ 7, 8 }, 0, dk.AA),
     Combo_Tap(.{ 17, 18 }, 0, dk.MINS),
+    Combo_Tap(.{ 20, 21 }, 0, dk.BSLS),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
