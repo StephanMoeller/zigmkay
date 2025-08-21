@@ -12,7 +12,7 @@ pub fn CreateProcessorType(
         const Self = @This();
         layers_activations: core.LayerActivations = .{},
         stats: stats_collector.StatsCollector = .{},
-        release_map: [keymap_dimensions.layer_count]ReleaseMapEntry = [_]ReleaseMapEntry{ReleaseMapEntry.None} ** keymap_dimensions.layer_count,
+        release_map: [keymap_dimensions.key_count]ReleaseMapEntry = [_]ReleaseMapEntry{ReleaseMapEntry.None} ** keymap_dimensions.key_count,
         current_autofire: ?core.AutoFireDef = null,
         current_autofire_key_index: core.KeyIndex = 0,
         next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0),
