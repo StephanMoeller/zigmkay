@@ -24,11 +24,11 @@ const G = helpers.TAP(g);
 // when the sizes and alignments change of the types that are part of the keymap
 // as this is a type that may exist in copies in the hundreds when a big keyboard has lots of layers
 test "Struct size: KeyDef" {
-    try std.testing.expectEqual(12, @sizeOf(core.KeyDef));
+    try std.testing.expectEqual(14, @sizeOf(core.KeyDef));
     try std.testing.expectEqual(2, @alignOf(core.KeyDef));
 }
 test "Struct size: TapDef" {
-    try std.testing.expectEqual(3, @sizeOf(core.TapDef));
+    try std.testing.expectEqual(5, @sizeOf(core.TapDef));
     try std.testing.expectEqual(1, @alignOf(core.TapDef));
 }
 test "Struct size: HoldDef" {
@@ -40,10 +40,10 @@ test "Struct size: Modifiers" {
     try std.testing.expectEqual(1, @alignOf(core.Modifiers));
 }
 test "Struct size: TapHold" {
-    try std.testing.expectEqual(10, @sizeOf(core.TapHoldDef));
+    try std.testing.expectEqual(12, @sizeOf(core.TapHoldDef));
     try std.testing.expectEqual(2, @alignOf(core.TapHoldDef));
 }
 test "Struct size: AutoFireDef" {
-    try std.testing.expectEqual(8, @sizeOf(core.AutoFireDef));
+    try std.testing.expectEqual(10, @sizeOf(core.AutoFireDef));
     try std.testing.expectEqual(2, @alignOf(core.AutoFireDef));
 }
