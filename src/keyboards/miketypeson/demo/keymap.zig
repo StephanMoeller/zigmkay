@@ -79,7 +79,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 12, 13 }, 0, dk.V),
     Combo_Tap(.{ 12, 13 }, 1, dk.AMPR),
 
-    Combo_Tap(.{ 13, 16 }, 3, dk.A),
+    Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
     Combo_Tap(.{ 23, 24 }, 0, us.BOOT),
     Combo_Tap(.{ 6, 7 }, 0, dk.AE),
