@@ -3,7 +3,6 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 
 const helpers = @import("processing.test_helpers.zig");
-const init_test_with_combos = helpers.init_test_with_combos;
 
 const a = 4;
 const b = 5;
@@ -33,7 +32,7 @@ test "activate, key1, key2" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -71,7 +70,7 @@ test "different layer from current" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 1, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     try o.press_key(0, current_time);
     try o.press_key(2, current_time);
@@ -103,7 +102,7 @@ test "activate, key2, key1" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -141,7 +140,7 @@ test "tap-only: key1 timeout" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -166,7 +165,7 @@ test "key2 timeout" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -191,7 +190,7 @@ test "other key inbetween" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     try o.press_key(0, current_time);
     try o.press_key(2, current_time);
@@ -229,7 +228,7 @@ test "activate with tap/hold on one of the keys, key1, key2" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 0, .timeout = combo_timeout, .key_def = G }};
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -275,7 +274,7 @@ test "ensure correct layers combo is chosen" {
         .{ .key_indexes = .{ 0, 1 }, .layer = 2, .timeout = combo_timeout, .key_def = F },
     };
 
-    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+    var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
 
     try o.press_key(2, current_time); // to switch layer to layer 1
     current_time = current_time.add_ms(1000);
@@ -292,5 +291,63 @@ test "ensure correct layers combo is chosen" {
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = e }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+}
+
+test "custom code activate another layer - ensure combo works" {
+    const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
+    const combo_timeout = core.TimeSpan{ .ms = 30 };
+
+    const layer1_hold = core.KeyDef{ .hold_only = .{ .hold_layer = 1 } };
+    const layer2_hold = core.KeyDef{ .hold_only = .{ .hold_layer = 2 } };
+
+    const MyFunctions = struct {
+        var layer3_is_active = false;
+        fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
+            _ = output_queue;
+            switch (event) {
+                .OnHoldEnterAfter => |data| {
+                    _ = data;
+                    layer3_is_active = layers.is_layer_active(1) and layers.is_layer_active(2);
+                    layers.set_layer_state(3, layer3_is_active);
+                },
+                .OnHoldExitAfter => |data| {
+                    _ = data;
+                    layer3_is_active = layers.is_layer_active(1) and layers.is_layer_active(2);
+                    layers.set_layer_state(3, layer3_is_active);
+                },
+                else => {},
+            }
+        }
+    };
+
+    const custom_functions = core.CustomFunctions{
+        .on_event = MyFunctions.on_event,
+    };
+    const base_layer = comptime [_]core.KeyDef{ A, layer1_hold, layer2_hold, B };
+    const layer_1 = comptime [_]core.KeyDef{ D, layer1_hold, layer2_hold, B };
+    const layer_2 = comptime [_]core.KeyDef{ D, layer1_hold, layer2_hold, B };
+    const layer_3 = comptime [_]core.KeyDef{ D, E, F, B };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
+    const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 3, .timeout = combo_timeout, .key_def = G }};
+
+    var o = helpers.init_test_full(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos, &custom_functions){};
+    try o.press_key(1, current_time);
+    try o.press_key(2, current_time);
+    try std.testing.expectEqual(false, MyFunctions.layer3_is_active);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    // Now both layers should be active, hence layer 3 should also be active
+    try std.testing.expectEqual(true, MyFunctions.layer3_is_active);
+
+    // now fire the combo
+    try o.press_key(0, current_time);
+    try o.press_key(3, current_time);
+
+    try o.release_key(0, current_time);
+    try o.release_key(3, current_time);
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }

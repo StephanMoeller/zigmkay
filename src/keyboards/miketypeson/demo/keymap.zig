@@ -75,7 +75,12 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
     Combo_Tap(.{ 1, 2 }, 0, dk.J),
     Combo_Tap(.{ 11, 12 }, 0, dk.Z),
+
     Combo_Tap(.{ 12, 13 }, 0, dk.V),
+    Combo_Tap(.{ 12, 13 }, 1, dk.AMPR),
+
+    Combo_Tap(.{ 13, 16 }, 3, dk.A),
+
     Combo_Tap(.{ 23, 24 }, 0, us.BOOT),
     Combo_Tap(.{ 6, 7 }, 0, dk.AE),
     Combo_Tap(.{ 6, 8 }, 0, dk.OE),
@@ -83,8 +88,10 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 7, 8 }, 0, dk.AA),
 
     Combo_Tap(.{ 7, 8 }, 1, dk.QUES),
+
     Combo_Tap(.{ 17, 18 }, 0, dk.MINS),
     Combo_Tap(.{ 17, 18 }, 1, dk.PLUS),
+    Combo_Tap(.{ 16, 17 }, 1, dk.PIPE),
 
     Combo_Tap(.{ 20, 21 }, 0, dk.BSLS),
 };

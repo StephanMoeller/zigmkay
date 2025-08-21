@@ -1,6 +1,7 @@
 const generic_queue = @import("generic_queue.zig");
 const std = @import("std");
 const string_printing = @import("string_printing.zig");
+
 pub const special_keycode_BOOT: u8 = 0x001;
 pub const special_keycode_PRINT_STATS: u8 = 0x002;
 

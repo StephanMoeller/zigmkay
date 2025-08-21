@@ -1,2 +1,1 @@
-- add all keys from glove80
-- fix bugs with f and ' repeating
+- add all keys from glove80: app, ampersand pipe

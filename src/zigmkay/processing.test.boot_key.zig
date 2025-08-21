@@ -68,3 +68,5 @@ test "boot key as a combo test" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
+
+test "ensure boot and print keycodes are the same for uk and core" {}
