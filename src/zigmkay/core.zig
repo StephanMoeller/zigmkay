@@ -153,29 +153,44 @@ pub const DiffError = error{CurrentIsEarlierThanInput};
 
 pub const LayerActivations = struct {
     layers: [32]bool = [_]bool{false} ** 32,
-
-    pub fn activate(self: *LayerActivations, layer_index: usize) void {
+    top_most_active_layer: LayerIndex = 0,
+    const Self = @This();
+    pub fn activate(self: *Self, layer_index: LayerIndex) void {
         if (layer_index == 0)
             return;
         self.layers[layer_index] = true;
+        if (layer_index > self.top_most_active_layer) {
+            self.top_most_active_layer = layer_index;
+        }
     }
 
-    pub fn deactivate(self: *LayerActivations, layer_index: usize) void {
+    pub fn deactivate(self: *Self, layer_index: LayerIndex) void {
         if (layer_index == 0)
             return;
         self.layers[layer_index] = false;
+        if (layer_index == self.top_most_active_layer) {
+            // now find the next top most active layer
+            var counter = self.top_most_active_layer - 1;
+            while (self.layers[counter] == false and counter > 0) {
+                counter -= 1;
+            }
+            self.top_most_active_layer = counter;
+        }
     }
 
-    pub fn set_layer_state(self: *LayerActivations, layer_index: usize, state: bool) void {
+    pub fn set_layer_state(self: *Self, layer_index: LayerIndex, state: bool) void {
         if (layer_index == 0)
             return;
         self.layers[layer_index] = state;
     }
 
-    pub fn is_layer_active(self: *const LayerActivations, layer_index: usize) bool {
+    pub fn is_layer_active(self: *const Self, layer_index: LayerIndex) bool {
         if (layer_index == 0)
             return true;
         return self.layers[layer_index];
+    }
+    pub fn get_top_most_active_layer(self: *const Self) LayerIndex {
+        return self.top_most_active_layer;
     }
 };
 

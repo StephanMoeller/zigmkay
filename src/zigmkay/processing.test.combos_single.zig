@@ -258,3 +258,39 @@ test "activate with tap/hold on one of the keys, key1, key2" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
+
+test "ensure correct layers combo is chosen" {
+    var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
+    const combo_timeout = core.TimeSpan{ .ms = 30 };
+
+    const layer_1_hold = core.KeyDef{ .hold_only = .{ .hold_layer = 1 } };
+
+    const base_layer = comptime [_]core.KeyDef{ A, A, layer_1_hold };
+    const layer_1 = comptime [_]core.KeyDef{ B, B, B };
+    const layer_2 = comptime [_]core.KeyDef{ C, C, C };
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2 };
+    const combos = comptime [_]core.Combo2Def{
+        .{ .key_indexes = .{ 0, 1 }, .layer = 0, .timeout = combo_timeout, .key_def = D },
+        .{ .key_indexes = .{ 0, 1 }, .layer = 1, .timeout = combo_timeout, .key_def = E },
+        .{ .key_indexes = .{ 0, 1 }, .layer = 2, .timeout = combo_timeout, .key_def = F },
+    };
+
+    var o = init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
+
+    try o.press_key(2, current_time); // to switch layer to layer 1
+    current_time = current_time.add_ms(1000);
+    try o.press_key(0, current_time);
+    try o.press_key(1, current_time);
+
+    current_time = current_time.add_us(1);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = e }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+
+    try o.release_key(0, current_time);
+    try o.release_key(1, current_time);
+
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = e }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+}

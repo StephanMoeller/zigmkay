@@ -194,8 +194,6 @@ pub fn CreateProcessorType(
         }
 
         fn decide_combo_or_single(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ?NextKeyFindResult {
-
-            //var combo: ?core.Combo2Def = null;
             const head_event = data[0];
             if (data.len > 1 and data[1].pressed == false) {
                 // next key is not a press - no cases will ever return in a combo then
@@ -206,7 +204,7 @@ pub fn CreateProcessorType(
             const time_elapsed_ms = (next_event_time.time_since_boot_us - head_event.time.time_since_boot_us) / 1000;
 
             for (combos) |combo_to_test| {
-                if (!self.layers_activations.is_layer_active(combo_to_test.layer)) {
+                if (self.layers_activations.get_top_most_active_layer() != combo_to_test.layer) {
                     continue; // this combo's layers is not active
                 }
                 if (combo_to_test.timeout.ms < time_elapsed_ms) {
@@ -320,11 +318,11 @@ pub fn CreateProcessorType(
             // Find key on active position
             var pressed_key_def = keymap[0][key_index]; // Start out picking the key from the base layer
 
-            var layer_index: usize = @as(usize, keymap_dimensions.layer_count - 1);
+            var layer_index: core.LayerIndex = keymap_dimensions.layer_count - 1;
             while (layer_index > 0) {
                 // transparent support: ...
                 if (self.layers_activations.is_layer_active(layer_index) and keymap[layer_index][key_index] != core.KeyDef.transparent) {
-                    pressed_key_def = keymap[layer_index][key_index];
+                    pressed_key_def = keymap[@as(usize, layer_index)][key_index];
                     break;
                 }
                 layer_index -= 1;

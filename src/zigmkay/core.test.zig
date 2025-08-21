@@ -70,3 +70,33 @@ test "LayerActivations" {
     try std.testing.expectEqual(true, layers.is_layer_active(4)); // base is always active
     try std.testing.expectEqual(false, layers.is_layer_active(7)); // base is always active
 }
+
+test "LayerActivations is_top_most_active_layer - test 1" {
+    var layers = core.LayerActivations{};
+    try std.testing.expectEqual(0, layers.get_top_most_active_layer());
+    layers.activate(3);
+    try std.testing.expectEqual(3, layers.get_top_most_active_layer());
+    layers.deactivate(3);
+    try std.testing.expectEqual(0, layers.get_top_most_active_layer());
+}
+
+test "LayerActivations is_top_most_active_layer - test 2" {
+    var layers = core.LayerActivations{};
+    try std.testing.expectEqual(0, layers.get_top_most_active_layer());
+    layers.activate(3);
+    layers.deactivate(3);
+    layers.activate(4);
+    layers.activate(5);
+    layers.activate(6);
+    layers.deactivate(5);
+
+    try std.testing.expectEqual(6, layers.get_top_most_active_layer());
+
+    layers.deactivate(5);
+
+    try std.testing.expectEqual(6, layers.get_top_most_active_layer());
+
+    layers.deactivate(6);
+
+    try std.testing.expectEqual(4, layers.get_top_most_active_layer());
+}

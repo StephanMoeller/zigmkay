@@ -12,7 +12,7 @@ pub const N7 = core.KeyCodeFire{ .tap_keycode = us.KC_7 }; // 7
 pub const N8 = core.KeyCodeFire{ .tap_keycode = us.KC_8 }; // 8
 pub const N9 = core.KeyCodeFire{ .tap_keycode = us.KC_9 }; // 9
 pub const N0 = core.KeyCodeFire{ .tap_keycode = us.KC_0 }; // 0
-pub const PLUS = core.KeyCodeFire{ .tap_keycode = us.KC_MINS }; // +
+pub const PLUS = core.KeyCodeFire{ .tap_keycode = us.KC_MINUS }; // +
 pub const ACUT = core.KeyCodeFire{ .tap_keycode = us.KC_EQL }; // ´ (dead)
 pub const Q = core.KeyCodeFire{ .tap_keycode = us.KC_Q }; // Q
 pub const W = core.KeyCodeFire{ .tap_keycode = us.KC_W }; // W
