@@ -74,10 +74,10 @@ const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
     Combo_Tap(.{ 1, 2 }, 0, dk.J),
-    Combo_Tap(.{ 11, 12 }, 0, dk.Z),
+    Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .left_ctrl = true, .left_alt = true }),
 
-    Combo_Tap(.{ 12, 13 }, 0, dk.V),
-    Combo_Tap(.{ 12, 13 }, 1, dk.AMPR),
+    Combo_Tap_HoldMod(.{ 12, 13 }, 0, dk.V, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, 1, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
@@ -88,13 +88,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 7, 8 }, 0, dk.AA),
 
     Combo_Tap(.{ 7, 8 }, 1, dk.QUES),
-
-    core.Combo2Def{
-        .key_indexes = .{ 17, 18 },
-        .layer = 0,
-        .timeout = combo_timeout,
-        .key_def = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = dk.MINS }, .hold = .{ .hold_modifiers = .{ .left_ctrl = true, .left_alt = true } }, .tapping_term = tapping_term } },
-    },
+    Combo_Tap_HoldMod(.{ 17, 18 }, 0, dk.MINS, .{ .left_ctrl = true, .left_alt = true }),
     Combo_Tap(.{ 17, 18 }, 1, dk.PLUS),
     Combo_Tap(.{ 16, 17 }, 1, dk.PIPE),
 
@@ -111,7 +105,14 @@ fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode_fire
         .key_def = core.KeyDef{ .tap_only = .{ .key_press = keycode_fire } },
     };
 }
-
+fn Combo_Tap_HoldMod(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode_fire: core.KeyCodeFire, mods: core.Modifiers) core.Combo2Def {
+    return core.Combo2Def{
+        .key_indexes = key_indexes,
+        .layer = layer,
+        .timeout = combo_timeout,
+        .key_def = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = keycode_fire }, .hold = .{ .hold_modifiers = mods }, .tapping_term = tapping_term } },
+    };
+}
 // autofire
 fn AF(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
