@@ -89,7 +89,12 @@ pub const combos = [_]core.Combo2Def{
 
     Combo_Tap(.{ 7, 8 }, 1, dk.QUES),
 
-    Combo_Tap(.{ 17, 18 }, 0, dk.MINS),
+    core.Combo2Def{
+        .key_indexes = .{ 17, 18 },
+        .layer = 0,
+        .timeout = combo_timeout,
+        .key_def = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = dk.MINS }, .hold = .{ .hold_modifiers = .{ .left_ctrl = true, .left_alt = true } }, .tapping_term = tapping_term } },
+    },
     Combo_Tap(.{ 17, 18 }, 1, dk.PLUS),
     Combo_Tap(.{ 16, 17 }, 1, dk.PIPE),
 
