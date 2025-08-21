@@ -327,9 +327,9 @@ test "custom code activate another layer - ensure combo works" {
     const base_layer = comptime [_]core.KeyDef{ A, layer1_hold, layer2_hold, B };
     const layer_1 = comptime [_]core.KeyDef{ D, layer1_hold, layer2_hold, B };
     const layer_2 = comptime [_]core.KeyDef{ D, layer1_hold, layer2_hold, B };
-    const layer_3 = comptime [_]core.KeyDef{ D, E, F, B };
+    const layer_3 = comptime [_]core.KeyDef{ E, E, E, E };
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
-    const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 1, 2 }, .layer = 3, .timeout = combo_timeout, .key_def = G }};
+    const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 0, 3 }, .layer = 3, .timeout = combo_timeout, .key_def = G }};
 
     var o = helpers.init_test_full(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos, &custom_functions){};
     try o.press_key(1, current_time);
@@ -347,6 +347,7 @@ test "custom code activate another layer - ensure combo works" {
     try o.release_key(3, current_time);
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try std.testing.expectEqual(true, MyFunctions.layer3_is_active);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());

@@ -180,9 +180,10 @@ pub const LayerActivations = struct {
     }
 
     pub fn set_layer_state(self: *Self, layer_index: LayerIndex, state: bool) void {
-        if (layer_index == 0)
-            return;
-        self.layers[layer_index] = state;
+        switch (state) {
+            true => activate(self, layer_index),
+            false => deactivate(self, layer_index),
+        }
     }
 
     pub fn is_layer_active(self: *const Self, layer_index: LayerIndex) bool {
