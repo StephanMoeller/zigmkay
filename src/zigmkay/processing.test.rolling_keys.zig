@@ -62,7 +62,7 @@ test "Rolling - only tap keys" {
 }
 
 test "Rolling - tap/hold keys" {
-    var current_time = core.TimeSinceBoot.from_absolute_us(100);
+    const current_time = core.TimeSinceBoot.from_absolute_us(100);
     const tapping_term = core.TimeSpan{ .ms = 250 };
     const _a = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = a } }, .{ .left_shift = true }, tapping_term);
     const _b = comptime helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = b } }, .{ .left_shift = true }, tapping_term);
@@ -74,21 +74,13 @@ test "Rolling - tap/hold keys" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
 
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    current_time = current_time.add_us(1);
     try o.press_key(0, current_time);
-    current_time = current_time.add_us(1);
     try o.press_key(1, current_time);
-    current_time = current_time.add_us(1);
     try o.release_key(0, current_time);
-    current_time = current_time.add_us(1);
     try o.press_key(2, current_time);
-    current_time = current_time.add_us(1);
     try o.release_key(1, current_time);
-    current_time = current_time.add_us(1);
     try o.press_key(3, current_time);
-    current_time = current_time.add_us(1);
     try o.release_key(2, current_time);
-    current_time = current_time.add_us(1);
     try o.release_key(3, current_time);
 
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
@@ -192,9 +184,9 @@ test "Rolling - with sudden permanent layer shift" {
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     current_time = current_time.add_us(1);
     try o.press_key(1, current_time);
-    try o.press_key(2, current_time);
+    try o.press_key(4, current_time);
     try o.release_key(1, current_time);
-    current_time = current_time.add_us(1000); // ensure layer hold tapping term expired
+    current_time = current_time.add_ms(1000); // ensure layer hold tapping term expired
     try o.press_key(1, current_time);
     try o.release_key(1, current_time);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);

@@ -25,8 +25,10 @@ pub fn CreateProcessorType(
         ) !void {
             _ = self.stats.register_tick(current_time);
             on_event(self, core.ProcessorEvent.Tick, output_usb_commands);
+
             while (true) {
-                switch (try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {
+                const data: []core.MatrixStateChange = input_matrix_changes.peek_all()[0..];
+                switch (try process_next(self, data, output_usb_commands, current_time)) {
                     .DequeueAndRunAgain => |dequeue_info| {
                         self.current_action_id += 1;
                         try input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
@@ -34,8 +36,6 @@ pub fn CreateProcessorType(
                     .Stop => break,
                 }
             }
-
-            while (ProcessContinuation.DequeueAndRunAgain == try process_next(self, input_matrix_changes, output_usb_commands, current_time)) {}
 
             if (self.current_autofire) |autofire| {
                 if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
@@ -46,23 +46,12 @@ pub fn CreateProcessorType(
             }
         }
 
-        const ProcessContinuation = union(enum) {
-            DequeueAndRunAgain: struct { dequeue_count: u8 },
-            Stop,
-        };
-
-        fn process_next(
-            self: *Self,
-            input_matrix_changes: *core.MatrixStateChangeQueue,
-            output_queue: *core.OutputCommandQueue,
-            current_time: core.TimeSinceBoot,
-        ) !ProcessContinuation {
-            if (input_matrix_changes.Count() == 0) {
+        fn process_next(self: *Self, data: []core.MatrixStateChange, output_queue: *core.OutputCommandQueue, current_time: core.TimeSinceBoot) !ProcessContinuation {
+            if (data.len == 0) {
                 return ProcessContinuation.Stop;
             }
             // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
             // This decreases the number of test combinations required to be run as all cases will result in changes being processed one by one
-            const data = input_matrix_changes.peek_all();
 
             // Only decide for the head
             const head_event = data[0];
@@ -70,6 +59,7 @@ pub fn CreateProcessorType(
                 self.current_autofire = null;
             }
 
+            warn("prosessing next head {}, pressed: {}", .{ head_event.key_index, head_event.pressed });
             if (head_event.pressed) {
                 var head_key_def: core.KeyDef = undefined;
                 var dequeue_count: u2 = undefined;
@@ -77,6 +67,7 @@ pub fn CreateProcessorType(
                     head_key_def = res.key_def;
                     dequeue_count = res.consumed_event_count;
                 } else {
+                    warn("case 0", .{});
                     return ProcessContinuation.Stop;
                 }
 
@@ -86,6 +77,7 @@ pub fn CreateProcessorType(
                     .tap_only => |tap| {
                         try apply_tap(self, tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
 
+                        warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
@@ -93,54 +85,65 @@ pub fn CreateProcessorType(
                         self.current_autofire = tap_with_autofire;
                         self.current_autofire_key_index = head_event.key_index;
                         self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
+
+                        warn("case 2", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, head_key_def, head_event, output_queue);
 
+                        warn("case 3", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_hold => |tap_and_hold| {
-                        for (data[dequeue_count..], dequeue_count..) |outer_ev, outer_index| {
-                            if (outer_ev.time.time_since_boot_us < head_event.time.time_since_boot_us) {
-                                @panic("this should never happen!");
-                            }
-                            const tapping_term_expired = outer_ev.time.time_since_boot_us > head_event.time.add(tap_and_hold.tapping_term).time_since_boot_us;
-                            if (tapping_term_expired) {
+
+                        // a down => ?
+                        // a down, timeout => hold
+                        // a down, a up => Tap
+                        // a down, * down => ?
+                        // a down, * down, timeout => hold
+                        // a down, b down, b up => hold (permissive hold)
+                        // a down, * down, a up => tap
+                        // a down, b up => ? could be rolling, could be not, wait for next event
+
+                        const tail = data[1..];
+                        warn("case 4", .{});
+                        for (tail, 0..) |ev, outer_idx| {
+                            if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
+                                // exceeding tapping term => hold
                                 try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
+
+                                warn("case a {}", .{head_event.key_index});
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                             }
+                            if (ev.pressed) {
+                                continue; // more pressed keys should not trigger anything
+                            }
 
-                            const key_was_released = !outer_ev.pressed;
-                            if (key_was_released) {
-                                // if released key was the pressed one, choose tap
-                                if (outer_ev.key_index == head_event.key_index) {
-                                    try apply_tap(self, tap_and_hold.tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
-                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
-                                }
-                                // if the key released was pressed before the head key, we are in a rolling writing mode, hence choose tap
-                                var released_key_was_pressed_after_head = false;
-                                for (data[dequeue_count..outer_index]) |inner_ev| {
-                                    if (inner_ev.key_index == outer_ev.key_index) {
-                                        released_key_was_pressed_after_head = true;
-                                    }
-                                }
-
-                                if (released_key_was_pressed_after_head) {
+                            // this key was released, check for permissive hold
+                            for (tail[0..outer_idx]) |earlier_event| {
+                                if (earlier_event.key_index == ev.key_index and earlier_event.pressed) {
+                                    // permissive hold
                                     try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
-                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
-                                } else {
-                                    try apply_tap(self, tap_and_hold.tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
+
+                                    warn("case b {}", .{head_event.key_index});
                                     return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                                 }
+                            }
+
+                            if (ev.key_index == head_event.key_index) {
+                                // same key released within tapping term
+                                try apply_tap(self, tap_and_hold.tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
+
+                                warn("case c {}", .{head_event.key_index});
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                             }
                         }
 
-                        // No decision made while looping through all events, finally check if time just passed without anything happened
-                        // In this case, it's a hold.
-                        const tapping_term_expired = current_time.time_since_boot_us > head_event.time.add(tap_and_hold.tapping_term).time_since_boot_us;
-                        if (tapping_term_expired) {
+                        if (try head_event.time.up_til_ms(&current_time) >= tap_and_hold.tapping_term.ms) {
+                            // exceeding tapping term => hold
                             try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
+                            warn("case d", .{});
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                         }
 
@@ -150,6 +153,9 @@ pub fn CreateProcessorType(
             } else {
                 // handle release
                 // in special cases, tapping is all done at press time, hence no release action (eg when a key should be tapped with a modifier applied to it)
+                if (head_event.key_index >= self.release_map.len) {
+                    @panic("release was out of bounds!");
+                }
                 switch (self.release_map[head_event.key_index]) {
                     .None => {},
                     .Release => |release_info| {
@@ -157,6 +163,7 @@ pub fn CreateProcessorType(
                             .ReleaseTap => |tap| {
                                 switch (tap) {
                                     .key_press => |keycode_fire| {
+                                        warn("releasing tap {}", .{keycode_fire.tap_keycode});
                                         on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } }, output_queue);
                                         try output_queue.release_key(keycode_fire);
                                         self.release_map[head_event.key_index] = ReleaseMapEntry.None;
@@ -270,7 +277,6 @@ pub fn CreateProcessorType(
                     }
                 },
                 .one_shot => |one_shot_hold| {
-                    warn("one_shot_found", .{});
                     try fire_hold(self, one_shot_hold, output_queue);
                 },
             }
@@ -279,7 +285,6 @@ pub fn CreateProcessorType(
         }
 
         fn fire_hold(self: *Self, hold: core.HoldDef, output_queue: *core.OutputCommandQueue) !void {
-            warn("hold applied", .{});
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
                 var modifiers = output_queue.get_current_modifiers();
@@ -293,7 +298,6 @@ pub fn CreateProcessorType(
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
             on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } }, output_queue);
-            warn("hold applied", .{});
             try fire_hold(self, hold, output_queue);
 
             var retro_tap: ?core.TapDef = null;
@@ -330,13 +334,16 @@ pub fn CreateProcessorType(
             return pressed_key_def;
         }
         fn warn(comptime msg: []const u8, args: anytype) void {
-            _ = msg;
-            _ = args;
-            //std.log.warn(msg, args);
+            //_ = msg;
+            //_ = args;
+            std.log.warn(msg, args);
         }
     };
 }
-
+const ProcessContinuation = union(enum) {
+    DequeueAndRunAgain: struct { dequeue_count: u8 },
+    Stop,
+};
 const LC = 0x00E0;
 const LS = 0x00E1;
 const LA = 0x00E2;

@@ -64,7 +64,12 @@ pub const MatrixStateChange = struct { pressed: bool, key_index: KeyIndex, time:
 pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, queue_capacities);
 
 // USB output
-pub const OutputCommand = union(enum) { KeyCodePress: u8, KeyCodeRelease: u8, ModifiersChanged: Modifiers, ActivateBootMode };
+pub const OutputCommand = union(enum) {
+    KeyCodePress: u8,
+    KeyCodeRelease: u8,
+    ModifiersChanged: Modifiers,
+    ActivateBootMode,
+};
 pub const OutputCommandQueue = struct {
     const QueueType = generic_queue.GenericQueue(OutputCommand, queue_capacities);
     currently_pressed_keycodes: [256]bool = [1]bool{false} ** 256,
@@ -148,9 +153,18 @@ pub const TimeSinceBoot = struct {
         }
         return self.time_since_boot_us - other.time_since_boot_us;
     }
+    pub fn diff_ms(self: *const TimeSinceBoot, other: *const TimeSinceBoot) DiffError!u64 {
+        return try self.diff_us(other) * 1000;
+    }
+    pub fn up_til_ms(self: *const TimeSinceBoot, other: *const TimeSinceBoot) DiffError!u64 {
+        if (self.time_since_boot_us > other.time_since_boot_us) {
+            return DiffError.CurrentIsLaterThanInput;
+        }
+        return (other.time_since_boot_us - self.time_since_boot_us) / 1000;
+    }
 };
 
-pub const DiffError = error{CurrentIsEarlierThanInput};
+pub const DiffError = error{ CurrentIsEarlierThanInput, CurrentIsLaterThanInput };
 
 pub const LayerActivations = struct {
     layers: [32]bool = [_]bool{false} ** 32,

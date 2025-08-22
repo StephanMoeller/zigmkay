@@ -1,0 +1,7 @@
+
+[a down, timeout] => hold
+[a down, B down, A up] => tap 
+[A down, B up, timeout] => hold 
+[A down, B up, C down] => hold
+[A down, B down, B up] => hold
+

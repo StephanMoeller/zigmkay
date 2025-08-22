@@ -36,6 +36,7 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/processing.test.combos_advanced.zig",
         "src/zigmkay/processing.test.custom_functions.zig",
         "src/zigmkay/processing.test.basics.multitap_same_keycode.zig",
+        "src/zigmkay/processing.test.tap_hold.all_cases.zig",
         "src/zigmkay/output_command_queue.test.zig",
         "src/zigmkay/generic_queue.test.zig",
         "src/zigmkay/processing.test.boot_key.zig",
