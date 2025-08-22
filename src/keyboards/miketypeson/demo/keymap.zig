@@ -44,7 +44,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
      AF(dk.Q), AF(dk.W), GUI(dk.R),   T(dk.P),  AF(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),        T(dk.U), T(dk.QUOT),
     T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),      T(dk.M), SFT(dk.N), CTL(dk.E),      ALT(dk.I), T(dk.Y),
-               T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),       T(dk.J),T(dk.H),    T(dk.COMMA), T(dk.DOT),
+               T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),       T(dk.J),T(dk.H),    T(dk.COMMA), LT(4, dk.DOT),
                                  LT(2, us.ENTER),                LT(1, us.SPACE)
     },
     .{ 
@@ -64,7 +64,13 @@ pub const keymap = [_][key_count]core.KeyDef{
     T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             _______, T(us.BS),    T(us.BS),    T(us.BS),    _______,
                   T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),             _______, T(us.DEL),   T(us.DEL),   T(us.DEL),
                                         _______,             T(dk.N0)
-    }
+    },
+    .{ 
+    WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
+    WinNav(dk.N4), _______, WinNav(dk.N2), WinNav(dk.N5), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
+                   _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                          _______,             LT(1, dk.N0)
+   },
 };
 // zig fmt: on
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
@@ -133,6 +139,11 @@ fn LT(layer_index: core.LayerIndex, keycode_fire: core.KeyCodeFire) core.KeyDef 
     };
 }
 // T for 'Tap-only'
+fn WinNav(keycode: core.KeyCodeFire) core.KeyDef {
+    return core.KeyDef{
+        .tap_only = .{ .key_press = .{ .tap_keycode = keycode.tap_keycode, .tap_modifiers = .{ .left_gui = true } } },
+    };
+}
 fn T(keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_only = .{ .key_press = keycode_fire },
