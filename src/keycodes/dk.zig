@@ -64,7 +64,7 @@ pub const EQL = core.KeyCodeFire{ .tap_keycode = us.KC_0, .tap_modifiers = .{ .l
 pub const QUES = core.KeyCodeFire{ .tap_keycode = us.KC_MINUS, .tap_modifiers = .{ .left_shift = true } }; // ?
 pub const GRV = core.KeyCodeFire{ .tap_keycode = us.KC_EQUAL, .tap_modifiers = .{ .left_shift = true } }; // ` (dead)
 pub const CIRC = core.KeyCodeFire{ .tap_keycode = us.KC_RBRC, .tap_modifiers = .{ .left_shift = true } }; // ^ (dead)
-pub const ASTR = core.KeyCodeFire{ .tap_keycode = us.KC_NUHS, .tap_modifiers = .{ .left_shift = true } }; // *
+pub const ASTR = core.KeyCodeFire{ .tap_keycode = us.KC_NONUS_HASH, .tap_modifiers = .{ .left_shift = true } }; // *
 pub const RABK = core.KeyCodeFire{ .tap_keycode = us.NUBS.tap_keycode, .tap_modifiers = .{ .left_shift = true } }; // >
 pub const SCLN = core.KeyCodeFire{ .tap_keycode = us.KC_COMMA, .tap_modifiers = .{ .left_shift = true } }; // ;
 pub const COLN = core.KeyCodeFire{ .tap_keycode = us.KC_DOT, .tap_modifiers = .{ .left_shift = true } }; // :
