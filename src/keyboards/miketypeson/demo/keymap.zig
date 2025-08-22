@@ -80,7 +80,7 @@ const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
     Combo_Tap(.{ 1, 2 }, 0, dk.J),
-    Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .left_ctrl = true, .left_alt = true }),
+    Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .right_ctrl = true }),
 
     Combo_Tap_HoldMod(.{ 12, 13 }, 0, dk.V, .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, 1, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),

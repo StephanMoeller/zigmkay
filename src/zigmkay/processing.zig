@@ -106,7 +106,7 @@ pub fn CreateProcessorType(
                         // a down, * down, a up => tap
                         // a down, b up => ? could be rolling, could be not, wait for next event
 
-                        const tail = data[1..];
+                        const tail = data[dequeue_count..];
                         warn("case 4", .{});
                         for (tail, 0..) |ev, outer_idx| {
                             if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
@@ -214,7 +214,7 @@ pub fn CreateProcessorType(
                 if (self.layers_activations.get_top_most_active_layer() != combo_to_test.layer) {
                     continue; // this combo's layers is not active
                 }
-                if (combo_to_test.timeout.ms < time_elapsed_ms) {
+                if (time_elapsed_ms > combo_to_test.timeout.ms) {
                     continue; // This combo has timed out
                 }
                 if (combo_to_test.key_indexes[0] != head_event.key_index and combo_to_test.key_indexes[1] != head_event.key_index) {
