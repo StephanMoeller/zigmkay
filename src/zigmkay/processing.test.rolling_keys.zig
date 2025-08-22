@@ -175,3 +175,37 @@ test "Rolling - with sudden shift usage" {
     try std.testing.expectEqual(0, o.actions_queue.Count());
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
 }
+
+test "Rolling - with sudden permanent layer shift" {
+    // This test is supposed to spell out abCda with rolling behaviour combined with
+    var current_time = core.TimeSinceBoot.from_absolute_us(100);
+    const tapping_term = core.TimeSpan{ .ms = 250 };
+
+    const layer_hold = comptime helpers.LT(1, b, .{}, tapping_term);
+
+    const base_layer = comptime [_]core.KeyDef{ A, A, A, A, layer_hold };
+    const layer_1 = comptime [_]core.KeyDef{ C, C, C, C, C };
+
+    const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1 };
+
+    // intexes
+    var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
+    current_time = current_time.add_us(1);
+    try o.press_key(1, current_time);
+    try o.press_key(2, current_time);
+    try o.release_key(1, current_time);
+    current_time = current_time.add_us(1000); // ensure layer hold tapping term expired
+    try o.press_key(1, current_time);
+    try o.release_key(1, current_time);
+    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    // expect B to be fired as press
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
+
+    // expect event removed from input_events
+    try std.testing.expectEqual(0, o.actions_queue.Count());
+    try std.testing.expectEqual(0, o.matrix_change_queue.Count());
+}

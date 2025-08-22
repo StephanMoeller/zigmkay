@@ -67,7 +67,7 @@ pub fn MO(layer: core.LayerIndex) core.KeyDef {
 }
 pub fn LT(layer: core.LayerIndex, tap_keycode: u8, tap_modifiers: core.Modifiers, tapping_term: core.TimeSpan) core.KeyDef {
     return core.KeyDef{ .tap_hold = .{
-        .tap = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers },
+        .tap = .{ .key_press = .{ .tap_keycode = tap_keycode, .tap_modifiers = tap_modifiers } },
         .hold = .{ .hold_layer = layer },
         .tapping_term = tapping_term,
         .retro_tapping = false,
