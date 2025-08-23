@@ -388,13 +388,13 @@ test "Ensure waiting on combos" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const combo_timeout = core.TimeSpan{ .ms = 200 };
 
-    const _A = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = .{ .tap_keycode = a } }, .hold = .{ .hold_modifiers = .{ .left_shift = true } }, .tapping_term = .{ .ms = 150 } } };
+    const _A = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = .{ .tap_keycode = a } }, .hold = .{ .hold_modifiers = .{ .left_ctrl = true } }, .tapping_term = .{ .ms = 150 } } };
     const _B = core.KeyDef{ .tap_hold = .{ .tap = .{ .key_press = .{ .tap_keycode = b } }, .hold = .{ .hold_modifiers = .{ .left_shift = true } }, .tapping_term = .{ .ms = 150 } } };
     const combos = comptime [_]core.Combo2Def{.{
         .key_indexes = .{ 0, 1 },
         .layer = 0,
         .timeout = combo_timeout,
-        .key_def = helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .left_shift = true }, .{ .ms = 250 }),
+        .key_def = helpers.MT(core.TapDef{ .key_press = .{ .tap_keycode = c } }, .{ .right_alt = true, .right_ctrl = true }, .{ .ms = 250 }),
     }};
 
     const base_layer = comptime [_]core.KeyDef{ _A, _B };
@@ -402,21 +402,18 @@ test "Ensure waiting on combos" {
 
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(0, current_time);
-    current_time = current_time.add_ms(50);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
     try o.press_key(1, current_time);
-    current_time = current_time.add_ms(1);
+
+    current_time = current_time.add_ms(500);
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
-    current_time = current_time.add_ms(1);
     try o.release_key(0, current_time);
-
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
-    current_time = current_time.add_ms(1);
     try o.release_key(1, current_time);
-
     try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
+
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .right_ctrl = true, .right_alt = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
