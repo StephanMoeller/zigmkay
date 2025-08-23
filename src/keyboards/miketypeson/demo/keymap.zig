@@ -48,10 +48,10 @@ pub const keymap = [_][key_count]core.KeyDef{
                                  LT(2, us.ENTER),                LT(1, us.SPACE)
     },
     .{ 
-    _______, T(dk.LABK), T(dk.EQL),  T(dk.RABK), T(dk.PERC),          T(dk.SLSH),  T(us.HOME),     AF(us.UP),   T(us.END), _______,
-    T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),   T(us.PGUP), T(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
-              T(dk.HASH), T(dk.LBRC), T(dk.RBRC),  _______,           _______,    T(us.TAB),     T(dk.DQUO),     T(us.ESC),
-                                           LT(2, us.SPACE),           _______
+    T(us.TAB),  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH), T(us.HOME),   AF(us.UP),    T(us.END),    _______,
+    T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), T(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
+                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                            _______,     _______,   T(dk.DQUO),  T(us.ESC),
+                                                   LT(2, us.SPACE),             _______
     }, 
     .{ 
     _______, _______, _______, _______, _______,             T(dk.TILD),   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
