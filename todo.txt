@@ -1,1 +1,1 @@
-- add all keys from glove80: app, ampersand pipe
+make keyDef nullable and change all transparent behaviour to be nullable instead
