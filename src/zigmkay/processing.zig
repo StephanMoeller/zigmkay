@@ -44,10 +44,7 @@ pub fn CreateProcessorType(
             if (data.len == 0) {
                 return ProcessContinuation.Stop;
             }
-            // This flow is designed to ensure it won't matter if one call Process once with a full queue or multiple times with single or no items in the queue.
-            // This decreases the number of test combinations required to be run as all cases will result in changes being processed one by one
 
-            // Only decide for the head
             const head_event = data[0];
             check_stop_autofire(self, head_event);
             if (head_event.pressed) {
