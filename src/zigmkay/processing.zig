@@ -22,6 +22,8 @@ pub fn CreateProcessorType(
         next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0),
         current_action_id: u64 = 0,
 
+        one_shot_hold: ?core.KeyDef = null,
+
         pub fn Process(self: *Self, current_time: core.TimeSinceBoot) !void {
             _ = self.stats.register_tick(current_time);
             on_event(self, core.ProcessorEvent.Tick);
@@ -143,6 +145,10 @@ pub fn CreateProcessorType(
                         }
                     },
                 }
+
+                // If anything was released, check if one_shot should be disabled again
+                //if(head_event.key_index == self.one
+
                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } }; // always only consuming one key release at at time
             }
         }
@@ -226,6 +232,7 @@ pub fn CreateProcessorType(
                 },
                 .one_shot => |one_shot_hold| {
                     try hold_apply_modifiers_and_layers(self, one_shot_hold);
+                    // self.one_shot_hold = one_shot_hold;
                 },
             }
 
