@@ -30,7 +30,6 @@ pub fn CreateProcessorType(
                 const data: []core.MatrixStateChange = self.input_matrix_changes.peek_all()[0..];
                 switch (try process_next(self, data, current_time)) {
                     .DequeueAndRunAgain => |dequeue_info| {
-                        self.current_action_id += 1;
                         try self.input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
                     },
                     .Stop => break,
@@ -41,6 +40,7 @@ pub fn CreateProcessorType(
         }
 
         fn process_next(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) !ProcessContinuation {
+            self.current_action_id += 1;
             if (data.len == 0) {
                 return ProcessContinuation.Stop;
             }
