@@ -61,21 +61,19 @@ pub fn CreateProcessorType(
 
             warn("prosessing next head {}, pressed: {}", .{ head_event.key_index, head_event.pressed });
             if (head_event.pressed) {
-                const next_key = decide_next_combo_or_single(self, data, current_time) catch {
+                const next_key_info = decide_next_combo_or_single(self, data, current_time) catch {
                     warn("case 0", .{});
                     return ProcessContinuation.Stop;
                 };
-                const head_key_def = next_key.key_def;
-                const dequeue_count = next_key.consumed_event_count;
 
-                switch (head_key_def) {
-                    .transparent => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } }, // only happening if the base layer has a transparent key
-                    .none => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } },
+                switch (next_key_info.key_def) {
+                    .transparent => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } }, // only happening if the base layer has a transparent key
+                    .none => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } },
                     .tap_only => |tap| {
                         try apply_tap(self, tap, head_event, TapReleaseMode.AwaitKeyReleased);
 
                         warn("case 1", .{});
-                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(self, tap_with_autofire.tap, head_event, TapReleaseMode.ForceInstant);
@@ -84,13 +82,13 @@ pub fn CreateProcessorType(
                         self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
 
                         warn("case 2", .{});
-                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .hold_only => |hold| {
-                        try apply_hold(self, hold, head_key_def, head_event);
+                        try apply_hold(self, hold, next_key_info.key_def, head_event);
 
                         warn("case 3", .{});
-                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .tap_hold => |tap_and_hold| {
 
@@ -103,15 +101,15 @@ pub fn CreateProcessorType(
                         // a down, * down, a up => tap
                         // a down, b up => ? could be rolling, could be not, wait for next event
 
-                        const tail = data[dequeue_count..];
+                        const tail = data[next_key_info.consumed_event_count..];
                         warn("case 4", .{});
                         for (tail, 0..) |ev, outer_idx| {
                             if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
                                 // exceeding tapping term => hold
-                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
+                                try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
 
                                 warn("case a {}", .{head_event.key_index});
-                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                             }
                             if (ev.pressed) {
                                 continue; // more pressed keys should not trigger anything
@@ -121,10 +119,10 @@ pub fn CreateProcessorType(
                             for (tail[0..outer_idx]) |earlier_event| {
                                 if (earlier_event.key_index == ev.key_index and earlier_event.pressed) {
                                     // permissive hold
-                                    try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
+                                    try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
 
                                     warn("case b {}", .{head_event.key_index});
-                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                                 }
                             }
 
@@ -133,15 +131,15 @@ pub fn CreateProcessorType(
                                 try apply_tap(self, tap_and_hold.tap, head_event, TapReleaseMode.AwaitKeyReleased);
 
                                 warn("case c {}", .{head_event.key_index});
-                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                             }
                         }
 
                         if (try head_event.time.up_til_ms(&current_time) >= tap_and_hold.tapping_term.ms) {
                             // exceeding tapping term => hold
-                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
+                            try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
                             warn("case d", .{});
-                            return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
+                            return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                         }
 
                         return ProcessContinuation.Stop;
@@ -193,7 +191,7 @@ pub fn CreateProcessorType(
                         }
                     },
                 }
-                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } };
+                return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } }; // always only consuming one key release at at time
             }
         }
 
