@@ -61,15 +61,12 @@ pub fn CreateProcessorType(
 
             warn("prosessing next head {}, pressed: {}", .{ head_event.key_index, head_event.pressed });
             if (head_event.pressed) {
-                var head_key_def: core.KeyDef = undefined;
-                var dequeue_count: u2 = undefined;
-                if (decide_combo_or_single(self, data, current_time)) |res| {
-                    head_key_def = res.key_def;
-                    dequeue_count = res.consumed_event_count;
-                } else {
+                const next_key = decide_next_combo_or_single(self, data, current_time) catch {
                     warn("case 0", .{});
                     return ProcessContinuation.Stop;
-                }
+                };
+                const head_key_def = next_key.key_def;
+                const dequeue_count = next_key.consumed_event_count;
 
                 switch (head_key_def) {
                     .transparent => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } }, // only happening if the base layer has a transparent key
@@ -200,7 +197,8 @@ pub fn CreateProcessorType(
             }
         }
 
-        fn decide_combo_or_single(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) ?NextKeyFindResult {
+        const NextFindError = error{NotPossibleToDetermine};
+        fn decide_next_combo_or_single(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) NextFindError!NextKeyFindResult {
             const head_event = data[0];
             if (data.len > 1 and data[1].pressed == false) {
                 // next key is not a press - no cases will ever return in a combo then
@@ -229,7 +227,7 @@ pub fn CreateProcessorType(
                     return NextKeyFindResult{ .key_def = combo_to_test.key_def, .consumed_event_count = 2 };
                 } else {
                     // there are no more events - but this combo could be relevant
-                    return null;
+                    return NextFindError.NotPossibleToDetermine;
                 }
             }
 
