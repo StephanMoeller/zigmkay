@@ -10,6 +10,10 @@ pub fn CreateProcessorType(
 ) type {
     return struct {
         const Self = @This();
+
+        input_matrix_changes: *core.MatrixStateChangeQueue,
+        output_usb_commands: *core.OutputCommandQueue,
+
         layers_activations: core.LayerActivations = .{},
         stats: stats_collector.StatsCollector = .{},
         release_map: [keymap_dimensions.key_count]ReleaseMapEntry = [_]ReleaseMapEntry{ReleaseMapEntry.None} ** keymap_dimensions.key_count,
@@ -17,12 +21,8 @@ pub fn CreateProcessorType(
         current_autofire_key_index: core.KeyIndex = 0,
         next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0),
         current_action_id: u64 = 0,
-        input_matrix_changes: *core.MatrixStateChangeQueue,
-        output_usb_commands: *core.OutputCommandQueue,
-        pub fn Process(
-            self: *Self,
-            current_time: core.TimeSinceBoot,
-        ) !void {
+
+        pub fn Process(self: *Self, current_time: core.TimeSinceBoot) !void {
             _ = self.stats.register_tick(current_time);
             on_event(self, core.ProcessorEvent.Tick);
 
@@ -39,31 +39,6 @@ pub fn CreateProcessorType(
 
             try tick_autofire(self, current_time);
         }
-
-        // AUTOFIRE START
-        fn activate_autofire(self: *Self, tap_with_autofire: core.AutoFireDef, head_event: core.MatrixStateChange, current_time: core.TimeSinceBoot) void {
-            self.current_autofire = tap_with_autofire;
-            self.current_autofire_key_index = head_event.key_index;
-            self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
-        }
-
-        fn tick_autofire(self: *Self, current_time: core.TimeSinceBoot) !void {
-            if (self.current_autofire) |autofire| {
-                if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
-                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
-                    try apply_tap(self, autofire.tap, unused_event, TapReleaseMode.ForceInstant);
-                    self.next_autofire_trigger_time = self.next_autofire_trigger_time.add(autofire.repeat_interval);
-                }
-            }
-        }
-
-        fn check_stop_autofire(self: *Self, head_event: core.MatrixStateChange) void {
-            // check to se if autofire key was released
-            if (self.current_autofire != null and self.current_autofire_key_index == head_event.key_index and head_event.pressed == false) {
-                self.current_autofire = null;
-            }
-        }
-        // AUTOFIRE END
 
         fn process_next(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) !ProcessContinuation {
             if (data.len == 0) {
@@ -94,59 +69,42 @@ pub fn CreateProcessorType(
                     },
                     .hold_only => |hold| {
                         try apply_hold(self, hold, next_key_info.key_def, head_event);
-
-                        warn("case 3", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .tap_hold => |tap_and_hold| {
-
-                        // a down => ?
-                        // a down, timeout => hold
-                        // a down, a up => Tap
-                        // a down, * down => ?
-                        // a down, * down, timeout => hold
-                        // a down, b down, b up => hold (permissive hold)
-                        // a down, * down, a up => tap
-                        // a down, b up => ? could be rolling, could be not, wait for next event
-
                         const tail = data[next_key_info.consumed_event_count..];
-                        warn("case 4", .{});
-                        for (tail, 0..) |ev, outer_idx| {
-                            if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
-                                // exceeding tapping term => hold
-                                try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
 
-                                warn("case a {}", .{head_event.key_index});
+                        // Iterate tail
+                        for (tail, 0..) |ev, outer_idx| {
+
+                            // Exceeding tapping term?
+                            if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
+                                try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                             }
+
                             if (ev.pressed) {
-                                continue; // more pressed keys should not trigger anything
+                                continue; // More pressed keys should not trigger anything
                             }
 
-                            // this key was released, check for permissive hold
+                            // Permissive hold?
                             for (tail[0..outer_idx]) |earlier_event| {
                                 if (earlier_event.key_index == ev.key_index and earlier_event.pressed) {
-                                    // permissive hold
                                     try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
-
-                                    warn("case b {}", .{head_event.key_index});
                                     return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                                 }
                             }
 
+                            // Same key released within tapping term?
                             if (ev.key_index == head_event.key_index) {
-                                // same key released within tapping term
                                 try apply_tap(self, tap_and_hold.tap, head_event, TapReleaseMode.AwaitKeyReleased);
-
-                                warn("case c {}", .{head_event.key_index});
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                             }
                         }
 
+                        // Exceeding tapping term?
                         if (try head_event.time.up_til_ms(&current_time) >= tap_and_hold.tapping_term.ms) {
-                            // exceeding tapping term => hold
                             try apply_hold(self, tap_and_hold.hold, next_key_info.key_def, head_event);
-                            warn("case d", .{});
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                         }
 
@@ -337,6 +295,32 @@ pub fn CreateProcessorType(
             }
             return pressed_key_def;
         }
+
+        // AUTOFIRE START
+        fn activate_autofire(self: *Self, tap_with_autofire: core.AutoFireDef, head_event: core.MatrixStateChange, current_time: core.TimeSinceBoot) void {
+            self.current_autofire = tap_with_autofire;
+            self.current_autofire_key_index = head_event.key_index;
+            self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
+        }
+
+        fn tick_autofire(self: *Self, current_time: core.TimeSinceBoot) !void {
+            if (self.current_autofire) |autofire| {
+                if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
+                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
+                    try apply_tap(self, autofire.tap, unused_event, TapReleaseMode.ForceInstant);
+                    self.next_autofire_trigger_time = self.next_autofire_trigger_time.add(autofire.repeat_interval);
+                }
+            }
+        }
+
+        fn check_stop_autofire(self: *Self, head_event: core.MatrixStateChange) void {
+            // check to se if autofire key was released
+            if (self.current_autofire != null and self.current_autofire_key_index == head_event.key_index and head_event.pressed == false) {
+                self.current_autofire = null;
+            }
+        }
+        // AUTOFIRE END
+
         fn warn(comptime msg: []const u8, args: anytype) void {
             //_ = msg;
             //_ = args;
