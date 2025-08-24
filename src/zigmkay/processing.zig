@@ -37,12 +37,29 @@ pub fn CreateProcessorType(
                 }
             }
 
+            try tick_autofire(self, current_time);
+        }
+
+        fn activate_autofire(self: *Self, tap_with_autofire: core.AutoFireDef, head_event: core.MatrixStateChange, current_time: core.TimeSinceBoot) void {
+            self.current_autofire = tap_with_autofire;
+            self.current_autofire_key_index = head_event.key_index;
+            self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
+        }
+
+        fn tick_autofire(self: *Self, current_time: core.TimeSinceBoot) !void {
             if (self.current_autofire) |autofire| {
                 if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
                     const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
                     try apply_tap(self, autofire.tap, unused_event, TapReleaseMode.ForceInstant);
                     self.next_autofire_trigger_time = self.next_autofire_trigger_time.add(autofire.repeat_interval);
                 }
+            }
+        }
+
+        fn check_stop_autofire(self: *Self, head_event: core.MatrixStateChange) void {
+            // check to se if autofire key was released
+            if (self.current_autofire != null and self.current_autofire_key_index == head_event.key_index and head_event.pressed == false) {
+                self.current_autofire = null;
             }
         }
 
@@ -55,14 +72,9 @@ pub fn CreateProcessorType(
 
             // Only decide for the head
             const head_event = data[0];
-            if (self.current_autofire != null and self.current_autofire_key_index == head_event.key_index and head_event.pressed == false) {
-                self.current_autofire = null;
-            }
-
-            warn("prosessing next head {}, pressed: {}", .{ head_event.key_index, head_event.pressed });
+            check_stop_autofire(self, head_event);
             if (head_event.pressed) {
                 const next_key_info = decide_next_combo_or_single(self, data, current_time) catch {
-                    warn("case 0", .{});
                     return ProcessContinuation.Stop;
                 };
 
@@ -71,17 +83,11 @@ pub fn CreateProcessorType(
                     .none => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } },
                     .tap_only => |tap| {
                         try apply_tap(self, tap, head_event, TapReleaseMode.AwaitKeyReleased);
-
-                        warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
                         try apply_tap(self, tap_with_autofire.tap, head_event, TapReleaseMode.ForceInstant);
-                        self.current_autofire = tap_with_autofire;
-                        self.current_autofire_key_index = head_event.key_index;
-                        self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
-
-                        warn("case 2", .{});
+                        activate_autofire(self, tap_with_autofire, head_event, current_time);
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                     },
                     .hold_only => |hold| {
