@@ -17,21 +17,21 @@ pub fn CreateProcessorType(
         current_autofire_key_index: core.KeyIndex = 0,
         next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0),
         current_action_id: u64 = 0,
+        input_matrix_changes: *core.MatrixStateChangeQueue,
+        output_usb_commands: *core.OutputCommandQueue,
         pub fn Process(
             self: *Self,
-            input_matrix_changes: *core.MatrixStateChangeQueue,
-            output_usb_commands: *core.OutputCommandQueue,
             current_time: core.TimeSinceBoot,
         ) !void {
             _ = self.stats.register_tick(current_time);
-            on_event(self, core.ProcessorEvent.Tick, output_usb_commands);
+            on_event(self, core.ProcessorEvent.Tick);
 
             while (true) {
-                const data: []core.MatrixStateChange = input_matrix_changes.peek_all()[0..];
-                switch (try process_next(self, data, output_usb_commands, current_time)) {
+                const data: []core.MatrixStateChange = self.input_matrix_changes.peek_all()[0..];
+                switch (try process_next(self, data, current_time)) {
                     .DequeueAndRunAgain => |dequeue_info| {
                         self.current_action_id += 1;
-                        try input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
+                        try self.input_matrix_changes.dequeue_count(dequeue_info.dequeue_count);
                     },
                     .Stop => break,
                 }
@@ -40,13 +40,13 @@ pub fn CreateProcessorType(
             if (self.current_autofire) |autofire| {
                 if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
                     const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
-                    try apply_tap(self, autofire.tap, unused_event, output_usb_commands, TapReleaseMode.ForceInstant);
+                    try apply_tap(self, autofire.tap, unused_event, TapReleaseMode.ForceInstant);
                     self.next_autofire_trigger_time = self.next_autofire_trigger_time.add(autofire.repeat_interval);
                 }
             }
         }
 
-        fn process_next(self: *Self, data: []core.MatrixStateChange, output_queue: *core.OutputCommandQueue, current_time: core.TimeSinceBoot) !ProcessContinuation {
+        fn process_next(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) !ProcessContinuation {
             if (data.len == 0) {
                 return ProcessContinuation.Stop;
             }
@@ -75,13 +75,13 @@ pub fn CreateProcessorType(
                     .transparent => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } }, // only happening if the base layer has a transparent key
                     .none => return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } },
                     .tap_only => |tap| {
-                        try apply_tap(self, tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
+                        try apply_tap(self, tap, head_event, TapReleaseMode.AwaitKeyReleased);
 
                         warn("case 1", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .tap_with_autofire => |tap_with_autofire| {
-                        try apply_tap(self, tap_with_autofire.tap, head_event, output_queue, TapReleaseMode.ForceInstant);
+                        try apply_tap(self, tap_with_autofire.tap, head_event, TapReleaseMode.ForceInstant);
                         self.current_autofire = tap_with_autofire;
                         self.current_autofire_key_index = head_event.key_index;
                         self.next_autofire_trigger_time = current_time.add(tap_with_autofire.initial_delay);
@@ -90,7 +90,7 @@ pub fn CreateProcessorType(
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                     },
                     .hold_only => |hold| {
-                        try apply_hold(self, hold, head_key_def, head_event, output_queue);
+                        try apply_hold(self, hold, head_key_def, head_event);
 
                         warn("case 3", .{});
                         return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -111,7 +111,7 @@ pub fn CreateProcessorType(
                         for (tail, 0..) |ev, outer_idx| {
                             if (try head_event.time.up_til_ms(&ev.time) >= tap_and_hold.tapping_term.ms) {
                                 // exceeding tapping term => hold
-                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
+                                try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
 
                                 warn("case a {}", .{head_event.key_index});
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -124,7 +124,7 @@ pub fn CreateProcessorType(
                             for (tail[0..outer_idx]) |earlier_event| {
                                 if (earlier_event.key_index == ev.key_index and earlier_event.pressed) {
                                     // permissive hold
-                                    try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
+                                    try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
 
                                     warn("case b {}", .{head_event.key_index});
                                     return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -133,7 +133,7 @@ pub fn CreateProcessorType(
 
                             if (ev.key_index == head_event.key_index) {
                                 // same key released within tapping term
-                                try apply_tap(self, tap_and_hold.tap, head_event, output_queue, TapReleaseMode.AwaitKeyReleased);
+                                try apply_tap(self, tap_and_hold.tap, head_event, TapReleaseMode.AwaitKeyReleased);
 
                                 warn("case c {}", .{head_event.key_index});
                                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
@@ -142,7 +142,7 @@ pub fn CreateProcessorType(
 
                         if (try head_event.time.up_til_ms(&current_time) >= tap_and_hold.tapping_term.ms) {
                             // exceeding tapping term => hold
-                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event, output_queue);
+                            try apply_hold(self, tap_and_hold.hold, head_key_def, head_event);
                             warn("case d", .{});
                             return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = dequeue_count } };
                         }
@@ -164,22 +164,22 @@ pub fn CreateProcessorType(
                                 switch (tap) {
                                     .key_press => |keycode_fire| {
                                         warn("releasing tap {}", .{keycode_fire.tap_keycode});
-                                        on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } }, output_queue);
-                                        try output_queue.release_key(keycode_fire);
+                                        on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } });
+                                        try self.output_usb_commands.release_key(keycode_fire);
                                         self.release_map[head_event.key_index] = ReleaseMapEntry.None;
-                                        on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } }, output_queue);
+                                        on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } });
                                     },
                                     .one_shot => unreachable,
                                 }
                             },
                             .ReleaseHold => |hold_def| {
                                 const hold = hold_def.hold;
-                                on_event(self, .{ .OnHoldExitBefore = .{ .hold = hold } }, output_queue);
+                                on_event(self, .{ .OnHoldExitBefore = .{ .hold = hold } });
                                 if (hold.hold_modifiers != null) {
                                     // Cancel the hold modifier(s)
-                                    var modifiers = output_queue.get_current_modifiers();
+                                    var modifiers = self.output_usb_commands.get_current_modifiers();
                                     modifiers = modifiers.remove(hold.hold_modifiers.?);
-                                    try output_queue.set_mods(modifiers);
+                                    try self.output_usb_commands.set_mods(modifiers);
                                 }
                                 if (hold.hold_layer != null) {
                                     self.layers_activations.deactivate(hold.hold_layer.?);
@@ -188,10 +188,10 @@ pub fn CreateProcessorType(
 
                                 if (release_info.action_id_when_pressed == self.current_action_id - 1) {
                                     if (hold_def.retro_tap) |tap| {
-                                        try apply_tap(self, tap, head_event, output_queue, TapReleaseMode.ForceInstant);
+                                        try apply_tap(self, tap, head_event, TapReleaseMode.ForceInstant);
                                     }
                                 }
-                                on_event(self, .{ .OnHoldExitAfter = .{ .hold = hold } }, output_queue);
+                                on_event(self, .{ .OnHoldExitAfter = .{ .hold = hold } });
                             },
                         }
                     },
@@ -237,12 +237,12 @@ pub fn CreateProcessorType(
         }
 
         const TapReleaseMode = enum { ForceInstant, AwaitKeyReleased };
-        fn on_event(self: *Self, event: core.ProcessorEvent, output_usb_commands: *core.OutputCommandQueue) void {
-            custom.on_event(event, &self.layers_activations, output_usb_commands);
+        fn on_event(self: *Self, event: core.ProcessorEvent) void {
+            custom.on_event(event, &self.layers_activations, self.output_usb_commands);
         }
 
-        fn apply_tap(self: *Self, tap: core.TapDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue, release_mode: TapReleaseMode) !void {
-            on_event(self, .{ .OnTapEnterBefore = .{ .tap = tap } }, output_queue);
+        fn apply_tap(self: *Self, tap: core.TapDef, event: core.MatrixStateChange, release_mode: TapReleaseMode) !void {
+            on_event(self, .{ .OnTapEnterBefore = .{ .tap = tap } });
             // features:
             //      modifiers must be changeable
             //      layers must be changeable
@@ -251,19 +251,19 @@ pub fn CreateProcessorType(
             switch (tap) {
                 .key_press => |keycode_fire| {
                     if (keycode_fire.tap_keycode == core.special_keycode_BOOT) {
-                        try output_queue.go_to_boot_mode();
+                        try self.output_usb_commands.go_to_boot_mode();
                         return;
                     }
                     if (keycode_fire.tap_keycode == core.special_keycode_PRINT_STATS) {
                         const max_len = 2000;
                         var buf: [max_len]u8 = undefined;
                         const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE: last {}, highest: {}, lowest: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
-                        try output_queue.print_string(numAsString);
+                        try self.output_usb_commands.print_string(numAsString);
                         return;
                     }
                     switch (release_mode) {
                         .AwaitKeyReleased => {
-                            try output_queue.press_key(keycode_fire);
+                            try self.output_usb_commands.press_key(keycode_fire);
                             self.release_map[event.key_index] = .{
                                 .Release = .{
                                     .release_action = KeyReleaseAction{ .ReleaseTap = tap },
@@ -272,33 +272,33 @@ pub fn CreateProcessorType(
                             };
                         },
                         .ForceInstant => {
-                            try output_queue.tap_key(keycode_fire);
+                            try self.output_usb_commands.tap_key(keycode_fire);
                         },
                     }
                 },
                 .one_shot => |one_shot_hold| {
-                    try fire_hold(self, one_shot_hold, output_queue);
+                    try fire_hold(self, one_shot_hold);
                 },
             }
 
-            on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } }, output_queue);
+            on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } });
         }
 
-        fn fire_hold(self: *Self, hold: core.HoldDef, output_queue: *core.OutputCommandQueue) !void {
+        fn fire_hold(self: *Self, hold: core.HoldDef) !void {
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
-                var modifiers = output_queue.get_current_modifiers();
+                var modifiers = self.output_usb_commands.get_current_modifiers();
                 modifiers = modifiers.add(hold.hold_modifiers.?);
-                try output_queue.set_mods(modifiers);
+                try self.output_usb_commands.set_mods(modifiers);
             }
             if (hold.hold_layer != null) {
                 self.layers_activations.activate(hold.hold_layer.?);
             }
         }
 
-        fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange, output_queue: *core.OutputCommandQueue) !void {
-            on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } }, output_queue);
-            try fire_hold(self, hold, output_queue);
+        fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange) !void {
+            on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } });
+            try fire_hold(self, hold);
 
             var retro_tap: ?core.TapDef = null;
             switch (key_def) {
@@ -315,7 +315,7 @@ pub fn CreateProcessorType(
                     .action_id_when_pressed = self.current_action_id,
                 },
             };
-            on_event(self, .{ .OnHoldEnterAfter = .{ .hold = hold } }, output_queue);
+            on_event(self, .{ .OnHoldEnterAfter = .{ .hold = hold } });
         }
 
         fn determine_key_def(self: *Self, key_index: usize) core.KeyDef {

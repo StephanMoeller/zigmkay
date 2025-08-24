@@ -33,7 +33,10 @@ pub fn main() !void {
         &my_zilpzapl_keyboard.keymap,
         my_zilpzapl_keyboard.combos[0..],
         &my_zilpzapl_keyboard.custom_functions,
-    ){};
+    ){
+        .input_matrix_changes = &matrix_change_queue,
+        .output_usb_commands = &usb_command_queue,
+    };
 
     // USB events
     const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
@@ -45,7 +48,7 @@ pub fn main() !void {
         try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
         // Processing: decide actions
-        try processor.Process(&matrix_change_queue, &usb_command_queue, current_time);
+        try processor.Process(current_time);
 
         // Execute actions: send usb commands to the host
         try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue, current_time);
