@@ -40,6 +40,7 @@ pub fn CreateProcessorType(
             try tick_autofire(self, current_time);
         }
 
+        // AUTOFIRE START
         fn activate_autofire(self: *Self, tap_with_autofire: core.AutoFireDef, head_event: core.MatrixStateChange, current_time: core.TimeSinceBoot) void {
             self.current_autofire = tap_with_autofire;
             self.current_autofire_key_index = head_event.key_index;
@@ -62,6 +63,7 @@ pub fn CreateProcessorType(
                 self.current_autofire = null;
             }
         }
+        // AUTOFIRE END
 
         fn process_next(self: *Self, data: []core.MatrixStateChange, current_time: core.TimeSinceBoot) !ProcessContinuation {
             if (data.len == 0) {
