@@ -129,15 +129,7 @@ pub fn CreateProcessorType(
                             .ReleaseHold => |hold_def| {
                                 on_event(self, .{ .OnHoldExitBefore = .{ .hold = hold_def.hold } });
 
-                                if (hold_def.hold.hold_modifiers != null) {
-                                    // Cancel the hold modifier(s)
-                                    var modifiers = self.output_usb_commands.get_current_modifiers();
-                                    modifiers = modifiers.remove(hold_def.hold.hold_modifiers.?);
-                                    try self.output_usb_commands.set_mods(modifiers);
-                                }
-                                if (hold_def.hold.hold_layer != null) {
-                                    self.layers_activations.deactivate(hold_def.hold.hold_layer.?);
-                                }
+                                try hold_remove_modifiers_and_layers(self, hold_def.hold);
 
                                 if (release_info.action_id_when_pressed == self.current_action_id - 1) {
                                     if (hold_def.retro_tap) |tap| {
@@ -233,14 +225,25 @@ pub fn CreateProcessorType(
                     }
                 },
                 .one_shot => |one_shot_hold| {
-                    try enter_hold(self, one_shot_hold);
+                    try hold_apply_modifiers_and_layers(self, one_shot_hold);
                 },
             }
 
             on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } });
         }
 
-        fn enter_hold(self: *Self, hold: core.HoldDef) !void {
+        fn hold_remove_modifiers_and_layers(self: *Self, hold: core.HoldDef) !void {
+            if (hold.hold_modifiers != null) {
+                // Cancel the hold modifier(s)
+                var modifiers = self.output_usb_commands.get_current_modifiers();
+                modifiers = modifiers.remove(hold.hold_modifiers.?);
+                try self.output_usb_commands.set_mods(modifiers);
+            }
+            if (hold.hold_layer != null) {
+                self.layers_activations.deactivate(hold.hold_layer.?);
+            }
+        }
+        fn hold_apply_modifiers_and_layers(self: *Self, hold: core.HoldDef) !void {
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
                 var modifiers = self.output_usb_commands.get_current_modifiers();
@@ -254,7 +257,7 @@ pub fn CreateProcessorType(
 
         fn on_hold_decided(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange) !void {
             on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } });
-            try enter_hold(self, hold);
+            try hold_apply_modifiers_and_layers(self, hold);
 
             var retro_tap: ?core.TapDef = null;
             switch (key_def) {
