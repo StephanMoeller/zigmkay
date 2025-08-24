@@ -277,14 +277,14 @@ pub fn CreateProcessorType(
                     }
                 },
                 .one_shot => |one_shot_hold| {
-                    try fire_hold(self, one_shot_hold);
+                    try enter_hold(self, one_shot_hold);
                 },
             }
 
             on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } });
         }
 
-        fn fire_hold(self: *Self, hold: core.HoldDef) !void {
+        fn enter_hold(self: *Self, hold: core.HoldDef) !void {
             if (hold.hold_modifiers != null) {
                 // Apply the hold modifier(s)
                 var modifiers = self.output_usb_commands.get_current_modifiers();
@@ -298,7 +298,7 @@ pub fn CreateProcessorType(
 
         fn apply_hold(self: *Self, hold: core.HoldDef, key_def: core.KeyDef, event: core.MatrixStateChange) !void {
             on_event(self, .{ .OnHoldEnterBefore = .{ .hold = hold } });
-            try fire_hold(self, hold);
+            try enter_hold(self, hold);
 
             var retro_tap: ?core.TapDef = null;
             switch (key_def) {
