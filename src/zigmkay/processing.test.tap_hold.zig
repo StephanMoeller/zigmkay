@@ -36,7 +36,7 @@ test "MT tap within tapping term - process with both in queue" {
     // Now ensure that a tap will happen when releasing within tapping term
     current_time = current_time.add_us(10); // within tapping term
     try o.release_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
@@ -57,12 +57,12 @@ test "MT tap within tapping term - process with multiple calls" {
     // Ensure nothing happens at first press when the key has multiple functions (both tap and hold)
     try o.press_key(0, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
+    try o.process(current_time);
     // Now ensure that a tap will happen when releasing within tapping term
     current_time = current_time.add_us(10); // within tapping term
     try o.release_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
@@ -87,7 +87,7 @@ test "MT hold case: release after tapping term => hold" {
     current_time = current_time.add_ms(tapping_term.ms + 1);
     try o.release_key(0, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());
@@ -113,7 +113,7 @@ test "MT hold case: timeout => hold" {
 
     current_time = current_time.add_ms(tapping_term.ms + 1); // within tapping term
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_alt = true } }, try o.actions_queue.dequeue());

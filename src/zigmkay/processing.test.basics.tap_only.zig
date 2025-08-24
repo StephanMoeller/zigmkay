@@ -28,7 +28,7 @@ test "TAP - single key press" {
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, o.actions_queue.Count());
@@ -46,7 +46,7 @@ test "TAP - single key release - expect nothing as key is not held" {
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     try std.testing.expectEqual(0, o.actions_queue.Count()); // expect B to be fired as press
 }
@@ -62,7 +62,7 @@ test "TAP - multiple simple tap events" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(5, o.actions_queue.Count());
@@ -87,7 +87,7 @@ test "TAP_WITH_MOD - single key press" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(4, o.actions_queue.Count());
@@ -114,7 +114,7 @@ test "TAP_WITH_MOD - with other keys" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 }); // Release A + shift
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 }); // Release B
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(6, o.actions_queue.Count());

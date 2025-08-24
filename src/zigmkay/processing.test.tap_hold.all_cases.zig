@@ -112,7 +112,7 @@ fn run(events: []TestEvent, expect: TestExpectation) !void {
             },
         }
     }
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     switch (expect) {
         .undecided => {
             try std.testing.expectEqual(0, o.actions_queue.Count());

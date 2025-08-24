@@ -58,7 +58,7 @@ fn run_permissive_hold_test(comptime config: PermissiveHoldParameters) !void {
     current_time = current_time.add_ms(config.target_release_delta_ms);
 
     try o.release_key(target_key_index, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     switch (config.expectation) {
@@ -123,7 +123,7 @@ test "MT - multiple holds, release in same order" {
     try o.release_key(_b, current_time);
     try o.release_key(_c, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -174,7 +174,7 @@ test "MT - multiple holds, release in reverse order" {
     try o.release_key(_b, current_time);
     try o.release_key(_a, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, core.TimeSinceBoot.from_absolute_us(100));
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());

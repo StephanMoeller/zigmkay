@@ -31,7 +31,7 @@ test "boot key test" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 2 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 2 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, o.actions_queue.Count());
@@ -58,7 +58,7 @@ test "boot key as a combo test" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 2 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(1, o.actions_queue.Count());

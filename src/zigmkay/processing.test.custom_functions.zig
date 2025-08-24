@@ -88,7 +88,7 @@ test "custom code - tap events" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // ensure all 4 tap events are fired and in the correct order
     try std.testing.expectEqual(5, MyFunctions.get_event_count());
@@ -174,7 +174,7 @@ test "custom code - hold events" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     current_time = current_time.add_ms(500); // should trigger holding
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // ensure all 4 tap events are fired and in the correct order
     try std.testing.expectEqual(5, MyFunctions.get_event_count());
@@ -236,7 +236,7 @@ test "custom code - ensure tick event" {
         &[_]core.Combo2Def{},
         &custom_functions,
     ){};
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // ensure all 4 tap events are fired and in the correct order
     try std.testing.expectEqual(1, MyFunctions.get_event_count());

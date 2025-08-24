@@ -32,7 +32,7 @@ test "Multitap - case A" {
     try o.release_key(0, current_time);
     try o.press_key(1, current_time);
     try o.release_key(1, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(4, o.actions_queue.Count());
@@ -55,7 +55,7 @@ test "Multitap - case B" {
     try o.press_key(1, current_time);
     try o.release_key(0, current_time);
     try o.release_key(1, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());

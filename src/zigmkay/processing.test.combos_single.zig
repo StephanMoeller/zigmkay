@@ -35,13 +35,15 @@ test "activate, key1, key2" {
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     current_time = current_time.add_ms(combo_timeout.ms - 1); // pressed within timeout
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
@@ -50,14 +52,14 @@ test "activate, key1, key2" {
     current_time = current_time.add_us(1);
     try o.release_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // ensure released when releasing first key
     current_time = current_time.add_us(1);
     try o.release_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -76,7 +78,7 @@ test "different layer from current" {
     try o.press_key(2, current_time);
 
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
@@ -86,7 +88,8 @@ test "different layer from current" {
     try o.release_key(0, current_time);
     try o.release_key(2, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
@@ -105,12 +108,14 @@ test "activate, key2, key1" {
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
     current_time = current_time.add_ms(25);
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
@@ -119,14 +124,14 @@ test "activate, key2, key1" {
     current_time = current_time.add_us(1);
     try o.release_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // ensure released when releasing first key
     current_time = current_time.add_us(1);
     try o.release_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -143,16 +148,18 @@ test "tap-only: key1 timeout" {
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     current_time = current_time.add_ms(combo_timeout.ms + 1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     try o.release_key(1, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -168,16 +175,18 @@ test "key2 timeout" {
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     current_time = current_time.add_ms(combo_timeout.ms + 1); // pressed within timeout
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     try o.release_key(2, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -196,20 +205,22 @@ test "other key inbetween" {
     try o.press_key(2, current_time);
 
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     current_time = current_time.add_ms(combo_timeout.ms + 1); // this will timeout the press of the last key, c
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
 
     try o.release_key(1, current_time);
     try o.release_key(0, current_time);
     try o.release_key(2, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = b }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
@@ -231,13 +242,15 @@ test "activate with tap/hold on one of the keys, key1, key2" {
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     current_time = current_time.add_ms(combo_timeout.ms - 1); // pressed within timeout
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
@@ -246,14 +259,14 @@ test "activate with tap/hold on one of the keys, key1, key2" {
     current_time = current_time.add_us(1);
     try o.release_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     // ensure released when releasing first key
     current_time = current_time.add_us(1);
     try o.release_key(1, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -282,14 +295,16 @@ test "ensure correct layers combo is chosen" {
     try o.press_key(1, current_time);
 
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = e }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 
     try o.release_key(0, current_time);
     try o.release_key(1, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = e }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(0, o.actions_queue.Count());
 }
@@ -335,7 +350,9 @@ test "custom code activate another layer - ensure combo works" {
     try o.press_key(1, current_time);
     try o.press_key(2, current_time);
     try std.testing.expectEqual(false, MyFunctions.layer3_is_active);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+
+    try o.process(current_time);
+
     // Now both layers should be active, hence layer 3 should also be active
     try std.testing.expectEqual(true, MyFunctions.layer3_is_active);
 
@@ -346,7 +363,7 @@ test "custom code activate another layer - ensure combo works" {
     try o.release_key(0, current_time);
     try o.release_key(3, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(true, MyFunctions.layer3_is_active);
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = g }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = g }, try o.actions_queue.dequeue());
@@ -371,13 +388,13 @@ test "combo is hold/tap: combo released slowly => hold" {
     current_time = current_time.add_us(1);
     try o.press_key(2, current_time);
     current_time = current_time.add_us(1);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     current_time = current_time.add_ms(160);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try o.release_key(1, current_time);
     try o.release_key(2, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
@@ -402,15 +419,15 @@ test "Ensure waiting on combos" {
 
     var o = helpers.init_test_with_combos(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos){};
     try o.press_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try o.press_key(1, current_time);
 
     current_time = current_time.add_ms(500);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try o.release_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
     try o.release_key(1, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .right_ctrl = true, .right_alt = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());

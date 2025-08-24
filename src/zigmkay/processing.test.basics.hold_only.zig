@@ -39,7 +39,7 @@ test "HOLD_MOD - single hold" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 }); // Release B
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 }); // Release left shift
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -69,7 +69,7 @@ test "HOLD_MOD - multiple holds" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 }); // Release left shift first (to mix things up)
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 }); // Release left alt
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -108,7 +108,7 @@ test "HOLD_MOD combined with TAP_WITH_MOD" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 }); // Release left alt
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 }); // Release left shift
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
@@ -145,7 +145,7 @@ test "Layers - simple switch" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = f }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = f }, try o.actions_queue.dequeue());
@@ -190,7 +190,7 @@ test "Layers - complex switch" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Expect B tapped
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -252,7 +252,7 @@ test "Layers - ensure correct release key" {
     // Release E
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -310,7 +310,7 @@ test "Layers - multiple layers case 1" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -374,7 +374,7 @@ test "Layers - multiple layers case 2" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Press B expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = b }, try o.actions_queue.dequeue());
@@ -411,7 +411,7 @@ test "MO - invalid layer id" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());

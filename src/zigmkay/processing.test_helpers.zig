@@ -24,12 +24,21 @@ pub fn init_test_full(
         const Self = @This();
         matrix_change_queue: zigmkay.core.MatrixStateChangeQueue = zigmkay.core.MatrixStateChangeQueue.Create(),
         actions_queue: zigmkay.core.OutputCommandQueue = zigmkay.core.OutputCommandQueue.Create(),
-        processor: ProcessorType = ProcessorType{},
+        _inner_processor: ?ProcessorType = null,
         pub fn press_key(self: *Self, key_index: zigmkay.core.KeyIndex, time: core.TimeSinceBoot) !void {
+            if (self._inner_processor == null)
+                self._inner_processor = ProcessorType{};
             try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = true, .key_index = key_index });
         }
         pub fn release_key(self: *Self, key_index: zigmkay.core.KeyIndex, time: core.TimeSinceBoot) !void {
+            if (self._inner_processor == null)
+                self._inner_processor = ProcessorType{};
             try self.matrix_change_queue.enqueue(.{ .time = time, .pressed = false, .key_index = key_index });
+        }
+        pub fn process(self: *Self, time: core.TimeSinceBoot) !void {
+            if (self._inner_processor == null)
+                self._inner_processor = ProcessorType{};
+            try self._inner_processor.?.Process(&self.matrix_change_queue, &self.actions_queue, time);
         }
     };
 }

@@ -44,7 +44,7 @@ test "Rolling - only tap keys" {
     try o.release_key(3, current_time);
     current_time = current_time.add_us(1);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -83,7 +83,7 @@ test "Rolling - tap/hold keys" {
     try o.release_key(2, current_time);
     try o.release_key(3, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -147,7 +147,7 @@ test "Rolling - with sudden shift usage" {
     current_time = current_time.add_us(12);
     try o.release_key(_a, current_time);
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -189,7 +189,7 @@ test "Rolling - with sudden permanent layer shift" {
     current_time = current_time.add_ms(1000); // ensure layer hold tapping term expired
     try o.press_key(1, current_time);
     try o.release_key(1, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect B to be fired as press
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());

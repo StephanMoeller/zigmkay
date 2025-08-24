@@ -42,7 +42,7 @@ test "TRANSPARENT case 1" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Press B expected
     try std.testing.expectEqual(b, (try o.actions_queue.dequeue()).KeyCodePress);
@@ -73,7 +73,7 @@ test "TRANSPARENT case 2" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Press A expected
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
@@ -105,7 +105,7 @@ test "TRANSPARENT case 3" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());
@@ -127,7 +127,7 @@ test "NONE key" {
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 });
     try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 });
 
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // Expect no more actions
     try std.testing.expectEqual(0, o.matrix_change_queue.Count());

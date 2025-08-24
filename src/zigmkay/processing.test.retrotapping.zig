@@ -60,7 +60,7 @@ fn run_retrotest_test(comptime config: RetroTestParameters) !void {
     // Now ensure that a tap will happen when releasing within tapping term
     current_time = current_time.add_ms(config.release_delta_time_ms); // within tapping term
     try o.release_key(0, current_time);
-    try o.processor.Process(&o.matrix_change_queue, &o.actions_queue, current_time);
+    try o.process(current_time);
 
     // expect A pressed as no layer switch is expected
     switch (config.expectation) {
