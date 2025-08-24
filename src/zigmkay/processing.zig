@@ -22,7 +22,8 @@ pub fn CreateProcessorType(
         next_autofire_trigger_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0),
         current_action_id: u64 = 0,
 
-        one_shot_hold: ?core.KeyDef = null,
+        one_shot_hold_to_enable_before_next_tap: ?core.HoldDef = null,
+        one_shot_hold_to_disable_after_next_release: ?core.HoldDef = null,
 
         pub fn Process(self: *Self, current_time: core.TimeSinceBoot) !void {
             _ = self.stats.register_tick(current_time);
@@ -146,8 +147,10 @@ pub fn CreateProcessorType(
                     },
                 }
 
-                // If anything was released, check if one_shot should be disabled again
-                //if(head_event.key_index == self.one
+                if (self.one_shot_hold_to_disable_after_next_release) |hold| {
+                    try hold_remove_modifiers_and_layers(self, hold);
+                    self.one_shot_hold_to_disable_after_next_release = null;
+                }
 
                 return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = 1 } }; // always only consuming one key release at at time
             }
@@ -207,11 +210,11 @@ pub fn CreateProcessorType(
         }
         fn on_tap_decided(self: *Self, tap: core.TapDef, event: core.MatrixStateChange, release_mode: TapReleaseMode) !void {
             on_event(self, .{ .OnTapEnterBefore = .{ .tap = tap } });
-            // features:
-            //      modifiers must be changeable
-            //      layers must be changeable
-            //      firing key_presses and key_releases should be possible
-            //      running code on ticks
+            if (self.one_shot_hold_to_enable_before_next_tap) |hold| {
+                try hold_apply_modifiers_and_layers(self, hold);
+                self.one_shot_hold_to_disable_after_next_release = self.one_shot_hold_to_enable_before_next_tap;
+                self.one_shot_hold_to_enable_before_next_tap = null;
+            }
             switch (tap) {
                 .key_press => |keycode_fire| {
                     try enter_tap(self, keycode_fire);
@@ -231,8 +234,7 @@ pub fn CreateProcessorType(
                     }
                 },
                 .one_shot => |one_shot_hold| {
-                    try hold_apply_modifiers_and_layers(self, one_shot_hold);
-                    // self.one_shot_hold = one_shot_hold;
+                    self.one_shot_hold_to_enable_before_next_tap = one_shot_hold;
                 },
             }
 
