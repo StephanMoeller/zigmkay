@@ -1,7 +1,7 @@
-const dk = @import("../../../keycodes/dk.zig");
-const us = @import("../../../keycodes/us.zig");
+const dk = @import("../../keycodes/dk.zig");
+const us = @import("../../keycodes/us.zig");
 const std = @import("std");
-const core = @import("../../../zigmkay/core.zig");
+const core = @import("../../zigmkay/core.zig");
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 

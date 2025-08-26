@@ -1,5 +1,5 @@
-const zigmkay = @import("../../../zigmkay/zigmkay.zig");
-const dk = @import("../../../keycodes/dk.zig");
+const zigmkay = @import("../../zigmkay/zigmkay.zig");
+const dk = @import("../../keycodes/dk.zig");
 
 const core = zigmkay.core;
 const std = @import("std");
