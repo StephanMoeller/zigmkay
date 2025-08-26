@@ -48,7 +48,7 @@ pub const keymap = [_][key_count]core.KeyDef{
                                  LT(2, us.ENTER),                LT(1, us.SPACE)
     },
     .{ 
-     one_shot_shift,   T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),    _______,
+     one_shot_shift,   T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),    T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(us.TAB),  T(dk.DQUO),    T(us.ESC),
                                                    LT(2, us.SPACE),             _______
