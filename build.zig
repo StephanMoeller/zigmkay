@@ -41,6 +41,7 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/generic_queue.test.zig",
         "src/zigmkay/processing.test.boot_key.zig",
         "src/zigmkay/processing.test.known_bugs.zig",
+        "src/zigmkay/grazkb.test.zig",
     };
 
     const test_step = b.step("test", "Run unit tests");

@@ -46,6 +46,8 @@ pub const pin_mappings = [key_count][2]usize{
 
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
+
+// zig fmt: off
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     t(us.KC_GRAVE), t(us.KC_1),  t(us.KC_2),  t(us.KC_3),  t(us.KC_4),  t(us.KC_5),                        t(us.KC_6),       t(us.KC_7),      t(us.KC_8),       t(us.KC_9),       t(us.KC_0),       t(us.KC_MINUS),
