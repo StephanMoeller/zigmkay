@@ -98,7 +98,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 17, 18 }, 1, dk.PLUS),
     Combo_Tap(.{ 16, 17 }, 1, dk.PIPE),
 
-    Combo_Tap(.{ 20, 21 }, 0, dk.BSLS),
+    Combo_Tap(.{ 20, 21 }, 1, dk.BSLS),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
