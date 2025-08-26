@@ -49,6 +49,7 @@ pub const M = core.KeyCodeFire{ .tap_keycode = us.KC_M }; // M
 pub const COMMA = core.KeyCodeFire{ .tap_keycode = us.KC_COMMA }; // ,
 pub const DOT = core.KeyCodeFire{ .tap_keycode = us.KC_DOT }; // .
 pub const MINS = core.KeyCodeFire{ .tap_keycode = us.KC_SLASH }; // -
+pub const APP = us.APPLICATION; // -
 //
 pub const SECT = core.KeyCodeFire{ .tap_keycode = us.KC_GRAVE, .tap_modifiers = .{ .left_shift = true } }; // §
 pub const EXLM = core.KeyCodeFire{ .tap_keycode = us.KC_1, .tap_modifiers = .{ .left_shift = true } }; // !
