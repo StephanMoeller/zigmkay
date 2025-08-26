@@ -3,7 +3,7 @@ const dk = @import("../../keycodes/dk.zig");
 
 const core = zigmkay.core;
 const std = @import("std");
-const my_zilpzapl_keyboard = @import("keymap.zig");
+const mike_typeson = @import("keymap.zig");
 const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
 
@@ -13,14 +13,14 @@ pub fn main() !void {
     var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
-    my_zilpzapl_keyboard.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+    mike_typeson.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
 
     // Matrix scanning
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-        my_zilpzapl_keyboard.dimensions,
-        my_zilpzapl_keyboard.pin_cols[0..],
-        my_zilpzapl_keyboard.pin_rows[0..],
-        my_zilpzapl_keyboard.pin_mappings,
+        mike_typeson.dimensions,
+        mike_typeson.pin_cols[0..],
+        mike_typeson.pin_rows[0..],
+        mike_typeson.pin_mappings,
         .{ .debounce = .{ .ms = 25 } },
     ){};
 
@@ -29,10 +29,10 @@ pub fn main() !void {
 
     // Processing
     var processor = zigmkay.processing.CreateProcessorType(
-        my_zilpzapl_keyboard.dimensions,
-        &my_zilpzapl_keyboard.keymap,
-        my_zilpzapl_keyboard.combos[0..],
-        &my_zilpzapl_keyboard.custom_functions,
+        mike_typeson.dimensions,
+        &mike_typeson.keymap,
+        mike_typeson.combos[0..],
+        &mike_typeson.custom_functions,
     ){
         .input_matrix_changes = &matrix_change_queue,
         .output_usb_commands = &usb_command_queue,
