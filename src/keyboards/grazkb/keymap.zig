@@ -6,10 +6,6 @@ const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 
 pub const pin_config = rp2xxx.pins.GlobalConfiguration{
-    .GPIO17 = .{ .name = "led_red", .direction = .out },
-    .GPIO16 = .{ .name = "led_green", .direction = .out },
-    .GPIO25 = .{ .name = "led_blue", .direction = .out },
-
     .GPIO28 = .{ .name = "r0", .direction = .in },
     .GPIO27 = .{ .name = "r1", .direction = .in },
     .GPIO26 = .{ .name = "r2", .direction = .in },
