@@ -5,8 +5,6 @@ const core = @import("../../zigmkay/core.zig");
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 
-pub const key_count = 58;
-
 pub const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO17 = .{ .name = "led_red", .direction = .out },
     .GPIO16 = .{ .name = "led_green", .direction = .out },
@@ -34,6 +32,7 @@ pub const p = pin_config.pins();
 pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.c0, p.c1, p.c2, p.c3, p.c4, p.c5 };
 pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5, p.r6, p.r7, p.r8, p.r9 };
 
+pub const key_count = 58;
 // zig fmt: off
 pub const pin_mappings = [key_count][2]usize{
 
