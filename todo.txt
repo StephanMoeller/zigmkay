@@ -1,1 +1,4 @@
-make keyDef nullable and change all transparent behaviour to be nullable instead
+make it a module
+make documentation
+split support
+import keycodes from qmk
