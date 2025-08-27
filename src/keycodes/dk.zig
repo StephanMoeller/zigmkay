@@ -63,8 +63,8 @@ pub const LPRN = core.KeyCodeFire{ .tap_keycode = us.KC_8, .tap_modifiers = .{ .
 pub const RPRN = core.KeyCodeFire{ .tap_keycode = us.KC_9, .tap_modifiers = .{ .left_shift = true } }; // )
 pub const EQL = core.KeyCodeFire{ .tap_keycode = us.KC_0, .tap_modifiers = .{ .left_shift = true } }; // =
 pub const QUES = core.KeyCodeFire{ .tap_keycode = us.KC_MINUS, .tap_modifiers = .{ .left_shift = true } }; // ?
-pub const GRV = core.KeyCodeFire{ .tap_keycode = us.KC_EQUAL, .tap_modifiers = .{ .left_shift = true } }; // ` (dead)
-pub const CIRC = core.KeyCodeFire{ .tap_keycode = us.KC_RBRC, .tap_modifiers = .{ .left_shift = true } }; // ^ (dead)
+pub const GRV = core.KeyCodeFire{ .tap_keycode = us.KC_EQUAL, .dead = true, .tap_modifiers = .{ .left_shift = true } }; // ` (dead)
+pub const CIRC = core.KeyCodeFire{ .tap_keycode = us.KC_RIGHT_BRACKET, .dead = true, .tap_modifiers = .{ .left_shift = true } }; // ^ (dead)
 pub const ASTR = core.KeyCodeFire{ .tap_keycode = us.KC_NONUS_HASH, .tap_modifiers = .{ .left_shift = true } }; // *
 pub const RABK = core.KeyCodeFire{ .tap_keycode = us.NUBS.tap_keycode, .tap_modifiers = .{ .left_shift = true } }; // >
 pub const SCLN = core.KeyCodeFire{ .tap_keycode = us.KC_COMMA, .tap_modifiers = .{ .left_shift = true } }; // ;
@@ -79,7 +79,7 @@ pub const LBRC = core.KeyCodeFire{ .tap_keycode = us.KC_8, .tap_modifiers = .{ .
 pub const RBRC = core.KeyCodeFire{ .tap_keycode = us.KC_9, .tap_modifiers = .{ .right_alt = true } }; // ]
 pub const RCBR = core.KeyCodeFire{ .tap_keycode = us.KC_0, .tap_modifiers = .{ .right_alt = true } }; // }
 pub const PIPE = core.KeyCodeFire{ .tap_keycode = us.KC_EQUAL, .tap_modifiers = .{ .right_alt = true } }; // |
-pub const TILD = core.KeyCodeFire{ .tap_keycode = us.KC_RIGHT_BRACKET, .tap_modifiers = .{ .right_alt = true } }; // ~ (dead)
+pub const TILD = core.KeyCodeFire{ .tap_keycode = us.KC_RIGHT_BRACKET, .dead = true, .tap_modifiers = .{ .right_alt = true } }; // ~ (dead)
 pub const BSLS = core.KeyCodeFire{ .tap_keycode = us.KC_NONUS_BACKSLASH, .tap_modifiers = .{ .right_alt = true } }; // (backslash)
 pub const MICR = core.KeyCodeFire{ .tap_keycode = us.M, .tap_modifiers = .{ .right_alt = true } }; // µ
 //LABK#define DK_MICR ALGR(DK_M)    // µ

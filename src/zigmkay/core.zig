@@ -12,6 +12,7 @@ pub const KeymapDimensions = struct {
 pub const KeyCodeFire = struct {
     tap_keycode: u8 = 0,
     tap_modifiers: ?Modifiers = null,
+    dead: bool = false,
 };
 pub const TapDef = union(enum) {
     key_press: KeyCodeFire,

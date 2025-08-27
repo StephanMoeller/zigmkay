@@ -47,3 +47,7 @@ test "Struct size: AutoFireDef" {
     try std.testing.expectEqual(10, @sizeOf(core.AutoFireDef));
     try std.testing.expectEqual(2, @alignOf(core.AutoFireDef));
 }
+test "Struct size: KeyCodeFire" {
+    try std.testing.expectEqual(4, @sizeOf(core.KeyCodeFire));
+    try std.testing.expectEqual(1, @alignOf(core.KeyCodeFire));
+}

@@ -1,4 +1,4 @@
-const other_main = @import("keyboards/grazkb/main.zig");
+const other_main = @import("keyboards/miketypeson/main.zig");
 
 pub fn main() !void {
     try other_main.main();
