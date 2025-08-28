@@ -13,6 +13,27 @@ Follow these instructions: https://ziglang.org/learn/getting-started/ - The obje
 
 3. Contact me on the discord "microzig" for a personal guide to get you up and running. :) 
  
+# Getting started
+- Copy an existing keyboard folder. For this walk through, we will copy the zilpzapl keyboard folder and call it "cool_board".
+- In the outer most main.zig, the one that is located directly at the root of the src folder, change the content to this:
+
+```c
+pub fn main() !void {
+    try @import("keyboards/cool_board/main.zig").main();
+}
+```
+
+- Open a terminal at the root folder (the parent folder of the src folder) and run the follow command:
+```bash
+zig build
+```
+
+If you don't encounter any build errors, nothing will be outputted in the terminal.
+
+Now you can find a .uf2 file in zig-out/firmware/zigmkay.uf2
+
+Now flash this file to your keyboard.
+
 # Introduction to using ZigMKay
 A keymap consists of N number of layers each with M number of keys. It is defined as [N][M]KeyDef. 
 

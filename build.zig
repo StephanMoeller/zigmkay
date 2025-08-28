@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) void {
     const mb = MicroBuild.init(b, mz_dep) orelse return;
 
     const firmware = mb.add_firmware(.{
-        .name = "blinky",
+        .name = "zigmkay",
         .target = mb.ports.rp2xxx.boards.raspberrypi.pico,
         .optimize = .ReleaseSafe,
         .root_source_file = b.path("src/main.zig"),
