@@ -1,4 +1,1 @@
-make it a module
-make documentation
-split support
-import keycodes from qmk
+

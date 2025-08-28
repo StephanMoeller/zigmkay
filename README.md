@@ -150,12 +150,11 @@ I was curious to what it would take to do this and then there was some things th
 - rgb: I don't need rgb support myself - however, it could be rather fun to explore good ways this could be supported so this might be a thing in the future - but no promisses
 
 # TODOs
-- (in progress) Matrix scanner should sort array at comptime by either row or cols depending on the direction of the current and keep track of the key position indexes
-- Make a getting-started guide to follow here in the readme
-- More tests for custom code support
-- Trrs support
-- Look into performance 
 - 3 key combos (maybe)
+- make it a module
+- make documentation
+- split support
+- import keycodes from qmk
 
 # Found a bug or want to contribute?
 - Please let me know. You can write me here in the repo or contact me on the "zig" or the "microzig" discord servers. My username is "Rollercole".
