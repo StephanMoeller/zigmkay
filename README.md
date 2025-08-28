@@ -34,6 +34,9 @@ Now you can find a .uf2 file in zig-out/firmware/zigmkay.uf2
 
 Now flash this file to your keyboard.
 
+# Editing your keymap
+Typically you will only need to edit the keymap.zig file. This will contain your keymap with combos and custom code, and your pin mappings which you only need to alter if the board you use is different from what the copied keyboard was made for.
+
 # Introduction to using ZigMKay
 A keymap consists of N number of layers each with M number of keys. It is defined as [N][M]KeyDef. 
 
