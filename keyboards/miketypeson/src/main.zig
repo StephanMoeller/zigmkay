@@ -4,7 +4,7 @@ const dk = @import("keycodes/dk.zig");
 const core = zigmkay.core;
 const std = @import("std");
 const mike_typeson = @import("keymap.zig");
-const rp2xxx = @import("microzig").hal;
+const rp2xxx = zigmkay.microzig.hal;
 const time = rp2xxx.time;
 
 pub fn main() !void {
