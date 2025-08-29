@@ -1,0 +1,20 @@
+.{
+    .name = .dev,
+    .version = "0.0.0",
+    .fingerprint = 0x1173f105b0d6c8d5,
+    .minimum_zig_version = "0.14.1",
+    .dependencies = .{
+        .zigmkay = .{
+            .path = "../..",
+        },
+        .microzig = .{
+            .url = "git+https://github.com/ZigEmbeddedGroup/microzig#d9031ddf98d3f05e64d524b22497d92ad733981f",
+            .hash = "microzig-0.14.1-D20YSYrJ1gDVmMQx6ecf1AowMwuVQioXf1UYB33XtWU9",
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}
