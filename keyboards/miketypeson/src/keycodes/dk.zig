@@ -1,5 +1,5 @@
 // These keycodes are copied from the qmk project under the gpl2 license
-const core = @import("../zigmkay/zigmkay.zig").core;
+const core = @import("zigmkay").core;
 const us = @import("us.zig");
 pub const HALF = core.KeyCodeFire{ .tap_keycode = us.KC_GRAVE }; // ½
 pub const N1 = core.KeyCodeFire{ .tap_keycode = us.KC_1 }; // 1

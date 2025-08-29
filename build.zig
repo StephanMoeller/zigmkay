@@ -3,7 +3,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     _ = b.addModule("zigmkay", .{
-        .root_source_file = b.path("src/zigmkay.zig"),
+        .root_source_file = b.path("src/zigmkay/zigmkay.zig"),
         .target = target,
         .optimize = optimize,
     });
