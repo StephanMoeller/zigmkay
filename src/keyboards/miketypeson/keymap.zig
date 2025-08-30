@@ -42,16 +42,16 @@ const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-    T(dk.Q),  T(dk.W), GUI(dk.R),   T(dk.P),   T(dk.B),      T(dk.K),   T(dk.L), GUI(dk.O),     T(dk.U),       T(dk.QUOT),
-    T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),      T(dk.M), SFT(dk.N), CTL(dk.E),     ALT(dk.I),     T(dk.Y),
-               T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),    _______,   T(dk.H),   T(dk.COMMA), LT(4, dk.DOT),
-                                 LT(2, us.ENTER),                LT(1, us.SPACE)
+    T(dk.Q),  T(dk.W), GUI(dk.R),   T(dk.P),   T(dk.B),          T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+    T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
+               T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),          _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
+                                       LT(2, us.ENTER),   LT(1, us.SPACE)
     },
     .{ 
-    _______,   T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),      T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),    T(dk.APP),
+    _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),    T(us.ESC),
-                                                   LT(2, us.SPACE),             _______
+                                                   LT(2, us.SPACE),                _______
     }, 
     .{ 
     _______, _______, _______, _______, _______,             _______,   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
@@ -61,9 +61,9 @@ pub const keymap = [_][key_count]core.KeyDef{
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
-    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS), _______,
-                  T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),               T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
-                                        _______,             T(dk.N0)
+    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),  _______,
+                  T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
+                                                      _______,              T(dk.N0)
     },
     .{ 
     WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
