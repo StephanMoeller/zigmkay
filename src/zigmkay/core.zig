@@ -21,6 +21,7 @@ pub const TapDef = union(enum) {
 pub const HoldDef = struct {
     hold_modifiers: ?Modifiers = null,
     hold_layer: ?LayerIndex = null,
+    custom: ?u8 = null,
 };
 
 pub const TapHoldDef = struct {

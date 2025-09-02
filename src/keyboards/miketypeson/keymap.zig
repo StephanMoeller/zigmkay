@@ -43,24 +43,24 @@ const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     T(dk.Q),  T(dk.W), GUI(dk.R),   T(dk.P),   T(dk.B),          T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
-    T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
+    T(dk.F), ALT(dk.A), CTL(dk.S), LT(2,dk.T),  T(dk.G),          T(dk.M), T(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
                T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),          _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
-                                       LT(2, us.ENTER),   LT(1, us.SPACE)
+                                   LEFT_THUMB_W_SHIFT_KEY,   RIGHT_THUMB_KEY
     },
     .{ 
     _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),    T(us.ESC),
-                                                   LT(2, us.SPACE),                _______
+                                    LEFT_THUMB_W_SPACE_KEY,                RIGHT_THUMB_KEY
     }, 
     .{ 
     _______, _______, _______, _______, _______,             _______,   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
-    _______, _______, _______, _______, _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
+    _______, _______, _______, _______, _______,             T(dk.N0), T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
              _______, _______, _______, _______,             _______,   T(dk.N1), T(dk.N2), T(dk.N3),
-                            _______,                         LT(1, dk.N0)
+                            _______,                         T(us.SPACE)
     },
     .{  
-    PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
+    PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.ENTER), T(us.ENTER), T(us.ENTER), T(dk.GRV),
     T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),  _______,
                   T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
                                                       _______,              T(dk.N0)
@@ -73,6 +73,37 @@ pub const keymap = [_][key_count]core.KeyDef{
    },
 };
 // zig fmt: on
+pub const LEFT_THUMB_W_SHIFT_KEY = core.KeyDef{
+    .tap_hold = .{
+        .tap = .{
+            .one_shot = .{
+                .hold_modifiers = .{ .left_shift = true },
+            },
+        },
+        .hold = .{ .custom = LEFT_THUMB },
+        .tapping_term = tapping_term,
+    },
+};
+pub const LEFT_THUMB_W_SPACE_KEY = core.KeyDef{
+    .tap_hold = .{
+        .tap = .{
+            .key_press = .{ .tap_keycode = us.KC_SPACE },
+        },
+        .hold = .{ .custom = LEFT_THUMB },
+        .tapping_term = tapping_term,
+    },
+};
+pub const RIGHT_THUMB_KEY = core.KeyDef{
+    .tap_hold = .{
+        .tap = .{
+            .key_press = .{ .tap_keycode = us.KC_SPACE },
+        },
+        .hold = .{ .custom = RIGHT_THUMB },
+        .tapping_term = tapping_term,
+    },
+};
+const LEFT_THUMB = 1;
+const RIGHT_THUMB = 2;
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
 const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
 const tapping_term = core.TimeSpan{ .ms = 250 };
@@ -188,15 +219,39 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     };
 }
 
+var left_down = false;
+var right_down = false;
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
         .OnHoldEnterAfter => |data| {
-            _ = data;
-            layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
+            if (data.hold.custom) |custom_val| {
+                if (custom_val == RIGHT_THUMB) {
+                    right_down = true;
+                }
+                if (custom_val == LEFT_THUMB) {
+                    left_down = true;
+                }
+                var mods = output_queue.get_current_modifiers();
+                mods.left_shift = left_down and !right_down;
+                output_queue.set_mods(mods) catch {};
+                layers.set_layer_state(3, left_down and right_down);
+                layers.set_layer_state(1, !left_down and right_down);
+            }
         },
         .OnHoldExitAfter => |data| {
-            _ = data;
-            layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
+            if (data.hold.custom) |custom_val| {
+                if (custom_val == RIGHT_THUMB) {
+                    right_down = false;
+                }
+                if (custom_val == LEFT_THUMB) {
+                    left_down = false;
+                }
+                var mods = output_queue.get_current_modifiers();
+                mods.left_shift = left_down and !right_down;
+                output_queue.set_mods(mods) catch {};
+                layers.set_layer_state(3, left_down and right_down);
+                layers.set_layer_state(1, !left_down and right_down);
+            }
         },
         .OnTapExitAfter => |data| {
             switch (data.tap) {
