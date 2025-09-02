@@ -40,6 +40,12 @@ pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5 };
 
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
+
+const LAYER_BASE:usize = 0;
+const LAYER_ARROWS:usize = 1;
+const LAYER_NUMBERS:usize = 2;
+const LAYER_BOTH:usize = 3;
+
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     T(dk.Q),   T(dk.W), LT(2, dk.R),   T(dk.P),   T(dk.B),       T(dk.K),   T(dk.L),     T(dk.O),       T(dk.U), T(dk.QUOT),
@@ -94,28 +100,31 @@ const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us
 const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
-    Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
+    Combo_Tap(.{ 1, 2 }, LAYER_BASE, dk.J),
+    Combo_Tap_HoldMod(.{ 11, 12 }, LAYER_BASE, dk.Z, .{ .right_ctrl = true }),
 
-    Combo_Tap(.{ 1, 2 }, 0, dk.J),
-    Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .right_ctrl = true }),
-
-    Combo_Tap_HoldMod(.{ 12, 13 }, 0, dk.V, .{ .left_ctrl = true, .left_shift = true }),
-    Combo_Tap_HoldMod(.{ 12, 13 }, 1, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, LAYER_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, LAYER_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
-    Combo_Tap(.{ 23, 24 }, 0, us.BOOT),
-    Combo_Tap(.{ 6, 7 }, 0, dk.AE),
-    Combo_Tap(.{ 6, 8 }, 0, dk.OE),
+    Combo_Tap(.{ 23, 24 }, LAYER_BASE, us.BOOT),
+    Combo_Tap(.{ 6, 7 }, LAYER_BASE, dk.AE),
+    Combo_Tap(.{ 6, 8 }, LAYER_BASE, dk.OE),
 
-    Combo_Tap(.{ 7, 8 }, 0, dk.AA),
+    Combo_Tap(.{ 7, 8 }, LAYER_BASE, dk.AA),
 
-    Combo_Tap(.{ 7, 8 }, 1, dk.QUES),
-    Combo_Tap_HoldMod(.{ 17, 18 }, 0, dk.MINS, .{ .left_ctrl = true, .left_alt = true }),
-    Combo_Tap(.{ 17, 18 }, 1, dk.PLUS),
-    Combo_Tap(.{ 16, 17 }, 1, dk.PIPE),
+    Combo_Tap(.{ 7, 8 }, LAYER_ARROWS, dk.QUES),
+    Combo_Tap(.{ 7, 8 }, LAYER_BOTH, dk.QUES),
 
-    Combo_Tap(.{ 20, 21 }, 1, dk.BSLS),
+    Combo_Tap(.{ 1, 2 }, LAYER_ARROWS, dk.EXLM),
+    Combo_Tap(.{ 1, 2 }, LAYER_BOTH, dk.EXLM),
+
+    Combo_Tap_HoldMod(.{ 17, 18 }, LAYER_BASE, dk.MINS, .{ .left_ctrl = true, .left_alt = true }),
+    Combo_Tap(.{ 17, 18 }, LAYER_ARROWS, dk.PLUS),
+    Combo_Tap(.{ 16, 17 }, LAYER_ARROWS, dk.PIPE),
+
+    Combo_Tap(.{ 20, 21 }, LAYER_ARROWS, dk.BSLS),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined

@@ -17,7 +17,7 @@ pub const UsbCommandExecutor = struct {
     var data: [7]u8 = [7]u8{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     var prev_action_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(0);
 
-    const next_tick_delay: u64 = 20000;
+    const next_tick_delay: u64 = 10000;
     pub fn HouseKeepAndProcessCommands(self: *const UsbCommandExecutor, output_command_queue: *core.OutputCommandQueue, current_time: core.TimeSinceBoot) !void {
         _ = self;
 
