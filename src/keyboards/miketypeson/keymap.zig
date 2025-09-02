@@ -42,10 +42,10 @@ const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-    T(dk.Q), GUI(dk.W), LT(2, dk.R),   T(dk.P),   T(dk.B),          T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+    T(dk.Q),   T(dk.W), LT(2, dk.R),   T(dk.P),   T(dk.B),       T(dk.K),   T(dk.L),     T(dk.O),       T(dk.U), T(dk.QUOT),
     T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-               T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),          _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
-                                   C(us.ENTER, LEFT_THUMB),   C(us.SPACE, RIGHT_THUMB)
+               T(dk.X),   T(dk.C), GUI(dk.D),  T(dk.V),          _______, GUI(dk.H), T(dk.COMMA), LT(4, dk.DOT),
+                                   C(us.ENTER, LEFT_THUMB),   C(us.SPACE, RIGHT_THUMB) 
     },
     .{ 
     _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
@@ -57,7 +57,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     _______, _______, _______, _______, _______,             _______,   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
     _______, _______, _______, _______, _______,             T(dk.N0), T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
              _______, _______, _______, _______,             _______,   T(dk.N1), T(dk.N2), T(dk.N3),
-                            _______,                         C(dk.N0, RIGHT_THUMB)
+                                        _______,             C(dk.N0, RIGHT_THUMB)
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.ENTER), T(us.ENTER), T(us.ENTER), T(dk.GRV),
@@ -75,7 +75,10 @@ pub const keymap = [_][key_count]core.KeyDef{
 // zig fmt: on
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
-
+fn _G(keycode: u8) core.KeyCodeFire {
+    const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_shift = true } };
+    return fire;
+}
 fn C(key_press: core.KeyCodeFire, custom_hold: u8) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
@@ -92,11 +95,6 @@ const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
-
-    Combo_Tap(.{ 2, 3 }, 0, us.ENTER),
-    Combo_Tap(.{ 2, 3 }, 1, us.ENTER),
-    Combo_Tap(.{ 2, 3 }, 2, us.ENTER),
-    Combo_Tap(.{ 2, 3 }, 3, us.ENTER),
 
     Combo_Tap(.{ 1, 2 }, 0, dk.J),
     Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .right_ctrl = true }),
@@ -175,7 +173,7 @@ fn GUI(keycode_fire: core.KeyCodeFire) core.KeyDef {
         .tap_hold = .{
             .tap = .{ .key_press = keycode_fire },
             .hold = core.HoldDef{ .hold_modifiers = .{ .left_gui = true } },
-            .tapping_term = tapping_term,
+            .tapping_term = .{ .ms = 750 },
         },
     };
 }
