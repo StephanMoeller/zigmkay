@@ -42,22 +42,22 @@ const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-    T(dk.Q),  T(dk.W), GUI(dk.R),   T(dk.P),   T(dk.B),          T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
-    T(dk.F), ALT(dk.A), CTL(dk.S), LT(2,dk.T),  T(dk.G),          T(dk.M), T(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
+    T(dk.Q), GUI(dk.W), LT(2, dk.R),   T(dk.P),   T(dk.B),          T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+    T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
                T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),          _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
-                                   LEFT_THUMB_W_SHIFT_KEY,   RIGHT_THUMB_KEY
+                                   C(us.ENTER, LEFT_THUMB),   C(us.SPACE, RIGHT_THUMB)
     },
     .{ 
     _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),    T(us.ESC),
-                                    LEFT_THUMB_W_SPACE_KEY,                RIGHT_THUMB_KEY
+                                    C(us.SPACE, LEFT_THUMB),                C(us.SPACE, RIGHT_THUMB)
     }, 
     .{ 
     _______, _______, _______, _______, _______,             _______,   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
     _______, _______, _______, _______, _______,             T(dk.N0), T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
              _______, _______, _______, _______,             _______,   T(dk.N1), T(dk.N2), T(dk.N3),
-                            _______,                         T(us.SPACE)
+                            _______,                         C(dk.N0, RIGHT_THUMB)
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.ENTER), T(us.ENTER), T(us.ENTER), T(dk.GRV),
@@ -73,43 +73,31 @@ pub const keymap = [_][key_count]core.KeyDef{
    },
 };
 // zig fmt: on
-pub const LEFT_THUMB_W_SHIFT_KEY = core.KeyDef{
-    .tap_hold = .{
-        .tap = .{
-            .one_shot = .{
-                .hold_modifiers = .{ .left_shift = true },
-            },
-        },
-        .hold = .{ .custom = LEFT_THUMB },
-        .tapping_term = tapping_term,
-    },
-};
-pub const LEFT_THUMB_W_SPACE_KEY = core.KeyDef{
-    .tap_hold = .{
-        .tap = .{
-            .key_press = .{ .tap_keycode = us.KC_SPACE },
-        },
-        .hold = .{ .custom = LEFT_THUMB },
-        .tapping_term = tapping_term,
-    },
-};
-pub const RIGHT_THUMB_KEY = core.KeyDef{
-    .tap_hold = .{
-        .tap = .{
-            .key_press = .{ .tap_keycode = us.KC_SPACE },
-        },
-        .hold = .{ .custom = RIGHT_THUMB },
-        .tapping_term = tapping_term,
-    },
-};
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
+
+fn C(key_press: core.KeyCodeFire, custom_hold: u8) core.KeyDef {
+    return core.KeyDef{
+        .tap_hold = .{
+            .tap = .{ .key_press = key_press },
+            .hold = .{ .custom = custom_hold },
+            .tapping_term = tapping_term,
+        },
+    };
+}
+
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
 const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
 const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, 1, dk.EXLM),
+
+    Combo_Tap(.{ 2, 3 }, 0, us.ENTER),
+    Combo_Tap(.{ 2, 3 }, 1, us.ENTER),
+    Combo_Tap(.{ 2, 3 }, 2, us.ENTER),
+    Combo_Tap(.{ 2, 3 }, 3, us.ENTER),
+
     Combo_Tap(.{ 1, 2 }, 0, dk.J),
     Combo_Tap_HoldMod(.{ 11, 12 }, 0, dk.Z, .{ .right_ctrl = true }),
 
