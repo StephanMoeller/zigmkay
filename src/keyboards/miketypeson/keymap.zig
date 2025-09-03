@@ -41,17 +41,17 @@ pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5 };
 const NONE = core.KeyDef.none;
 const _______ = core.KeyDef.transparent;
 
-const LAYER_BASE:usize = 0;
-const LAYER_ARROWS:usize = 1;
-const LAYER_NUMBERS:usize = 2;
-const LAYER_BOTH:usize = 3;
+const L_BASE:usize = 0;
+const L_ARROWS:usize = 1;
+const L_NUM:usize = 2;
+const L_BOTH:usize = 3;
 
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-    T(dk.Q),   T(dk.W), LT(2, dk.R),   T(dk.P),   T(dk.B),       T(dk.K),   T(dk.L),     T(dk.O),       T(dk.U), T(dk.QUOT),
-    T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),  T(dk.G),          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-               T(dk.X),   T(dk.C), GUI(dk.D),  T(dk.V),          _______, GUI(dk.H), T(dk.COMMA), LT(4, dk.DOT),
-                                   C(us.ENTER, LEFT_THUMB),   C(us.SPACE, RIGHT_THUMB) 
+         T(dk.Q),  AF(dk.W), GUI(dk.R),  T(dk.P),        AF(dk.B),                  T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),        T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
+                    T(dk.X),   T(dk.C), LT(L_NUM, dk.D),  T(dk.V),                  _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
+                                   C(us.ENTER, LEFT_THUMB),                   C(us.SPACE, RIGHT_THUMB) 
     },
     .{ 
     _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
@@ -66,7 +66,7 @@ pub const keymap = [_][key_count]core.KeyDef{
                                         _______,             C(dk.N0, RIGHT_THUMB)
     },
     .{  
-    PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.ENTER), T(us.ENTER), T(us.ENTER), T(dk.GRV),
+    PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
     T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),  _______,
                   T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
                                                       _______,              T(dk.N0)
@@ -75,7 +75,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
     WinNav(dk.N4), _______, WinNav(dk.N2), WinNav(dk.N5), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
                    _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
-                                                          _______,             LT(1, dk.N0)
+                                                          _______,             _______
    },
 };
 // zig fmt: on
@@ -100,31 +100,31 @@ const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us
 const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 50 };
 pub const combos = [_]core.Combo2Def{
-    Combo_Tap(.{ 1, 2 }, LAYER_BASE, dk.J),
-    Combo_Tap_HoldMod(.{ 11, 12 }, LAYER_BASE, dk.Z, .{ .right_ctrl = true }),
+    Combo_Tap(.{ 1, 2 }, L_BASE, dk.J),
+    Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
 
-    Combo_Tap_HoldMod(.{ 12, 13 }, LAYER_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
-    Combo_Tap_HoldMod(.{ 12, 13 }, LAYER_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, L_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, L_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
-    Combo_Tap(.{ 23, 24 }, LAYER_BASE, us.BOOT),
-    Combo_Tap(.{ 6, 7 }, LAYER_BASE, dk.AE),
-    Combo_Tap(.{ 6, 8 }, LAYER_BASE, dk.OE),
+    Combo_Tap(.{ 23, 24 }, L_BASE, us.BOOT),
+    Combo_Tap(.{ 6, 7 }, L_BASE, dk.AE),
+    Combo_Tap(.{ 6, 8 }, L_BASE, dk.OE),
 
-    Combo_Tap(.{ 7, 8 }, LAYER_BASE, dk.AA),
+    Combo_Tap(.{ 7, 8 }, L_BASE, dk.AA),
 
-    Combo_Tap(.{ 7, 8 }, LAYER_ARROWS, dk.QUES),
-    Combo_Tap(.{ 7, 8 }, LAYER_BOTH, dk.QUES),
+    Combo_Tap(.{ 7, 8 }, L_ARROWS, dk.QUES),
+    Combo_Tap(.{ 7, 8 }, L_BOTH, dk.QUES),
 
-    Combo_Tap(.{ 1, 2 }, LAYER_ARROWS, dk.EXLM),
-    Combo_Tap(.{ 1, 2 }, LAYER_BOTH, dk.EXLM),
+    Combo_Tap(.{ 1, 2 }, L_ARROWS, dk.EXLM),
+    Combo_Tap(.{ 1, 2 }, L_BOTH, dk.EXLM),
 
-    Combo_Tap_HoldMod(.{ 17, 18 }, LAYER_BASE, dk.MINS, .{ .left_ctrl = true, .left_alt = true }),
-    Combo_Tap(.{ 17, 18 }, LAYER_ARROWS, dk.PLUS),
-    Combo_Tap(.{ 16, 17 }, LAYER_ARROWS, dk.PIPE),
+    Combo_Tap_HoldMod(.{ 17, 18 }, L_BASE, dk.MINS, .{ .left_ctrl = true, .left_alt = true }),
+    Combo_Tap(.{ 17, 18 }, L_ARROWS, dk.PLUS),
+    Combo_Tap(.{ 16, 17 }, L_ARROWS, dk.PIPE),
 
-    Combo_Tap(.{ 20, 21 }, LAYER_ARROWS, dk.BSLS),
+    Combo_Tap(.{ 20, 21 }, L_ARROWS, dk.BSLS),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
@@ -244,8 +244,8 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
                 var mods = output_queue.get_current_modifiers();
                 mods.left_shift = left_down and !right_down;
                 output_queue.set_mods(mods) catch {};
-                layers.set_layer_state(3, left_down and right_down);
-                layers.set_layer_state(1, !left_down and right_down);
+                layers.set_layer_state(L_BOTH, left_down and right_down);
+                layers.set_layer_state(L_ARROWS, !left_down and right_down);
             }
         },
         .OnTapExitAfter => |data| {
