@@ -113,6 +113,7 @@ pub const combos = [_]core.Combo2Def{
 
     Combo_Tap_HoldMod(.{ 12, 13 }, L_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_NUM, _Ctl(us.KC_V), .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 11, 12 }, L_NUM, _Ctl(us.KC_X), .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
