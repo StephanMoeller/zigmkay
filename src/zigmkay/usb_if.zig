@@ -52,7 +52,7 @@ const usb_config_descriptor = usb.templates.config_descriptor(1, 1, 0, usb_confi
         .alternate_setting = 0,
         .num_endpoints = 1,
         .interface_class = 3,
-        .interface_subclass = 1,
+        .interface_subclass = 0,
         .interface_protocol = 1,
         .interface_s = 5,
     }).serialize() ++
