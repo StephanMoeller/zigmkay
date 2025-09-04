@@ -48,22 +48,24 @@ const L_BOTH:usize = 3;
 
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-         T(dk.Q),  AF(dk.W), GUI(dk.R),  T(dk.P),        AF(dk.B),                  T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.Q),  AF(dk.W), GUI(dk.R),   T(dk.P),        AF(dk.B),                  T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T),        T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-                    T(dk.X),   T(dk.C), LT(L_NUM, dk.D),  T(dk.V),                  _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
-                                   C(us.ENTER, LEFT_THUMB),                   C(us.SPACE, RIGHT_THUMB) 
+                    T(dk.X),   T(dk.C),   T(dk.D),  T(dk.V),                  _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
+                                                LT(L_NUM, us.ENTER),                   LT(L_ARROWS, us.SPACE) 
     },
+    // L_ARROWS
     .{ 
     _______,    T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),    T(us.ESC),
-                                    C(us.SPACE, LEFT_THUMB),                C(us.SPACE, RIGHT_THUMB)
+                                               LT(L_NUM, us.SPACE),                _______
     }, 
+    // L_NUM
     .{ 
     _______, _______, _______, _______, _______,             _______,   T(dk.N7), T(dk.N8), T(dk.N9), _______,         
     _______, _______, _______, _______, _______,             T(dk.N0), T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
              _______, _______, _______, _______,             _______,   T(dk.N1), T(dk.N2), T(dk.N3),
-                                        _______,             C(dk.N0, RIGHT_THUMB)
+                                        _______,             LT(L_ARROWS, dk.N0)
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
@@ -214,39 +216,13 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     };
 }
 
-var left_down = false;
-var right_down = false;
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
-        .OnHoldEnterAfter => |data| {
-            if (data.hold.custom) |custom_val| {
-                if (custom_val == RIGHT_THUMB) {
-                    right_down = true;
-                }
-                if (custom_val == LEFT_THUMB) {
-                    left_down = true;
-                }
-                var mods = output_queue.get_current_modifiers();
-                mods.left_shift = left_down and !right_down;
-                output_queue.set_mods(mods) catch {};
-                layers.set_layer_state(3, left_down and right_down);
-                layers.set_layer_state(1, !left_down and right_down);
-            }
+        .OnHoldEnterAfter => |_| {
+            layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
-        .OnHoldExitAfter => |data| {
-            if (data.hold.custom) |custom_val| {
-                if (custom_val == RIGHT_THUMB) {
-                    right_down = false;
-                }
-                if (custom_val == LEFT_THUMB) {
-                    left_down = false;
-                }
-                var mods = output_queue.get_current_modifiers();
-                mods.left_shift = left_down and !right_down;
-                output_queue.set_mods(mods) catch {};
-                layers.set_layer_state(L_BOTH, left_down and right_down);
-                layers.set_layer_state(L_ARROWS, !left_down and right_down);
-            }
+        .OnHoldExitAfter => |_| {
+            layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapExitAfter => |data| {
             switch (data.tap) {
