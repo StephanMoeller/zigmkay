@@ -62,10 +62,10 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    T(dk.TAB), T(_Ctl(us.KC_Z)), T(_Ctl(us.KC_Y)),   _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
-    _______,      T(dk.COMMA), T(dk.DOT),         T(dk.N0), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
-                 T(us.ESCAPE), T(_Ctl(us.KC_C)), T(us.DEL), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
-                                                            _______,             LT(L_ARROWS, us.SPACE)
+    T(dk.TAB), T(_Ctl(us.KC_Z)), T(_Ctl(us.KC_Y)),   _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), T(dk.TAB),         
+      T(dk.Q),    ALT(dk.COMMA),      CTL(dk.DOT),   T(us.SPACE), _______,             T(dk.N0), SFT(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
+                   T(us.ESCAPE), T(_Ctl(us.KC_C)), T(us.DEL), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                            _______,             LT(L_ARROWS, us.N0)
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
@@ -231,11 +231,27 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapEnterBefore => |tap| {
-            _ = tap;
-            //if (layers.is_layer_active(L_NUM)) {}
+            switch (tap.tap) {
+                .key_press => |keyfire_def| {
+                    if (keyfire_def.tap_keycode == us.KC_TAB and layers.is_layer_active(L_NUM)) {
+                        var mods = output_queue.get_current_modifiers();
+                        mods.left_alt = true;
+                        output_queue.set_mods(mods) catch {};
+
+                        alt_tab_activated = true;
+                    }
+                },
+
+                else => {},
+            }
         },
         .OnHoldExitAfter => |_| {
-            //if (alt_tab_activated) { alt_tab_activated = false; output_queue.remove_mods(.{ .left_alt = true }); }
+            if (alt_tab_activated) {
+                alt_tab_activated = false;
+                var mods = output_queue.get_current_modifiers();
+                mods.left_alt = false;
+                output_queue.set_mods(mods) catch {};
+            }
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapExitAfter => |data| {
