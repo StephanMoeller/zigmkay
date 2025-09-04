@@ -131,22 +131,7 @@ pub const OutputCommandQueue = struct {
         self.current_mods = modifiers;
         try self.queue.enqueue(.{ .ModifiersChanged = modifiers });
     }
-    pub fn add_mods(self: *OutputCommandQueue, modifiers: Modifiers) !void {
-        // todo: test this
-        const before = self.current_mods.toByte();
-        self.current_mods = self.current_mods.add(modifiers);
-        if (self.current_mods.toByte() != before) {
-            try self.queue.enqueue(.{ .ModifiersChanged = modifiers });
-        }
-    }
-    pub fn remove_mods(self: *OutputCommandQueue, modifiers: Modifiers) !void {
-        // todo: test this
-        const before = self.current_mods.toByte();
-        self.current_mods = self.current_mods.remove(modifiers);
-        if (self.current_mods.toByte() != before) {
-            try self.queue.enqueue(.{ .ModifiersChanged = modifiers });
-        }
-    }
+
     pub fn print_string(self: *OutputCommandQueue, string: []u8) !void {
         try string_printing.print_string(string, self);
     }
