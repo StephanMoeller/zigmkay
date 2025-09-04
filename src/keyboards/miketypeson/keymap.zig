@@ -62,10 +62,10 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    _______,     _______,   _______,  _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
-    _______, T(dk.COMMA), T(dk.DOT), T(dk.N0), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
-                 _______,   _______,  _______, _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
-                                         _______,             LT(L_ARROWS, us.SPACE)
+    _______,     _______,          _______,   _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
+    _______, T(dk.COMMA),        T(dk.DOT),  T(dk.N0), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
+        T(_Ctl(us.KC_X)), T(_Ctl(us.KC_C)), T(us.DEL), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                       _______,             LT(L_ARROWS, us.SPACE)
     },
     .{  
     PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
@@ -83,6 +83,12 @@ pub const keymap = [_][key_count]core.KeyDef{
 // zig fmt: on
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
+
+fn _Ctl(keycode: u8) core.KeyCodeFire {
+    const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_ctrl = true } };
+    return fire;
+}
+
 fn _G(keycode: u8) core.KeyCodeFire {
     const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_shift = true } };
     return fire;
@@ -106,6 +112,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
 
     Combo_Tap_HoldMod(.{ 12, 13 }, L_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, L_NUM, _Ctl(us.KC_V), .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
