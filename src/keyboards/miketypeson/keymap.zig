@@ -62,7 +62,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    _______, T(_Ctl(us.KC_Z)), T(_Ctl(us.KC_Y)),   _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
+    T(dk.TAB), T(_Ctl(us.KC_Z)), T(_Ctl(us.KC_Y)),   _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
     _______,      T(dk.COMMA), T(dk.DOT),         T(dk.N0), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
                  T(us.ESCAPE), T(_Ctl(us.KC_C)), T(us.DEL), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
                                                             _______,             LT(L_ARROWS, us.SPACE)
@@ -224,12 +224,18 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     };
 }
 
+var alt_tab_activated = false;
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
         .OnHoldEnterAfter => |_| {
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
+        .OnTapEnterBefore => |tap| {
+            _ = tap;
+            //if (layers.is_layer_active(L_NUM)) {}
+        },
         .OnHoldExitAfter => |_| {
+            //if (alt_tab_activated) { alt_tab_activated = false; output_queue.remove_mods(.{ .left_alt = true }); }
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapExitAfter => |data| {
