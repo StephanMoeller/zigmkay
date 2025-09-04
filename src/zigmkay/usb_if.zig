@@ -54,7 +54,7 @@ const usb_config_descriptor = usb.templates.config_descriptor(1, 1, 0, usb_confi
         .interface_class = 3,
         .interface_subclass = 0,
         .interface_protocol = 1,
-        .interface_s = 5,
+        .interface_s = 4,
     }).serialize() ++
     (hid.HidDescriptor{
         .bcd_hid = 0x0111,
@@ -90,7 +90,7 @@ pub var DEVICE_CONFIGURATION: usb.DeviceConfiguration = .{
         .vendor = 0xFAFA,
         .product = 0x00F0,
         .bcd_device = 0x0100,
-        // Those are indices to the descriptor strings
+        // Those are indices to the descriptor strings (starting from 1)
         // Make sure to provide enough string descriptors!
         .manufacturer_s = 1,
         .product_s = 2,
@@ -100,11 +100,10 @@ pub var DEVICE_CONFIGURATION: usb.DeviceConfiguration = .{
     .config_descriptor = &usb_config_descriptor,
     .lang_descriptor = "\x04\x03\x09\x04", // length || string descriptor (0x03) || Engl (0x0409)
     .descriptor_strings = &.{
+        &usb.utils.utf8_to_utf16_le("Stephan Møller"),
         &usb.utils.utf8_to_utf16_le("ZigMkay"),
+        &usb.utils.utf8_to_utf16_le("00000001"),
         &usb.utils.utf8_to_utf16_le("Keyboard"),
-        &usb.utils.utf8_to_utf16_le("Keyboard"),
-        &usb.utils.utf8_to_utf16_le("Accelerometer"),
-        &usb.utils.utf8_to_utf16_le("Flippers"),
     },
     .drivers = &drivers,
 };
