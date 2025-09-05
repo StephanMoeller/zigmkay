@@ -57,13 +57,13 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     _______,  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),      _______,
     T(us.ESC), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
-                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   NONE,  T(dk.DQUO),      T(us.ESC),
+                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),      T(us.ESC),
                                                LT(L_NUM, us.SPACE),                _______
     }, 
     // L_NUM
     .{ 
     _______,  TAB_PREV,           TAB,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), KILL_APP,
-    _______,      REDO,          UNDO,  T(dk.TAB), _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
+    _______,      REDO,          UNDO,  _______, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
                _______, T(_Ctl(dk.C)),T(us.DEL),   _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
                                                    _______,             LT(L_ARROWS, us.N0)
     },
@@ -248,19 +248,15 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
         .OnHoldEnterAfter => |_| {
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
-        .OnTapEnterBefore => |tap| {
-            switch (tap.tap) {
-                .key_press => |keyfire_def| {
-                    if (keyfire_def.tap_keycode == us.KC_TAB and layers.is_layer_active(L_NUM)) {
-                        var mods = output_queue.get_current_modifiers();
-                        mods.left_alt = true;
-                        output_queue.set_mods(mods) catch {};
+        .OnTapEnterBefore => |data| {
+            if (data.tap.key_press) |keyfire_def| {
+                if (keyfire_def.tap_keycode == us.KC_TAB and layers.is_layer_active(L_NUM)) {
+                    var mods = output_queue.get_current_modifiers();
+                    mods.left_alt = true;
+                    output_queue.set_mods(mods) catch {};
 
-                        alt_tab_activated = true;
-                    }
-                },
-
-                else => {},
+                    alt_tab_activated = true;
+                }
             }
         },
         .OnHoldExitAfter => |_| {
@@ -273,13 +269,10 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapExitAfter => |data| {
-            switch (data.tap) {
-                .key_press => |key_fire| {
-                    if (key_fire.dead) {
-                        output_queue.tap_key(us.SPACE) catch {};
-                    }
-                },
-                else => {},
+            if (data.tap.key_press) |key_fire| {
+                if (key_fire.dead) {
+                    output_queue.tap_key(us.SPACE) catch {};
+                }
             }
         },
         else => {},
