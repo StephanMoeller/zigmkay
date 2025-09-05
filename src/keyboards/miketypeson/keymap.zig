@@ -169,7 +169,7 @@ fn AF(keycode_fire: core.KeyCodeFire) core.KeyDef {
         .tap_with_autofire = .{
             .tap = .{ .key_press = keycode_fire },
             .repeat_interval = .{ .ms = 50 },
-            .initial_delay = .{ .ms = 100 },
+            .initial_delay = .{ .ms = 150 },
         },
     };
 }
