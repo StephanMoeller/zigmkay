@@ -55,21 +55,22 @@ pub const keymap = [_][key_count]core.KeyDef{
     },
     // L_ARROWS
     .{ 
-    T(us.ESC),  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END), T(dk.APP),
-    T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
-                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),      _______,
+    _______,  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),      _______,
+    T(us.ESC), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
+                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),      T(us.ESC),
                                                LT(L_NUM, us.SPACE),                _______
     }, 
     // L_NUM
     .{ 
-    T(us.ESC),            T(dk.TAB), T(_G(us.KC_TAB)),     _______,          _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), T(dk.TAB),         
-    T(_Ctl(us.KC_Z)), ALT(dk.COMMA),      CTL(dk.DOT), T(us.SPACE), T(_Ctl(us.KC_Y)),             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
-                            _______, T(_Ctl(us.KC_C)),   T(us.DEL),          _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
-                                                                             _______,             LT(L_ARROWS, us.N0)
+    _______,      UNDO,             REDO,  _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
+    _______,       TAB,             NONE, TAB_PREV, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
+               _______, T(_Ctl(us.KC_C)),T(us.DEL), _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                    _______,             LT(L_ARROWS, us.N0)
     },
+    // BOTH
     .{  
-    T(us.ESC),    T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
-    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   _______,
+    T(dk.AT),    T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
+    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   T(dk.APP),
                   T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
                                                       _______,              T(dk.N0)
     },
@@ -83,6 +84,12 @@ pub const keymap = [_][key_count]core.KeyDef{
 // zig fmt: on
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
+
+const UNDO = T(_Ctl(us.KC_Z));
+const REDO = T(_Ctl(us.KC_Y));
+
+const TAB = T(dk.TAB);
+const TAB_PREV = T(_G(us.KC_TAB));
 
 fn _Ctl(keycode: u8) core.KeyCodeFire {
     const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_ctrl = true } };
