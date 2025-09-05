@@ -13,10 +13,10 @@ echo "Waiting for USB drive to appear at $MOUNT_POINT..."
 while [ ! -d "$MOUNT_POINT" ]; do
     sleep 0.2
 done
-echo "Drive detected..."
+echo "USB drive detected..."
 sleep 0.5 # Ensure actually ready
 
-echo "USB drive detected. Copying firmware..."
+echo "Copying firmware..."
 cp "$FIRMWARE" "$TARGET"
 echo "Firmware copied to $TARGET"
 
