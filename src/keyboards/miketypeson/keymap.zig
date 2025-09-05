@@ -62,7 +62,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    T(dk.TAB),              _______,          _______,     _______,          _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), T(dk.TAB),         
+    T(dk.TAB),            T(_G(us.KC_TAB)),          _______,     _______,          _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), T(dk.TAB),         
     T(_Ctl(us.KC_Z)), ALT(dk.COMMA),      CTL(dk.DOT), T(us.SPACE), T(_Ctl(us.KC_Y)),             T(dk.N0), SFT(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
                        T(us.ESCAPE), T(_Ctl(us.KC_C)),   T(us.DEL),          _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
                                                                              _______,             LT(L_ARROWS, us.N0)

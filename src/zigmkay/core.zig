@@ -104,9 +104,12 @@ pub const OutputCommandQueue = struct {
         }
 
         if (tap.tap_modifiers) |mod| {
-            try self.queue.enqueue(.{ .ModifiersChanged = mod });
+            const temp_mods = self.current_mods.add(mod);
+            try self.queue.enqueue(.{ .ModifiersChanged = temp_mods });
+
             try self.queue.enqueue(.{ .KeyCodePress = tap.tap_keycode });
             try self.queue.enqueue(.{ .KeyCodeRelease = tap.tap_keycode });
+
             try self.queue.enqueue(.{ .ModifiersChanged = self.current_mods });
         } else {
             self.currently_pressed_keycodes[tap.tap_keycode] = true;

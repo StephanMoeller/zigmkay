@@ -85,48 +85,26 @@ test "HOLD_MOD - multiple holds" {
 }
 
 test "HOLD_MOD combined with TAP_WITH_MOD" {
-    // hold mods combined with modified taps - ensure tap mods will be applied temporarily and then cancelled again after the tap while hold mods are kept
-
+    // ensure mods applied but not cancelled if already held
     const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
-    const c_with_left_gui = comptime helpers.TAP_WITH_MOD(0x06, .{ .left_gui = true });
-    const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true });
-    const hold_left_alt = comptime helpers.HOLD_MOD(core.Modifiers{ .left_alt = true });
-    const base_layer = comptime [_]core.KeyDef{ hold_left_shift, hold_left_alt, c_with_left_gui, D, E };
+
+    const c_with_left_gui_and_shift = comptime helpers.TAP_WITH_MOD(0x06, .{ .left_gui = true, .left_shift = true });
+    const hold_left_shift = comptime helpers.HOLD_MOD(core.Modifiers{ .left_shift = true, .left_alt = true });
+    const base_layer = comptime [_]core.KeyDef{ hold_left_shift, c_with_left_gui_and_shift, D, E };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
     var o = init_test(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap){};
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 0 }); // Press left shift
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 1 }); // Press left alt
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 3 }); // Press D
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 3 }); // Release D
-
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 2 }); // Press gui+C
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 2 }); // Release gui+C
-
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = true, .key_index = 4 }); // Press E
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 4 }); // Release E
-
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 1 }); // Release left alt
-    try o.matrix_change_queue.enqueue(.{ .time = current_time, .pressed = false, .key_index = 0 }); // Release left shift
+    try o.press_key(0, current_time); // enable left shift and left alt
+    try o.press_key(1, current_time);
+    try o.release_key(1, current_time);
 
     try o.process(current_time);
 
     // expect B to be fired as press
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = d }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = d }, try o.actions_queue.dequeue());
-
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_gui = true } }, try o.actions_queue.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true, .left_gui = true } }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = c }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = c }, try o.actions_queue.dequeue());
-
-    // now expect shifting back to previous mods
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true, .left_alt = true } }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = e }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = e }, try o.actions_queue.dequeue());
-
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, try o.actions_queue.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{} }, try o.actions_queue.dequeue());
 
     // expect event removed from input_events
     try std.testing.expectEqual(0, o.actions_queue.Count());

@@ -332,9 +332,9 @@ pub fn CreateProcessorType(
         }
 
         fn warn(comptime msg: []const u8, args: anytype) void {
-            //_ = msg;
-            //_ = args;
-            std.log.warn(msg, args);
+            _ = msg;
+            _ = args;
+            //std.log.warn(msg, args);
         }
     };
 }
