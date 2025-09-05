@@ -57,15 +57,15 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
     _______,  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),      _______,
     T(us.ESC), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
-                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),      T(us.ESC),
+                T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   NONE,  T(dk.DQUO),      T(us.ESC),
                                                LT(L_NUM, us.SPACE),                _______
     }, 
     // L_NUM
     .{ 
-    _______,       TAB,         TAB_PREV, _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), KILL_APP,
-    _______,      UNDO,          _______,    REDO, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
-               _______, T(_Ctl(dk.C)),T(us.DEL), _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
-                                                    _______,             LT(L_ARROWS, us.N0)
+    _______,  TAB_PREV,           TAB,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), KILL_APP,
+    _______,      REDO,          UNDO,  T(dk.TAB), _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
+               _______, T(_Ctl(dk.C)),T(us.DEL),   _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                   _______,             LT(L_ARROWS, us.N0)
     },
     // BOTH
     .{  
