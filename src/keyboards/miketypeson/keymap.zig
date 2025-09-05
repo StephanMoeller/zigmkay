@@ -55,7 +55,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     },
     // L_ARROWS
     .{ 
-    _______,  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),      _______,
+    _______,  T(dk.LABK),    T(dk.EQL),   T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),      T(dk.APP),
     T(us.ESC), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                 T(dk.HASH),   T(dk.LBRC),   T(dk.RBRC),    _______,                _______,   T(dk.TAB),  T(dk.DQUO),      T(us.ESC),
                                                LT(L_NUM, us.SPACE),                _______
@@ -70,7 +70,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     // BOTH
     .{  
     T(dk.AT),    T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
-    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   T(dk.APP),
+    T(us.BOOT), ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   _______,
                   T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
                                                       _______,              T(dk.N0)
     },
