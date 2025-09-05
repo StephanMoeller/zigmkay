@@ -39,7 +39,7 @@ pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.c0, p.c1, p.c2, p.c3, p.c4 };
 pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5 };
 
 const NONE = core.KeyDef.none;
-const _______ = core.KeyDef.transparent;
+const _______ = NONE;//core.KeyDef.transparent;
 
 const L_BASE:usize = 0;
 const L_ARROWS:usize = 1;
@@ -62,8 +62,8 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    _______,  _______,       _______,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,
-    _______,      REDO,          UNDO,  _______, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
+    _______,  _______,        _______,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,
+    _______,     UNDO,           REDO,  _______,   _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
              T(us.ESC), T(_Ctl(dk.C)),T(us.DEL),   _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
                                                    _______,             LT(L_ARROWS, us.N0)
     },
