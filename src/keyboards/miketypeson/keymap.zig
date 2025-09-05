@@ -62,9 +62,9 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    _______,      UNDO,             REDO,  _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
-    _______,       TAB,             NONE, TAB_PREV, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
-               _______, T(_Ctl(us.KC_C)),T(us.DEL), _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
+    _______,       TAB,         TAB_PREV, _______, _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), KILL_APP,
+    _______,      UNDO,          _______,    REDO, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
+               _______, T(_Ctl(dk.C)),T(us.DEL), _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
                                                     _______,             LT(L_ARROWS, us.N0)
     },
     // BOTH
@@ -85,20 +85,31 @@ pub const keymap = [_][key_count]core.KeyDef{
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
 
-const UNDO = T(_Ctl(us.KC_Z));
-const REDO = T(_Ctl(us.KC_Y));
+const UNDO = T(_Ctl(dk.Z));
+const REDO = T(_Ctl(dk.Y));
 
 const TAB = T(dk.TAB);
-const TAB_PREV = T(_G(us.KC_TAB));
+const TAB_PREV = T(_G(us.TAB));
+const KILL_APP = T(_Ctl(dk.W));
 
-fn _Ctl(keycode: u8) core.KeyCodeFire {
-    const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_ctrl = true } };
-    return fire;
+fn _Ctl(fire: core.KeyCodeFire) core.KeyCodeFire {
+    var copy = fire;
+    if (copy.tap_modifiers) |mods| {
+        mods.left_ctrl = true;
+    } else {
+        copy.tap_modifiers = .{ .left_ctrl = true };
+    }
+    return copy;
 }
 
-fn _G(keycode: u8) core.KeyCodeFire {
-    const fire = core.KeyCodeFire{ .tap_keycode = keycode, .tap_modifiers = .{ .left_shift = true } };
-    return fire;
+fn _G(fire: core.KeyCodeFire) core.KeyCodeFire {
+    var copy = fire;
+    if (copy.tap_modifiers) |mods| {
+        mods.left_shift = true;
+    } else {
+        copy.tap_modifiers = .{ .left_shift = true };
+    }
+    return copy;
 }
 fn C(key_press: core.KeyCodeFire, custom_hold: u8) core.KeyDef {
     return core.KeyDef{
@@ -119,8 +130,8 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
 
     Combo_Tap_HoldMod(.{ 12, 13 }, L_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
-    Combo_Tap_HoldMod(.{ 12, 13 }, L_NUM, _Ctl(us.KC_V), .{ .left_ctrl = true, .left_shift = true }),
-    Combo_Tap_HoldMod(.{ 11, 12 }, L_NUM, _Ctl(us.KC_X), .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 12, 13 }, L_NUM, _Ctl(dk.V), .{ .left_ctrl = true, .left_shift = true }),
+    Combo_Tap_HoldMod(.{ 11, 12 }, L_NUM, _Ctl(dk.X), .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
     Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
