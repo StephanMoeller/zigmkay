@@ -14,9 +14,10 @@ pub const KeyCodeFire = struct {
     tap_modifiers: ?Modifiers = null,
     dead: bool = false,
 };
-pub const TapDef = union(enum) {
-    key_press: KeyCodeFire,
-    one_shot: HoldDef,
+pub const TapDef = struct {
+    key_press: ?KeyCodeFire = null,
+    one_shot: ?HoldDef = null,
+    custom: u8 = 0,
 };
 pub const HoldDef = struct {
     hold_modifiers: ?Modifiers = null,

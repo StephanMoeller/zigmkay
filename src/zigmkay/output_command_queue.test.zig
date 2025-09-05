@@ -3,7 +3,7 @@ const core = @import("core.zig");
 const helpers = @import("processing.test_helpers.zig");
 test "press key" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(helpers.TAP(0x04).tap_only.key_press);
+    try q.press_key(.{ .tap_keycode = 0x04 });
 
     try std.testing.expectEqual(1, q.Count());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x04 }, q.dequeue());
@@ -12,7 +12,7 @@ test "press key" {
 
 test "press key with modifier" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(helpers.TAP_WITH_MOD(0x04, .{ .left_shift = true }).tap_only.key_press);
+    try q.press_key(.{ .tap_keycode = 0x04, .tap_modifiers = .{ .left_shift = true } });
 
     try std.testing.expectEqual(4, q.Count());
     try std.testing.expectEqual(core.OutputCommand{ .ModifiersChanged = .{ .left_shift = true } }, q.dequeue());
@@ -24,17 +24,18 @@ test "press key with modifier" {
 
 test "press/release key - simple sequence" {
     var q = core.OutputCommandQueue.Create();
-    try q.press_key(helpers.TAP(4).tap_only.key_press);
-    try q.release_key(helpers.TAP(4).tap_only.key_press);
 
-    try q.press_key(helpers.TAP(5).tap_only.key_press);
-    try q.release_key(helpers.TAP(5).tap_only.key_press);
+    try q.press_key(.{ .tap_keycode = 0x04 });
+    try q.release_key(.{ .tap_keycode = 0x04 });
 
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 4 }, q.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 4 }, q.dequeue());
+    try q.press_key(.{ .tap_keycode = 0x05 });
+    try q.release_key(.{ .tap_keycode = 0x05 });
 
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 5 }, q.dequeue());
-    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 5 }, q.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x04 }, q.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 0x04 }, q.dequeue());
+
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = 0x05 }, q.dequeue());
+    try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = 0x05 }, q.dequeue());
 
     try std.testing.expectEqual(0, q.Count());
 }

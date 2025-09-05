@@ -118,15 +118,12 @@ pub fn CreateProcessorType(
                     .Release => |release_info| {
                         switch (release_info.release_action) {
                             .ReleaseTap => |tap| {
-                                switch (tap) {
-                                    .key_press => |keycode_fire| {
-                                        warn("releasing tap {}", .{keycode_fire.tap_keycode});
-                                        on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } });
-                                        try self.output_usb_commands.release_key(keycode_fire);
-                                        self.release_map[head_event.key_index] = ReleaseMapEntry.None;
-                                        on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } });
-                                    },
-                                    .one_shot => unreachable,
+                                if (tap.key_press) |keycode_fire| {
+                                    warn("releasing tap {}", .{keycode_fire.tap_keycode});
+                                    on_event(self, .{ .OnTapExitBefore = .{ .tap = tap } });
+                                    try self.output_usb_commands.release_key(keycode_fire);
+                                    self.release_map[head_event.key_index] = ReleaseMapEntry.None;
+                                    on_event(self, .{ .OnTapExitAfter = .{ .tap = tap } });
                                 }
                             },
                             .ReleaseHold => |hold_def| {
@@ -215,29 +212,26 @@ pub fn CreateProcessorType(
                 self.one_shot_hold_to_disable_after_next_release = self.one_shot_hold_to_enable_before_next_tap;
                 self.one_shot_hold_to_enable_before_next_tap = null;
             }
-            switch (tap) {
-                .key_press => |keycode_fire| {
-                    try enter_tap(self, keycode_fire);
-                    switch (release_mode) {
-                        .AwaitKeyReleased => {
-                            try self.output_usb_commands.press_key(keycode_fire);
-                            self.release_map[event.key_index] = .{
-                                .Release = .{
-                                    .release_action = KeyReleaseAction{ .ReleaseTap = tap },
-                                    .action_id_when_pressed = self.current_action_id,
-                                },
-                            };
-                        },
-                        .ForceInstant => {
-                            try self.output_usb_commands.tap_key(keycode_fire);
-                        },
-                    }
-                },
-                .one_shot => |one_shot_hold| {
-                    self.one_shot_hold_to_enable_before_next_tap = one_shot_hold;
-                },
+            if (tap.key_press) |keycode_fire| {
+                try enter_tap(self, keycode_fire);
+                switch (release_mode) {
+                    .AwaitKeyReleased => {
+                        try self.output_usb_commands.press_key(keycode_fire);
+                        self.release_map[event.key_index] = .{
+                            .Release = .{
+                                .release_action = KeyReleaseAction{ .ReleaseTap = tap },
+                                .action_id_when_pressed = self.current_action_id,
+                            },
+                        };
+                    },
+                    .ForceInstant => {
+                        try self.output_usb_commands.tap_key(keycode_fire);
+                    },
+                }
             }
-
+            if (tap.one_shot) |one_shot_hold| {
+                self.one_shot_hold_to_enable_before_next_tap = one_shot_hold;
+            }
             on_event(self, .{ .OnTapEnterAfter = .{ .tap = tap } });
         }
 

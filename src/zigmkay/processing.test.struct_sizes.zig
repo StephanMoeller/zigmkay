@@ -24,11 +24,11 @@ const G = helpers.TAP(g);
 // when the sizes and alignments change of the types that are part of the keymap
 // as this is a type that may exist in copies in the hundreds when a big keyboard has lots of layers
 test "Struct size: KeyDef" {
-    try std.testing.expectEqual(18, @sizeOf(core.KeyDef));
+    try std.testing.expectEqual(24, @sizeOf(core.KeyDef));
     try std.testing.expectEqual(2, @alignOf(core.KeyDef));
 }
 test "Struct size: TapDef" {
-    try std.testing.expectEqual(7, @sizeOf(core.TapDef));
+    try std.testing.expectEqual(13, @sizeOf(core.TapDef));
     try std.testing.expectEqual(1, @alignOf(core.TapDef));
 }
 test "Struct size: HoldDef" {
@@ -40,14 +40,18 @@ test "Struct size: Modifiers" {
     try std.testing.expectEqual(1, @alignOf(core.Modifiers));
 }
 test "Struct size: TapHold" {
-    try std.testing.expectEqual(16, @sizeOf(core.TapHoldDef));
+    try std.testing.expectEqual(22, @sizeOf(core.TapHoldDef));
     try std.testing.expectEqual(2, @alignOf(core.TapHoldDef));
 }
 test "Struct size: AutoFireDef" {
-    try std.testing.expectEqual(12, @sizeOf(core.AutoFireDef));
+    try std.testing.expectEqual(18, @sizeOf(core.AutoFireDef));
     try std.testing.expectEqual(2, @alignOf(core.AutoFireDef));
 }
 test "Struct size: KeyCodeFire" {
     try std.testing.expectEqual(4, @sizeOf(core.KeyCodeFire));
     try std.testing.expectEqual(1, @alignOf(core.KeyCodeFire));
+}
+test "Keymap of 36 keys with 5 layers - sanity checking" {
+    // roughly 4kb
+    try std.testing.expectEqual(4320, @sizeOf([5][36]core.KeyDef));
 }
