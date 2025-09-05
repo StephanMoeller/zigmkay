@@ -62,9 +62,9 @@ pub const keymap = [_][key_count]core.KeyDef{
     }, 
     // L_NUM
     .{ 
-    _______,  TAB_PREV,           TAB,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), KILL_APP,
+    _______,  _______,       _______,  _______,   _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,
     _______,      REDO,          UNDO,  _______, _______,             T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N6),
-               _______, T(_Ctl(dk.C)),T(us.DEL),   _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
+             T(us.ESC), T(_Ctl(dk.C)),T(us.DEL),   _______,             PrintStats, T(dk.N1), T(dk.N2), T(dk.N3),
                                                    _______,             LT(L_ARROWS, us.N0)
     },
     // BOTH
@@ -87,10 +87,6 @@ const RIGHT_THUMB = 2;
 
 const UNDO = T(_Ctl(dk.Z));
 const REDO = T(_Ctl(dk.Y));
-
-const TAB = T(dk.TAB);
-const TAB_PREV = T(_G(us.TAB));
-const KILL_APP = T(_Ctl(dk.W));
 
 fn _Ctl(fire: core.KeyCodeFire) core.KeyCodeFire {
     var copy = fire;
@@ -242,30 +238,12 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     };
 }
 
-var alt_tab_activated = false;
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
         .OnHoldEnterAfter => |_| {
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
-        .OnTapEnterBefore => |data| {
-            if (data.tap.key_press) |keyfire_def| {
-                if (keyfire_def.tap_keycode == us.KC_TAB and layers.is_layer_active(L_NUM)) {
-                    var mods = output_queue.get_current_modifiers();
-                    mods.left_alt = true;
-                    output_queue.set_mods(mods) catch {};
-
-                    alt_tab_activated = true;
-                }
-            }
-        },
         .OnHoldExitAfter => |_| {
-            if (alt_tab_activated) {
-                alt_tab_activated = false;
-                var mods = output_queue.get_current_modifiers();
-                mods.left_alt = false;
-                output_queue.set_mods(mods) catch {};
-            }
             layers.set_layer_state(3, layers.is_layer_active(1) and layers.is_layer_active(2));
         },
         .OnTapExitAfter => |data| {
