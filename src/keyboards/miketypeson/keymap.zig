@@ -49,7 +49,7 @@ const L_WIN:usize = 5;
 
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-         T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    T(dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),       SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
                     T(dk.X),   T(dk.C),       GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
                                              LT(L_EMPTY, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
@@ -75,6 +75,7 @@ pub const keymap = [_][key_count]core.KeyDef{
             _______, _______, _______, _______, _______,                _______, _______, _______, _______, _______,
                      _______, _______, _______, _______,                _______, _______, _______, _______,
                                              LT(L_EMPTY, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
+        
     },
     // BOTH
     .{ 
@@ -140,7 +141,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap_HoldMod(.{ 11, 12 }, L_NUM, _Ctl(dk.X), .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_ARROWS, dk.AMPR, .{ .left_ctrl = true, .left_shift = true }),
 
-    Combo_Tap(.{ 13, 16 }, 3, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
+    Combo_Tap(.{ 13, 16 }, L_BOTH, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
     Combo_Tap(.{ 23, 24 }, L_BASE, us.BOOT),
     Combo_Tap(.{ 6, 7 }, L_BASE, dk.AE),
