@@ -47,9 +47,9 @@ const L_BOTH:usize = 3;
 
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-         T(dk.Q),  AF(dk.W), GUI(dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),   GUI(dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.Q),  AF(dk.W), T(dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    T(dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-                    T(dk.X),   T(dk.C),   T(dk.D), T(dk.V),                  _______,   T(dk.H), T(dk.COMMA), LT(4, dk.DOT),
+                    T(dk.X),   T(dk.C),   GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(4, dk.DOT),
                                                 LT(L_NUM, us.ENTER),                   LT(L_ARROWS, us.SPACE) 
     },
     // L_ARROWS
@@ -62,10 +62,10 @@ pub const keymap = [_][key_count]core.KeyDef{
     // LBRC, RBRC
     // L_NUM
     .{ 
-       _______,  _______,    T(dk.LBRC),  T(dk.RBRC), _______,                _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
-       _______,     UNDO,          REDO, T(us.SPACE), _______,                _______, SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N0),
-               T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,  T(dk.N1),  T(dk.N2),  T(dk.N3),
-                                                      _______,             LT(L_ARROWS, us.SPACE)
+       _______,  _______,    T(dk.LBRC),  T(dk.RBRC), _______,                  _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
+       _______,     UNDO,          REDO, T(us.SPACE), _______,                _______, SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), _______,
+               T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,   T(dk.N1),  T(dk.N2),  T(dk.N3),
+                                                      _______,             LT(L_ARROWS, us.N0)
     },
     // BOTH
     .{ 
