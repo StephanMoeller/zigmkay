@@ -62,13 +62,13 @@ pub const keymap = [_][key_count]core.KeyDef{
     // LBRC, RBRC
     // L_NUM
     .{ 
-       _______,  _______,  T(dk.LBRC),    T(dk.RBRC), _______,                  _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
-    _______,     UNDO,          REDO, T(us.SPACE), _______,                T(dk.N0), SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.MINS),
-               T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,   T(dk.N1),  T(dk.N2),  T(dk.N3),
-                                                      _______,             LT(L_ARROWS, us.N0)
+       _______,  _______,    T(dk.LBRC),  T(dk.RBRC), _______,                _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
+       _______,     UNDO,          REDO, T(us.SPACE), _______,                _______, SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), T(dk.N0),
+               T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,  T(dk.N1),  T(dk.N2),  T(dk.N3),
+                                                      _______,             LT(L_ARROWS, us.SPACE)
     },
     // BOTH
-    .{  
+    .{ 
     _______,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
     _______, ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   _______,
                T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
@@ -180,7 +180,11 @@ fn AF(keycode_fire: core.KeyCodeFire) core.KeyDef {
         },
     };
 }
-
+fn MO(layer_index: core.LayerIndex) core.KeyDef {
+    return core.KeyDef{
+        .hold = .{ .hold_layer = layer_index },
+    };
+}
 fn LT(layer_index: core.LayerIndex, keycode_fire: core.KeyCodeFire) core.KeyDef {
     return core.KeyDef{
         .tap_hold = .{
