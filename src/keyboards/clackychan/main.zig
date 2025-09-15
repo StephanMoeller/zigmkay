@@ -18,17 +18,24 @@ const uart_rx_pin = gpio.num(1);
 const is_primary = true;
 
 pub fn main() !void {
-    try main_primary();
-}
+    var uart_data: [1]u8 = .{0};
 
-pub fn main_secondary() !void {
     // uart
     uart_tx_pin.set_function(.uart);
     uart_rx_pin.set_function(.uart);
     uart.apply(.{ .clock_config = rp2xxx.clock_config, .baud_rate = 9600 });
 
+    if (is_primary) {
+        //tries to write one byte with 100ms timeout
+        uart.write_blocking(&data, null) catch {
+            uart.clear_errors();
+        };
+    }
+}
+
+pub fn main_secondary() !void {
     var counter: u8 = 1;
-    var data: [1]u8 = .{0};
+
     var last_send: u64 = 0;
     while (true) {
         const current_time = time.get_time_since_boot().to_us();
@@ -41,10 +48,6 @@ pub fn main_secondary() !void {
             }
 
             data[0] = counter;
-            //tries to write one byte with 100ms timeout
-            uart.write_blocking(&data, null) catch {
-                uart.clear_errors();
-            };
         }
     }
 }
