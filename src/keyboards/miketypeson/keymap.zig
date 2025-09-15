@@ -47,7 +47,7 @@ const L_EMPTY: usize = 3;
 const L_BOTH:usize = 4;
 const L_WIN:usize = 5;
 
-const L_LEFT = L_EMPTY;
+const L_LEFT = L_NUM;
 const L_RIGHT = L_ARROWS;
 
 
@@ -56,7 +56,7 @@ pub const keymap = [_][key_count]core.KeyDef{
          T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),       SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
                     T(dk.X),   T(dk.C),       GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
-                                             LT(L_EMPTY, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
+                                             LT(L_NUM, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
     },
     // L_ARROWS
     .{ 
