@@ -17,7 +17,7 @@ pub fn main() !void {
 
     // Matrix scanning
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-        mike_typeson.dimensions,
+        mike_typeson.rollercole.dimensions,
         mike_typeson.pin_cols[0..],
         mike_typeson.pin_rows[0..],
         mike_typeson.pin_mappings,
@@ -29,10 +29,10 @@ pub fn main() !void {
 
     // Processing
     var processor = zigmkay.processing.CreateProcessorType(
-        mike_typeson.dimensions,
-        &mike_typeson.keymap,
-        mike_typeson.combos[0..],
-        &mike_typeson.custom_functions,
+        mike_typeson.rollercole.dimensions,
+        &mike_typeson.rollercole.keymap,
+        mike_typeson.rollercole.combos[0..],
+        &mike_typeson.rollercole.custom_functions,
     ){
         .input_matrix_changes = &matrix_change_queue,
         .output_usb_commands = &usb_command_queue,
