@@ -29,10 +29,10 @@ pub const pin_config = rp2xxx.pins.GlobalConfiguration{
 };
 pub const p = pin_config.pins();
 
-pub const pin_mappings = [key_count][2]usize{
-   .{0,0},.{0,1},.{0,2},.{0,3},.{0,4},  
-   .{0,5},.{0,6},.{0,7},.{0,8},.{0,9},  
-   .{0,10},.{0,11},.{0,12},.{0,13}, 
+pub const pin_mappings_right = [key_count][2]usize{
+   .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},  
+   .{0,9},.{0,8},.{0,7},.{0,6},.{0,0},  
+   .{0,4},.{0,3},.{0,2},.{0,1}, 
                                
 };
 pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.col };
@@ -51,7 +51,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
           T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
           T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-          T(dk.P),  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+          T(dk.J),  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
     },
     };
 // zig fmt: on
