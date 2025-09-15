@@ -6,7 +6,7 @@ const microzig = @import("microzig");
 
 const rp2xxx = microzig.hal;
 
-pub const key_count = 14;
+pub const key_count = 30;
 
 // zig fmt: off
 pub const pin_config = rp2xxx.pins.GlobalConfiguration{
@@ -29,12 +29,20 @@ pub const pin_config = rp2xxx.pins.GlobalConfiguration{
 };
 pub const p = pin_config.pins();
 
-pub const pin_mappings_right = [key_count][2]usize{
-   .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},  
-   .{0,9},.{0,8},.{0,7},.{0,6},.{0,0},  
-   .{0,4},.{0,3},.{0,2},.{0,1}, 
-                               
+pub const pin_mappings_right = [key_count]?[2]usize{
+   null, null, null, null, null,  .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},      
+   null, null, null, null, null,   .{0,9},.{0,8},.{0,7},.{0,6},.{0,0},  
+         null, null, null, null,   .{0,4},.{0,3},.{0,2},.{0,1},
+                           null,   null
 };
+
+pub const pin_mappings_left = [key_count]?[2]usize{
+  .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},       null, null, null, null, null,      
+   .{0,9}, .{0,8}, .{0,7}, .{0,6},.{0,0},       null, null, null, null, null,
+           .{0,4} ,.{0,3}, .{0,2},.{0,1},       null, null, null, null,
+                                    null,       null
+};
+
 pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.col };
 pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.k7, p.k8, p.k9, p.k12, p.k13, p.k14, p.k15, p.k16, p.k21, p.k23, p.k20, p.k22, p.k26, p.k27 };
 
@@ -47,13 +55,55 @@ const L_EMPTY: usize = 3;
 const L_BOTH:usize = 4;
 const L_WIN:usize = 5;
 
+const L_LEFT = L_NUM;
+const L_RIGHT = L_ARROWS;
+
+
+
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-          T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
-          T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-          T(dk.J),  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+         T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.F), ALT(dk.A), CTL(dk.S),       SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
+                    T(dk.X),   T(dk.C),       GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+                                             LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
     },
-    };
+    // L_ARROWS
+    .{ 
+   T(dk.EXLM),    T(dk.LABK),    T(dk.EQL),          T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),  T(dk.APP),
+    T(dk.AT), ALT(dk.LCBR), T(dk.LPRN),          T(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
+                  T(dk.HASH),   T(dk.LBRC),  T(dk.RBRC),    _______,                _______,   T(dk.TAB),  CTL(dk.DQUO),      T(us.ESC),
+                                                        LT(L_LEFT, us.SPACE),                _______
+    }, 
+    // L_NUM
+    .{ 
+       _______,  _______,    T(dk.LBRC),  T(dk.RBRC), _______,                  _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
+       _______,     UNDO,          REDO, T(us.SPACE), _______,                _______, SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), _______,
+               T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,   T(dk.N1),  T(dk.N2),  T(dk.N3),
+                                          LT(L_LEFT, us.SPACE),             LT(L_RIGHT, us.N0)
+    },
+    // L_EMPTY
+    .{
+            _______, _______, _______, _______, _______,                _______, _______, _______, _______, _______,
+            _______, _______, _______, _______, _______,                _______, _______, _______, _______, _______,
+                     _______, _______, _______, _______,                _______, _______, _______, _______,
+                                             LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
+        
+    },
+    // BOTH
+    .{ 
+    _______,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
+    _______, ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   _______,
+               T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
+                                                   _______,              T(dk.N0)
+    },
+    .{ 
+    WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
+    WinNav(dk.N4), _______, WinNav(dk.N2), WinNav(dk.N5), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
+                   _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
+                                                          _______,             _______
+   },
+
+};
 // zig fmt: on
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;

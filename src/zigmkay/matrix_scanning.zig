@@ -18,19 +18,21 @@ pub fn CreateMatrixScannerType(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime pin_cols: []const rp2xxx.gpio.Pin,
     comptime pin_rows: []const rp2xxx.gpio.Pin,
-    comptime pins_to_keys_mapping: [keymap_dimensions.key_count][2]usize,
+    comptime pins_to_keys_mapping: [keymap_dimensions.key_count]?[2]usize,
     comptime settings: ScannerSettings,
 ) type {
     comptime var pins_with_indexes: [keymap_dimensions.key_count]PinAndIndex = [1]PinAndIndex{undefined} ** keymap_dimensions.key_count;
     // Build a new array where the actual positon of the mappings does not matter
     // Instead the new array will contain PinAndIndex strucs, where the original array index will now
     // be stored as key_index in the new array
-    for (pins_to_keys_mapping, 0..) |pin_index_pair, key_index| {
-        pins_with_indexes[key_index] = PinAndIndex{
-            .col_index = pin_index_pair[0],
-            .row_index = pin_index_pair[1],
-            .key_index = key_index,
-        };
+    for (pins_to_keys_mapping, 0..) |pin_index_pair_or_null, key_index| {
+        if (pin_index_pair_or_null) |pin_index_pair| {
+            pins_with_indexes[key_index] = PinAndIndex{
+                .col_index = pin_index_pair[0],
+                .row_index = pin_index_pair[1],
+                .key_index = key_index,
+            };
+        }
     }
 
     // Just bubble sort the thing - its a small array and happening at comptime
