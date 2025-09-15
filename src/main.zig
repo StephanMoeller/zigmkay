@@ -1,3 +1,3 @@
 pub fn main() !void {
-    try @import("keyboards/miketypeson/main.zig").main();
+    try @import("keyboards/clackychan/main.zig").main();
 }

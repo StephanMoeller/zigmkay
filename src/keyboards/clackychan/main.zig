@@ -34,7 +34,7 @@ pub fn main() !void {
 
         // Matrix scanning
         const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-            clacky_chan.dimensions,
+            clacky_chan.rollercole.dimensions,
             clacky_chan.pin_cols[0..],
             clacky_chan.pin_rows[0..],
             clacky_chan.pin_mappings_left,
@@ -43,10 +43,10 @@ pub fn main() !void {
 
         // Processing
         var processor = zigmkay.processing.CreateProcessorType(
-            clacky_chan.dimensions,
-            &clacky_chan.keymap,
-            clacky_chan.combos[0..],
-            &clacky_chan.custom_functions,
+            clacky_chan.rollercole.dimensions,
+            &clacky_chan.rollercole.keymap,
+            clacky_chan.rollercole.combos[0..],
+            &clacky_chan.rollercole.custom_functions,
         ){
             .input_matrix_changes = &matrix_change_queue,
             .output_usb_commands = &usb_command_queue,
