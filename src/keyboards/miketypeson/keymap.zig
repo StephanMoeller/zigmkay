@@ -56,28 +56,28 @@ pub const keymap = [_][key_count]core.KeyDef{
          T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),       SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
                     T(dk.X),   T(dk.C),       GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
-                                             LT(L_NUM, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
+                                             LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
     },
     // L_ARROWS
     .{ 
    T(dk.EXLM),    T(dk.LABK),    T(dk.EQL),          T(dk.RABK), T(dk.PERC),             T(dk.SLSH),  T(us.HOME),   AF(us.UP),    T(us.END),  T(dk.APP),
     T(dk.AT), ALT(dk.LCBR), T(dk.LPRN),          T(dk.RPRN), T(dk.RCBR),             T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN),
                   T(dk.HASH),   T(dk.LBRC),  T(dk.RBRC),    _______,                _______,   T(dk.TAB),  CTL(dk.DQUO),      T(us.ESC),
-                                                        LT(L_EMPTY, us.SPACE),                _______
+                                                        LT(L_LEFT, us.SPACE),                _______
     }, 
     // L_NUM
     .{ 
        _______,  _______,    T(dk.LBRC),  T(dk.RBRC), _______,                  _______,   T(dk.N7),  T(dk.N8),  T(dk.N9),    _______,
        _______,     UNDO,          REDO, T(us.SPACE), _______,                _______, SFT(dk.N4),CTL(dk.N5),ALT(dk.N6), _______,
                T(us.ESC), T(_Ctl(dk.C)),   T(us.DEL), _______,              PrintStats,   T(dk.N1),  T(dk.N2),  T(dk.N3),
-                                          LT(L_EMPTY, us.SPACE),             LT(L_ARROWS, us.N0)
+                                          LT(L_LEFT, us.SPACE),             LT(L_RIGHT, us.N0)
     },
     // L_EMPTY
     .{
             _______, _______, _______, _______, _______,                _______, _______, _______, _______, _______,
             _______, _______, _______, _______, _______,                _______, _______, _______, _______, _______,
                      _______, _______, _______, _______,                _______, _______, _______, _______,
-                                             LT(L_EMPTY, us.ENTER),                  LT(L_ARROWS, us.SPACE) 
+                                             LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
         
     },
     // BOTH
