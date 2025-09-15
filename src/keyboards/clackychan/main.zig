@@ -37,7 +37,7 @@ pub fn main() !void {
             clacky_chan.dimensions,
             clacky_chan.pin_cols[0..],
             clacky_chan.pin_rows[0..],
-            clacky_chan.pin_mappings_right,
+            clacky_chan.pin_mappings_left,
             .{ .debounce = .{ .ms = 25 } },
         ){};
 

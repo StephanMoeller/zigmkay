@@ -37,9 +37,9 @@ pub const pin_mappings_right = [key_count]?[2]usize{
 };
 
 pub const pin_mappings_left = [key_count]?[2]usize{
-  .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},       null, null, null, null, null,      
-   .{0,9}, .{0,8}, .{0,7}, .{0,6},.{0,0},       null, null, null, null, null,
-           .{0,4} ,.{0,3}, .{0,2},.{0,1},       null, null, null, null,
+  .{0,5}, .{0,10},.{0,11},.{0,12},.{0,13},       null, null, null, null, null,      
+  .{0,0}, .{0,6}, .{0,7}, .{0,8}, .{0,9},       null, null, null, null, null,
+          .{0,1}, .{0,2}, .{0,3}, .{0,4} ,      null, null, null, null,
                                     null,       null
 };
 
