@@ -47,6 +47,10 @@ const L_EMPTY: usize = 3;
 const L_BOTH:usize = 4;
 const L_WIN:usize = 5;
 
+const L_LEFT = L_EMPTY;
+const L_RIGHT = L_ARROWS;
+
+
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
          T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),    LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
@@ -256,10 +260,10 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
         .OnHoldEnterAfter => |_| {
-            layers.set_layer_state(L_BOTH, layers.is_layer_active(L_ARROWS) and layers.is_layer_active(L_EMPTY));
+            layers.set_layer_state(L_BOTH, layers.is_layer_active(L_LEFT) and layers.is_layer_active(L_RIGHT));
         },
         .OnHoldExitAfter => |_| {
-            layers.set_layer_state(L_BOTH, layers.is_layer_active(L_ARROWS) and layers.is_layer_active(L_EMPTY));
+            layers.set_layer_state(L_BOTH, layers.is_layer_active(L_LEFT) and layers.is_layer_active(L_RIGHT));
         },
         .OnTapExitAfter => |data| {
             if (data.tap.key_press) |key_fire| {
