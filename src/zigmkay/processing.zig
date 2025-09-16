@@ -306,7 +306,7 @@ pub fn CreateProcessorType(
         fn tick_autofire(self: *Self, current_time: core.TimeSinceBoot) !void {
             if (self.current_autofire) |autofire| {
                 if (self.next_autofire_trigger_time.time_since_boot_us < current_time.time_since_boot_us) {
-                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 200 };
+                    const unused_event = core.MatrixStateChange{ .pressed = false, .time = current_time, .key_index = 0 };
                     try on_tap_decided(self, autofire.tap, unused_event, TapReleaseMode.ForceInstant);
                     self.next_autofire_trigger_time = self.next_autofire_trigger_time.add(autofire.repeat_interval);
                 }

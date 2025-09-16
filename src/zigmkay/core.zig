@@ -57,7 +57,7 @@ pub const TimeSpan = struct {
 };
 const TransparentLayerValue = 15;
 
-pub const KeyIndex = u8;
+pub const KeyIndex = u7;
 pub const LayerIndex = u4;
 
 const queue_capacities = 250;

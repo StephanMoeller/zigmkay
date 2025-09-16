@@ -19,29 +19,29 @@ const rollercole_shared_keymap = @import("../shared_keymap.zig");
 const clackychan_pins = @import("pins.zig");
 
 pub fn main() !void {
-    var uart_data: [1]u8 = .{0};
 
     // uart
+    var uart_data: [1]u8 = .{0};
     uart_tx_pin.set_function(.uart);
     uart_rx_pin.set_function(.uart);
     uart.apply(.{ .clock_config = rp2xxx.clock_config, .baud_rate = 9600 });
 
+    // Data queues
+    var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
+    var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
+
+    // Matrix scanning
+    clackychan_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
+        rollercole_shared_keymap.dimensions,
+        clackychan_pins.pin_cols[0..],
+        clackychan_pins.pin_rows[0..],
+        clackychan_pins.pin_mappings_left,
+        .{ .debounce = .{ .ms = 25 } },
+    ){};
+
     if (is_primary) {
-        // Data queues
-        var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
-        var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
-
-        clackychan_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
-
-        // Matrix scanning
-        const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-            rollercole_shared_keymap.dimensions,
-            clackychan_pins.pin_cols[0..],
-            clackychan_pins.pin_rows[0..],
-            clackychan_pins.pin_mappings_left,
-            .{ .debounce = .{ .ms = 25 } },
-        ){};
-
+        // PRIMARY HALF
         // Processing
         var processor = zigmkay.processing.CreateProcessorType(
             rollercole_shared_keymap.dimensions,
@@ -59,8 +59,10 @@ pub fn main() !void {
         while (true) {
             const current_time = core.TimeSinceBoot{ .time_since_boot_us = time.get_time_since_boot().to_us() };
 
-            // Matrix scanning: detect which keys have been pressed since last time
+            // Scan local matrix changes
             try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
+
+            // Receive remote changes as well
 
             // Processing: decide actions
             try processor.Process(current_time);
@@ -72,7 +74,8 @@ pub fn main() !void {
 
         }
     } else {
-        //tries to write one byte with 100ms timeout
+        // SECONDARY HALF
+        // Tries to write one byte with 100ms timeout
         uart.write_blocking(&uart_data, null) catch {
             uart.clear_errors();
         };
