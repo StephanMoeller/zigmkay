@@ -200,7 +200,7 @@ pub fn CreateProcessorType(
             if (keycode_fire.tap_keycode == core.special_keycode_PRINT_STATS) {
                 const max_len = 2000;
                 var buf: [max_len]u8 = undefined;
-                const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE: last {}, highest: {}, lowest: {}", .{ self.stats.get_tick_rate(), self.stats.get_highest_count(), self.stats.get_lowest_count() });
+                const numAsString = try std.fmt.bufPrint(&buf, "SCANRATE lowest {} highest {} ", .{ self.stats.get_lowest_count(), self.stats.get_highest_count() });
                 try self.output_usb_commands.print_string(numAsString);
                 return;
             }
