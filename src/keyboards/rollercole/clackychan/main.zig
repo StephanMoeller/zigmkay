@@ -16,7 +16,7 @@ const uart_rx_pin = gpio.num(1);
 const is_primary = true;
 
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
-const clacky_chan = @import("keymap.zig");
+const clackychan_pins = @import("pins.zig");
 
 pub fn main() !void {
     var uart_data: [1]u8 = .{0};
@@ -31,14 +31,14 @@ pub fn main() !void {
         var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
         var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
-        clacky_chan.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+        clackychan_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
 
         // Matrix scanning
         const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
             rollercole_shared_keymap.dimensions,
-            clacky_chan.pin_cols[0..],
-            clacky_chan.pin_rows[0..],
-            clacky_chan.pin_mappings_left,
+            clackychan_pins.pin_cols[0..],
+            clackychan_pins.pin_rows[0..],
+            clackychan_pins.pin_mappings_left,
             .{ .debounce = .{ .ms = 25 } },
         ){};
 

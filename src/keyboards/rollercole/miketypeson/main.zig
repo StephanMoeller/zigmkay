@@ -3,24 +3,25 @@ const dk = @import("../../../keycodes/dk.zig");
 
 const core = zigmkay.core;
 const std = @import("std");
-const mike_typeson = @import("keymap.zig");
 const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
+
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
+const miketypeson_pins = @import("pins.zig");
 pub fn main() !void {
 
     // Data queues
     var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
-    mike_typeson.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+    miketypeson_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
 
     // Matrix scanning
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
         rollercole_shared_keymap.dimensions,
-        mike_typeson.pin_cols[0..],
-        mike_typeson.pin_rows[0..],
-        mike_typeson.pin_mappings,
+        miketypeson_pins.pin_cols[0..],
+        miketypeson_pins.pin_rows[0..],
+        miketypeson_pins.pin_mappings,
         .{ .debounce = .{ .ms = 25 } },
     ){};
 
