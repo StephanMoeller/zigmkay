@@ -63,6 +63,16 @@ pub const LayerIndex = u4;
 const queue_capacities = 250;
 
 // Matrix events: switch press/release,
+pub const UartMessage = packed struct {
+    pressed: bool,
+    key_index: u7,
+    pub fn toByte(self: UartMessage) u8 {
+        return @bitCast(self);
+    }
+    pub fn fromByte(byte_val: u8) UartMessage {
+        return @bitCast(byte_val);
+    }
+};
 pub const MatrixStateChange = struct { pressed: bool, key_index: KeyIndex, time: TimeSinceBoot };
 pub const MatrixStateChangeQueue = generic_queue.GenericQueue(MatrixStateChange, queue_capacities);
 

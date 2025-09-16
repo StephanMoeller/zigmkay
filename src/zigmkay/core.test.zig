@@ -100,3 +100,10 @@ test "LayerActivations is_top_most_active_layer - test 2" {
 
     try std.testing.expectEqual(4, layers.get_top_most_active_layer());
 }
+test "Uart message" {
+    var uart = core.UartMessage{ .pressed = true, .key_index = 112 };
+    const byte = uart.toByte();
+    uart = core.UartMessage.fromByte(byte);
+    try std.testing.expectEqual(true, uart.pressed);
+    try std.testing.expectEqual(112, uart.key_index);
+}
