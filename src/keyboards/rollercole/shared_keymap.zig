@@ -18,9 +18,12 @@ const L_WIN: usize = 5;
 
 const L_LEFT = L_NUM;
 const L_RIGHT = L_ARROWS;
-
+// zig fmt: off
 pub const keymap = [_][key_count]core.KeyDef{
-    .{ T(dk.Q), AF(dk.W), LT(L_NUM, dk.R), T(dk.P), T(dk.B), T(dk.K), T(dk.L), LT(L_EMPTY, dk.O), T(dk.U), T(dk.QUOT), T(dk.F), ALT(dk.A), CTL(dk.S), SFT(dk.T), T(dk.G), T(dk.M), SFT(dk.N), CTL(dk.E), ALT(dk.I), T(dk.Y), T(dk.X), T(dk.C), GUI(dk.D), T(dk.V), _______, GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT), LT(L_LEFT, us.ENTER), LT(L_RIGHT, us.SPACE) },
+    .{ 
+        T(dk.Q),  AF(dk.W), LT(L_NUM, dk.R),   T(dk.P), T(dk.B),           T(dk.K),   T(dk.L), LT(L_EMPTY, dk.O), T(dk.U), T(dk.QUOT), 
+        T(dk.F), ALT(dk.A),       CTL(dk.S), SFT(dk.T), T(dk.G),           T(dk.M), SFT(dk.N), CTL(dk.E),       ALT(dk.I),    T(dk.Y), 
+        T(dk.X),   T(dk.C), GUI(dk.D), T(dk.V), _______, GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT), LT(L_LEFT, us.ENTER), LT(L_RIGHT, us.SPACE) },
     // L_ARROWS
     .{ T(dk.EXLM), T(dk.LABK), T(dk.EQL), T(dk.RABK), T(dk.PERC), T(dk.SLSH), T(us.HOME), AF(us.UP), T(us.END), T(dk.APP), T(dk.AT), ALT(dk.LCBR), CTL(dk.LPRN), SFT(dk.RPRN), T(dk.RCBR), T(us.PGUP), AF(us.LEFT), AF(us.DOWN), AF(us.RIGHT), T(us.PGDN), T(dk.HASH), T(dk.LBRC), T(dk.RBRC), _______, _______, T(dk.TAB), CTL(dk.DQUO), T(us.ESC), LT(L_LEFT, us.SPACE), _______ },
     // L_NUM

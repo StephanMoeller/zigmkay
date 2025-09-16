@@ -3,7 +3,7 @@ const us = @import("../../../keycodes/us.zig");
 const std = @import("std");
 const core = @import("../../../zigmkay/core.zig");
 const microzig = @import("microzig");
-pub const rollercole = @import("../shared_keymap.zig");
+pub const rollercole_shared_keymap = @import("../shared_keymap.zig");
 
 const rp2xxx = microzig.hal;
 
@@ -28,14 +28,14 @@ pub const pin_config = rp2xxx.pins.GlobalConfiguration{
 };
 pub const p = pin_config.pins();
 
-pub const pin_mappings_right = [rollercole.key_count]?[2]usize{
+pub const pin_mappings_right = [raollercole_shared_keymap.key_count]?[2]usize{
    null, null, null, null, null,  .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},      
    null, null, null, null, null,   .{0,9},.{0,8},.{0,7},.{0,6},.{0,0},  
          null, null, null, null,   .{0,4},.{0,3},.{0,2},.{0,1},
                            null,   null
 };
 
-pub const pin_mappings_left = [rollercole.key_count]?[2]usize{
+pub const pin_mappings_left = [rollercole_shared_keymap.key_count]?[2]usize{
   .{0,5}, .{0,10},.{0,11},.{0,12},.{0,13},       null, null, null, null, null,      
   .{0,0}, .{0,6}, .{0,7}, .{0,8}, .{0,9},       null, null, null, null, null,
           .{0,1}, .{0,2}, .{0,3}, .{0,4} ,      null, null, null, null,
