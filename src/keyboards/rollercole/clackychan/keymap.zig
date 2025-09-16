@@ -1,9 +1,9 @@
-const dk = @import("../../keycodes/dk.zig");
-const us = @import("../../keycodes/us.zig");
+const dk = @import("../../../keycodes/dk.zig");
+const us = @import("../../../keycodes/us.zig");
 const std = @import("std");
-const core = @import("../../zigmkay/core.zig");
+const core = @import("../../../zigmkay/core.zig");
 const microzig = @import("microzig");
-pub const rollercole = @import("../rollercole/keymap.zig");
+pub const rollercole = @import("../shared_keymap.zig");
 
 const rp2xxx = microzig.hal;
 
