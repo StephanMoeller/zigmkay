@@ -3,11 +3,9 @@ const dk = @import("../../../keycodes/dk.zig");
 
 const core = zigmkay.core;
 const std = @import("std");
-const clacky_chan = @import("keymap.zig");
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
-
 // uart
 
 const gpio = rp2xxx.gpio;
@@ -16,6 +14,9 @@ const uart_tx_pin = gpio.num(0);
 const uart_rx_pin = gpio.num(1);
 
 const is_primary = true;
+
+const rollercole_shared_keymap = @import("../shared_keymap.zig");
+const clacky_chan = @import("keymap.zig");
 
 pub fn main() !void {
     var uart_data: [1]u8 = .{0};
@@ -34,7 +35,7 @@ pub fn main() !void {
 
         // Matrix scanning
         const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-            clacky_chan.rollercole.dimensions,
+            rollercole_shared_keymap.dimensions,
             clacky_chan.pin_cols[0..],
             clacky_chan.pin_rows[0..],
             clacky_chan.pin_mappings_left,
@@ -43,10 +44,10 @@ pub fn main() !void {
 
         // Processing
         var processor = zigmkay.processing.CreateProcessorType(
-            clacky_chan.rollercole.dimensions,
-            &clacky_chan.rollercole.keymap,
-            clacky_chan.rollercole.combos[0..],
-            &clacky_chan.rollercole.custom_functions,
+            rollercole_shared_keymap.dimensions,
+            &rollercole_shared_keymap.keymap,
+            rollercole_shared_keymap.combos[0..],
+            &rollercole_shared_keymap.custom_functions,
         ){
             .input_matrix_changes = &matrix_change_queue,
             .output_usb_commands = &usb_command_queue,

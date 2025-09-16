@@ -6,7 +6,7 @@ const std = @import("std");
 const mike_typeson = @import("keymap.zig");
 const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
-
+const rollercole_shared_keymap = @import("../shared_keymap.zig");
 pub fn main() !void {
 
     // Data queues
@@ -17,7 +17,7 @@ pub fn main() !void {
 
     // Matrix scanning
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-        mike_typeson.rollercole.dimensions,
+        rollercole_shared_keymap.dimensions,
         mike_typeson.pin_cols[0..],
         mike_typeson.pin_rows[0..],
         mike_typeson.pin_mappings,
@@ -29,10 +29,10 @@ pub fn main() !void {
 
     // Processing
     var processor = zigmkay.processing.CreateProcessorType(
-        mike_typeson.rollercole.dimensions,
-        &mike_typeson.rollercole.keymap,
-        mike_typeson.rollercole.combos[0..],
-        &mike_typeson.rollercole.custom_functions,
+        rollercole_shared_keymap.dimensions,
+        &rollercole_shared_keymap.keymap,
+        rollercole_shared_keymap.combos[0..],
+        &rollercole_shared_keymap.custom_functions,
     ){
         .input_matrix_changes = &matrix_change_queue,
         .output_usb_commands = &usb_command_queue,
