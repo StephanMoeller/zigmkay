@@ -25,7 +25,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
          T(dk.Q),  AF(dk.W), LT(L_EMPTY, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),  LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),         SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-                    T(dk.X),   T(dk.C),         GUI(dk.D), T(dk.V),                  _______,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+                    T(dk.X),   T(dk.C),         GUI(dk.D), PrintStats,                  PrintStats,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
                                              LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
     },
     // L_ARROWS
