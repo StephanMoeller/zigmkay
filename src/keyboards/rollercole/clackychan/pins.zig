@@ -25,6 +25,7 @@ pub const pin_config = rp2xxx.pins.GlobalConfiguration{
     .GPIO22 = .{ .name = "k22", .direction = .in },
     .GPIO26 = .{ .name = "k26", .direction = .in },
     .GPIO27 = .{ .name = "k27", .direction = .in },
+    .GPIO10 = .{ .name = "k10", .direction = .in },
 };
 pub const p = pin_config.pins();
 
@@ -32,15 +33,15 @@ pub const pin_mappings_right = [rollercole_shared_keymap.key_count]?[2]usize{
    null, null, null, null, null,  .{0,13},.{0,12},.{0,11},.{0,10},.{0,5},      
    null, null, null, null, null,   .{0,9},.{0,8},.{0,7},.{0,6},.{0,0},  
          null, null, null, null,   .{0,4},.{0,3},.{0,2},.{0,1},
-                           null,   null
+                           null,   .{0, 14}
 };
 
 pub const pin_mappings_left = [rollercole_shared_keymap.key_count]?[2]usize{
   .{0,5}, .{0,10},.{0,11},.{0,12},.{0,13},       null, null, null, null, null,      
   .{0,0}, .{0,6}, .{0,7}, .{0,8}, .{0,9},       null, null, null, null, null,
-          .{0,1}, .{0,2}, .{0,3}, .{0,4} ,      null, null, null, null,
-                                    null,       null
+          .{0,1}, .{0,2}, .{0,3}, .{0,4},      null, null, null, null,
+                                 .{0, 14},       null
 };
 
 pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.col };
-pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.k7, p.k8, p.k9, p.k12, p.k13, p.k14, p.k15, p.k16, p.k21, p.k23, p.k20, p.k22, p.k26, p.k27 };
+pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.k7, p.k8, p.k9, p.k12, p.k13, p.k14, p.k15, p.k16, p.k21, p.k23, p.k20, p.k22, p.k26, p.k27, p.k10 };

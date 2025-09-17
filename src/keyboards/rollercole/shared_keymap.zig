@@ -23,9 +23,9 @@ const L_RIGHT = L_ARROWS;
 
 pub const keymap = [_][key_count]core.KeyDef{
     .{ 
-         T(dk.Q),  AF(dk.W), LT(L_EMPTY, dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),  LT(L_EMPTY,dk.O),       T(dk.U), T(dk.QUOT),
+         T(dk.Q),  AF(dk.W), GUI(dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),  GUI(dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),         SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-                    T(dk.X),   T(dk.C),         GUI(dk.D), PrintStats,                  PrintStats,  GUI(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+                    T(dk.X),   T(dk.C),         T(dk.D), PrintStats,                  PrintStats,  T(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
                                              LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
     },
     // L_ARROWS
@@ -117,6 +117,8 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 13, 16 }, L_BOTH, core.KeyCodeFire{ .tap_keycode = us.KC_F4, .tap_modifiers = .{ .left_alt = true } }),
 
     Combo_Tap(.{ 23, 24 }, L_BASE, us.BOOT),
+    Combo_Tap(.{ 0, 4 }, L_BASE, us.BOOT),
+    Combo_Tap(.{ 5, 4 }, L_BASE, us.BOOT),
     Combo_Tap(.{ 6, 7 }, L_BASE, dk.AE),
     Combo_Tap(.{ 6, 8 }, L_BASE, dk.OE),
 
