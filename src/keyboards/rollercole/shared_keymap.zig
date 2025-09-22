@@ -25,7 +25,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     .{ 
          T(dk.Q),  AF(dk.W), GUI(dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),  GUI(dk.O),       T(dk.U), T(dk.QUOT),
          T(dk.F), ALT(dk.A), CTL(dk.S),         SFT(dk.T), T(dk.G),                  T(dk.M), SFT(dk.N),   CTL(dk.E),     ALT(dk.I),    T(dk.Y),
-                    T(dk.X),   T(dk.C),         T(dk.D), PrintStats,                  PrintStats,  T(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
+                    T(dk.X),   T(dk.C),         T(dk.D), T(dk.V),                  T(dk.J),  T(dk.H), T(dk.COMMA), LT(L_WIN, dk.DOT),
                                              LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE) 
     },
     // L_ARROWS
@@ -52,7 +52,7 @@ pub const keymap = [_][key_count]core.KeyDef{
     },
     // BOTH
     .{ 
-    _______,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
+    PrintStats,   T(us.F7),   T(us.F8),   T(us.F9), T(us.F10),            T(dk.TILD), T(us.SPACE), T(us.SPACE), T(us.SPACE), T(dk.GRV),
     _______, ALT(us.F4), CTL(us.F5), SFT(us.F6), T(us.F11),             T(dk.DLR),  SFT(us.BS),  CTL(us.BS),  ALT(us.BS),   _______,
                T(us.F1),   T(us.F2),   T(us.F3), T(us.F12),            T(dk.CIRC),   T(us.DEL),   T(us.DEL),   T(us.DEL),
                                                    _______,              T(dk.N0)
@@ -103,8 +103,8 @@ fn C(key_press: core.KeyCodeFire, custom_hold: u8) core.KeyDef {
 
 pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_count = keymap.len };
 const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
-const tapping_term = core.TimeSpan{ .ms = 250 };
-const combo_timeout = core.TimeSpan{ .ms = 50 };
+const tapping_term = core.TimeSpan{ .ms = 125 };
+const combo_timeout = core.TimeSpan{ .ms = 40 };
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, L_BASE, dk.J),
     Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
