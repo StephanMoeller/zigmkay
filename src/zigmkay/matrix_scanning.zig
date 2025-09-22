@@ -6,6 +6,7 @@ const time = rp2xxx.time;
 pub const ScannerSettings = struct {
     debounce: core.TimeSpan,
     pin_raise_wait_us: u64 = 30,
+    activated_value: u1 = 1,
 };
 
 const PinAndIndex = struct {
@@ -39,14 +40,14 @@ pub fn CreateMatrixScannerType(
         const Self = @This();
         pub fn DetectKeyboardChanges(_: *const Self, output_queue: *core.MatrixStateChangeQueue, current_time: core.TimeSinceBoot) !void {
             for (pin_cols, 0..) |col, col_idx| {
-                col.put(1);
+                col.put(settings.activated_value);
                 time.sleep_us(settings.pin_raise_wait_us);
 
                 for (pin_rows, 0..) |row, row_idx| {
                     // find the key index for this combination
                     const key_index_or_null = row_col_to_keyindex[col_idx][row_idx];
                     if (key_index_or_null) |key_index| {
-                        const pressed = row.read() == 1;
+                        const pressed = row.read() == settings.activated_value;
 
                         if (pressed != current_states[key_index]) {
                             // DEBOUNCE HANDLING
@@ -68,7 +69,7 @@ pub fn CreateMatrixScannerType(
                     }
                 }
 
-                col.put(0);
+                col.put(1 - settings.activated_value);
             }
             // zig fmt: off
      }

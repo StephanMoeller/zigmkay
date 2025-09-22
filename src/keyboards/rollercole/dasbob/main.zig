@@ -39,7 +39,7 @@ pub fn main() !void {
         dasbob_pins.pin_cols[0..],
         dasbob_pins.pin_rows[0..],
         pin_mapping,
-        .{ .debounce = .{ .ms = 25 } },
+        .{ .debounce = .{ .ms = 25 }, .activated_value = 0 },
     ){};
 
     if (is_primary) {
@@ -105,4 +105,3 @@ pub fn main() !void {
         }
     }
 }
-
