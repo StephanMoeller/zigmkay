@@ -10,21 +10,23 @@ const time = rp2xxx.time;
 // uart
 
 const gpio = rp2xxx.gpio;
-//const uart = rp2xxx.uart.instance.num(0);
-//const uart_tx_pin = gpio.num(0);
-//const uart_rx_pin = gpio.num(1);
-
-const is_primary = true;
+const uart = rp2xxx.uart.instance.num(0);
 
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
 const dasbob_pins = @import("pins.zig");
 
+const is_primary = true;
+const unused_pin = 10;
+const rx_tx_pin = 1;
+
 pub fn main() !void {
+    const uart_tx_pin = if (is_primary) gpio.num(rx_tx_pin) else gpio.num(unused_pin);
+    const uart_rx_pin = if (is_primary) gpio.num(unused_pin) else gpio.num(rx_tx_pin);
 
     // uart
-    //    uart_tx_pin.set_function(.uart);
-    //    uart_rx_pin.set_function(.uart);
-    //    uart.apply(.{ .clock_config = rp2xxx.clock_config, .baud_rate = 9600 });
+    uart_tx_pin.set_function(.uart);
+    uart_rx_pin.set_function(.uart);
+    uart.apply(.{ .clock_config = rp2xxx.clock_config, .baud_rate = 9600 });
 
     // Data queues
     var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
@@ -43,6 +45,7 @@ pub fn main() !void {
     ){};
 
     if (is_primary) {
+
         // PRIMARY HALF
         // Processing
         const keymap = comptime dasbob_pins.get_keymap();
@@ -65,15 +68,15 @@ pub fn main() !void {
             try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
             // Receive remote changes as well
-            //const byte_or_null: ?u8 = uart.read_word(microzig.drivers.time.Duration.from_ms(0)) catch blk: {
-            //    uart.clear_errors();
-            //    break :blk null;
-            //};
+            const byte_or_null: ?u8 = uart.read_word(microzig.drivers.time.Duration.from_ms(0)) catch blk: {
+                uart.clear_errors();
+                break :blk null;
+            };
 
-            //if (byte_or_null) |byte| {
-            //    const uart_message = core.UartMessage.fromByte(byte);
-            //    try matrix_change_queue.enqueue(core.MatrixStateChange{ .pressed = uart_message.pressed, .key_index = uart_message.key_index, .time = current_time });
-            //}
+            if (byte_or_null) |byte| {
+                const uart_message = core.UartMessage.fromByte(byte);
+                try matrix_change_queue.enqueue(core.MatrixStateChange{ .pressed = uart_message.pressed, .key_index = uart_message.key_index, .time = current_time });
+            }
 
             // Processing: decide actions
             try processor.Process(current_time);
@@ -98,10 +101,11 @@ pub fn main() !void {
                 uart_send_buffer[0] = msg.toByte();
 
                 // Tries to write one byte with 100ms timeout
-                //uart.write_blocking(&uart_send_buffer, microzig.drivers.time.Duration.from_ms(100)) catch {
-                //    uart.clear_errors();
-                //};
+                uart.write_blocking(&uart_send_buffer, microzig.drivers.time.Duration.from_ms(100)) catch {
+                    uart.clear_errors();
+                };
             }
         }
     }
 }
+
