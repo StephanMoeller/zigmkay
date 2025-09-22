@@ -11,29 +11,29 @@ pub const key_count = 36;
 
 // zig fmt: off
 pub const pin_config = rp2xxx.pins.GlobalConfiguration{
-    .GPIO10 = .{ .name = "col", .direction = .out },
+    .GPIO11 = .{ .name = "col", .direction = .out },
 
     .GPIO13 = .{ .name = "GP13", .direction = .in, .pull = .up },
-    .GPIO28 = .{ .name = "GP28", .direction = .in },
-    .GPIO12 = .{ .name = "GP12", .direction = .in },
-    .GPIO29 = .{ .name = "GP29", .direction = .in },
-    .GPIO0 = .{ .name = "GP0", .direction = .in },
+    .GPIO28 = .{ .name = "GP28", .direction = .in, .pull = .up },
+    .GPIO12 = .{ .name = "GP12", .direction = .in, .pull = .up },
+    .GPIO29 = .{ .name = "GP29", .direction = .in, .pull = .up },
+    .GPIO0 = .{ .name = "GP0", .direction = .in, .pull = .up },
 
-    .GPIO22 = .{ .name = "GP22", .direction = .in },
-    .GPIO14 = .{ .name = "GP14", .direction = .in },
-    .GPIO26 = .{ .name = "GP26", .direction = .in },
-    .GPIO4 = .{ .name = "GP4", .direction = .in },
-    .GPIO27 = .{ .name = "GP27", .direction = .in },
+    .GPIO22 = .{ .name = "GP22", .direction = .in, .pull = .up },
+    .GPIO14 = .{ .name = "GP14", .direction = .in , .pull = .up},
+    .GPIO26 = .{ .name = "GP26", .direction = .in, .pull = .up },
+    .GPIO4 = .{ .name = "GP4", .direction = .in , .pull = .up},
+    .GPIO27 = .{ .name = "GP27", .direction = .in , .pull = .up},
 
-    .GPIO21 = .{ .name = "GP21", .direction = .in },
-    .GPIO23 = .{ .name = "GP23", .direction = .in },
-    .GPIO7 = .{ .name = "GP7", .direction = .in },
-    .GPIO20 = .{ .name = "GP20", .direction = .in },
-    .GPIO6 = .{ .name = "GP06", .direction = .in },
+    .GPIO21 = .{ .name = "GP21", .direction = .in, .pull = .up },
+    .GPIO23 = .{ .name = "GP23", .direction = .in , .pull = .up},
+    .GPIO7 = .{ .name = "GP7", .direction = .in, .pull = .up },
+    .GPIO20 = .{ .name = "GP20", .direction = .in , .pull = .up},
+    .GPIO6 = .{ .name = "GP06", .direction = .in , .pull = .up},
 
-.GPIO16 = .{ .name = "GP16", .direction = .in },
-    .GPIO9 = .{ .name = "GP9", .direction = .in },
-    .GPIO8 = .{ .name = "GP8", .direction = .in },
+.GPIO16 = .{ .name = "GP16", .direction = .in, .pull = .up },
+    .GPIO9 = .{ .name = "GP9", .direction = .in , .pull = .up},
+    .GPIO8 = .{ .name = "GP8", .direction = .in , .pull = .up},
     
 };
 pub const p = pin_config.pins();
