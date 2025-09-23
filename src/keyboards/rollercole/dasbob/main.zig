@@ -15,13 +15,13 @@ const uart = rp2xxx.uart.instance.num(0);
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
 const dasbob_pins = @import("pins.zig");
 
-const is_primary = true;
+const is_primary = false;
 const unused_pin = 10;
 const rx_tx_pin = 1;
 
 pub fn main() !void {
-    const uart_tx_pin = if (is_primary) gpio.num(rx_tx_pin) else gpio.num(unused_pin);
-    const uart_rx_pin = if (is_primary) gpio.num(unused_pin) else gpio.num(rx_tx_pin);
+    const uart_tx_pin = if (!is_primary) gpio.num(rx_tx_pin) else gpio.num(unused_pin);
+    const uart_rx_pin = if (!is_primary) gpio.num(unused_pin) else gpio.num(rx_tx_pin);
 
     // uart
     uart_tx_pin.set_function(.uart);
