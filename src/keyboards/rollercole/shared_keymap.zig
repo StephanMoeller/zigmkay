@@ -58,9 +58,9 @@ pub const keymap = [_][key_count]core.KeyDef{
                                                    _______,              T(dk.N0)
     },
     .{ 
-    WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, T(dk.N7), T(dk.N8), T(dk.N9), _______,         
-    WinNav(dk.N4), _______, WinNav(dk.N2), WinNav(dk.N5), _______,             _______, T(dk.N4), T(dk.N5), T(dk.N6), T(dk.N6),
-                   _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, T(dk.N1), T(dk.N2), T(dk.N3),
+    WinNav(dk.N7), _______, WinNav(dk.N1), WinNav(dk.N6), _______,             _______, _______, _______, _______, _______,         
+    WinNav(dk.N4), _______, WinNav(dk.N2), WinNav(dk.N5), _______,             _______, _______, _______, _______, _______,
+                   _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, _______, _______, _______,
                                                           _______,             _______
    },
 
