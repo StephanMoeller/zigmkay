@@ -45,9 +45,15 @@ pub fn build(b: *std.Build) void {
     };
 
     const test_step = b.step("test", "Run unit tests");
-
+    const target = b.standardTargetOptions(.{});
     for (test_files) |path| {
-        const test_exe = b.addTest(.{ .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = path } } });
+        const test_file_module = b.createModule(.{
+            .root_source_file = .{
+                .src_path = .{ .owner = b, .sub_path = path },
+            },
+            .target = target,
+        });
+        const test_exe = b.addTest(.{ .root_module = test_file_module });
         const run = b.addRunArtifact(test_exe);
         test_step.dependOn(&run.step);
     }

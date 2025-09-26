@@ -61,7 +61,7 @@ pub const UsbCommandExecutor = struct {
                     data[0] = modifiers.toByte();
                 },
                 .ActivateBootMode => {
-                    rp2xxx.rom.reset_to_usb_boot()(0, 0);
+                    rp2xxx.rom.reset_to_usb_boot();
                 },
             }
 

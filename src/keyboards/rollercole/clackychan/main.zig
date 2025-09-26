@@ -64,7 +64,7 @@ pub fn main() !void {
             try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
             // Receive remote changes as well
-            const byte_or_null: ?u8 = uart.read_word(microzig.drivers.time.Duration.from_ms(0)) catch blk: {
+            const byte_or_null: ?u8 = uart.read_word() catch blk: {
                 uart.clear_errors();
                 break :blk null;
             };
