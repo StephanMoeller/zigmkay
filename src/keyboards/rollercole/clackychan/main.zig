@@ -20,7 +20,13 @@ const rollercole_shared_keymap = @import("../shared_keymap.zig");
 const clackychan_pins = @import("pins.zig");
 
 pub fn main() !void {
-
+    clackychan_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+    main_internal() catch {
+        clackychan_pins.p.led.put(1);
+    };
+}
+pub fn main_internal() !void {
+    clackychan_pins.p.led.put(1);
     // uart
     uart_tx_pin.set_function(.uart);
     uart_rx_pin.set_function(.uart);
@@ -33,7 +39,6 @@ pub fn main() !void {
     const pin_mapping = if (is_primary) clackychan_pins.pin_mappings_right else clackychan_pins.pin_mappings_left;
 
     // Matrix scanning
-    clackychan_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
         rollercole_shared_keymap.dimensions,
         clackychan_pins.pin_cols[0..],
@@ -42,6 +47,8 @@ pub fn main() !void {
         .{ .debounce = .{ .ms = 25 } },
     ){};
 
+    time.sleep_us(250000);
+    clackychan_pins.p.led.put(0);
     if (is_primary) {
         // PRIMARY HALF
         // Processing
