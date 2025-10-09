@@ -118,7 +118,7 @@ pub const combos = [_]core.Combo2Def{
 
     Combo_Tap(.{ 23, 24 }, L_BASE, us.BOOT),
     Combo_Tap(.{ 0, 4 }, L_BASE, us.BOOT),
-    Combo_Tap(.{ 5, 4 }, L_BASE, us.BOOT),
+    Combo_Tap(.{ 5, 9 }, L_BASE, us.BOOT),
     Combo_Tap(.{ 6, 7 }, L_BASE, dk.AE),
     Combo_Tap(.{ 6, 8 }, L_BASE, dk.OE),
 

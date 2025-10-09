@@ -8,20 +8,34 @@ const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
 // uart
-
 const gpio = rp2xxx.gpio;
+
 const uart = rp2xxx.uart.instance.num(0);
 
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
 const dasbob_pins = @import("pins.zig");
 
-const is_primary = false;
 const unused_pin = 10;
+const is_primary = true;
 const rx_tx_pin = 1;
 
 pub fn main() !void {
-    const uart_tx_pin = if (!is_primary) gpio.num(rx_tx_pin) else gpio.num(unused_pin);
-    const uart_rx_pin = if (!is_primary) gpio.num(unused_pin) else gpio.num(rx_tx_pin);
+    dasbob_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+    p.led.put(1);
+    main_internal() catch {
+        while (true) {
+            p.led.put(0);
+            time.sleep_ms(250);
+            p.led.put(1);
+            time.sleep_ms(250);
+        }
+    };
+}
+
+pub const p = dasbob_pins.pin_config.pins();
+pub fn main_internal() !void {
+    const uart_tx_pin = if (is_primary) gpio.num(unused_pin) else gpio.num(rx_tx_pin);
+    const uart_rx_pin = if (is_primary) gpio.num(rx_tx_pin) else gpio.num(unused_pin);
 
     // uart
     uart_tx_pin.set_function(.uart);
@@ -33,9 +47,7 @@ pub fn main() !void {
     var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
 
     const pin_mapping = if (is_primary) dasbob_pins.pin_mappings_right else dasbob_pins.pin_mappings_left;
-
     // Matrix scanning
-    dasbob_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
     const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
         dasbob_pins.dimensions,
         dasbob_pins.pin_cols[0..],
@@ -68,8 +80,8 @@ pub fn main() !void {
             try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
 
             // Receive remote changes as well
-            const byte_or_null: ?u8 = uart.read_word(microzig.drivers.time.Duration.from_ms(0)) catch blk: {
-                uart.clear_errors();
+            uart.clear_errors();
+            const byte_or_null: ?u8 = try uart.read_word() catch blk: {
                 break :blk null;
             };
 
@@ -108,4 +120,3 @@ pub fn main() !void {
         }
     }
 }
-
