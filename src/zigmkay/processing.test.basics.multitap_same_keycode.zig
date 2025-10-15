@@ -62,7 +62,6 @@ test "Multitap - case B" {
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, try o.actions_queue.dequeue());
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodePress = a }, try o.actions_queue.dequeue());
     const h = try o.actions_queue.dequeue();
-    std.debug.print("{}", .{h});
     try std.testing.expectEqual(core.OutputCommand{ .KeyCodeRelease = a }, h);
 
     try std.testing.expectEqual(0, o.actions_queue.Count());
