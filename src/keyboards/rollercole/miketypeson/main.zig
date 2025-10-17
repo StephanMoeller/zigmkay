@@ -7,54 +7,54 @@ const rp2xxx = @import("microzig").hal;
 const time = rp2xxx.time;
 
 const rollercole_shared_keymap = @import("../shared_keymap.zig");
-const miketypeson_pins = @import("pins.zig");
+
+// zig fmt: off
+pub const pin_config = rp2xxx.pins.GlobalConfiguration{
+    .GPIO17 = .{ .name = "led_red", .direction = .out },
+    .GPIO16 = .{ .name = "led_green", .direction = .out },
+    .GPIO25 = .{ .name = "led_blue", .direction = .out },
+
+    .GPIO26 = .{ .name = "c0", .direction = .out },
+    .GPIO27 = .{ .name = "c1", .direction = .out },
+    .GPIO28 = .{ .name = "c2", .direction = .out },
+    .GPIO29 = .{ .name = "c3", .direction = .out },
+    .GPIO6 = .{ .name = "c4", .direction = .out },
+
+    .GPIO7 = .{ .name = "r0", .direction = .in },
+    .GPIO0 = .{ .name = "r1", .direction = .in },
+    .GPIO3 = .{ .name = "r2", .direction = .in },
+
+    .GPIO4 = .{ .name = "r3", .direction = .in },
+    .GPIO2 = .{ .name = "r4", .direction = .in },
+    .GPIO1 = .{ .name = "r5", .direction = .in },
+};
+pub const p = pin_config.pins();
+
+pub const pin_mappings = [rollercole_shared_keymap.key_count]?[2]usize{
+   .{4,0},.{3,0},.{2,0},.{1,0},.{0,0},  .{0,5},.{1,5},.{2,5},.{3,5},.{4,5},
+   .{4,1},.{3,1},.{2,1},.{1,1},.{0,1},  .{0,4},.{1,4},.{2,4},.{3,4},.{4,4},
+          .{3,2},.{2,2},.{1,2},.{0,2},  .{0,3},.{1,3},.{2,3},.{3,3},
+                               .{4,2},  .{4,3}
+};
+pub const pin_cols = [_]rp2xxx.gpio.Pin{ p.c0, p.c1, p.c2, p.c3, p.c4 };
+pub const pin_rows = [_]rp2xxx.gpio.Pin{ p.r0, p.r1, p.r2, p.r3, p.r4, p.r5 };
+
 pub fn main() !void {
 
-    // Data queues
-    var matrix_change_queue = zigmkay.core.MatrixStateChangeQueue.Create();
-    var usb_command_queue = zigmkay.core.OutputCommandQueue.Create();
+    // Init pins
+    pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
+        zigmkay.run_primary(
+            rollercole_shared_keymap.dimensions,
+            pin_cols[0..],
+            pin_rows[0..],
+            .{.debounce = .{ .ms = 25 } },
+            rollercole_shared_keymap.combos[0..],
+            &rollercole_shared_keymap.custom_functions,
+            pin_mappings,
+            &rollercole_shared_keymap.keymap,
+            null,// no uart, this is not a split keyboard
+        ) catch {
 
-    miketypeson_pins.pin_config.apply(); // dont know how this could be done inside the module, but it needs to be done for things to work
-
-    // Matrix scanning
-    const matrix_scanner = zigmkay.matrix_scanning.CreateMatrixScannerType(
-        rollercole_shared_keymap.dimensions,
-        miketypeson_pins.pin_cols[0..],
-        miketypeson_pins.pin_rows[0..],
-        miketypeson_pins.pin_mappings,
-        .{ .debounce = .{ .ms = 25 } },
-    ){};
-
-    // TODO: i2c communication with secondary half should happen here and produce events in the matrix_change_queue
-    // TODO: The secondary side should just scan the matrix and send the i2c data to the primary half
-
-    // Processing
-    var processor = zigmkay.processing.CreateProcessorType(
-        rollercole_shared_keymap.dimensions,
-        &rollercole_shared_keymap.keymap,
-        rollercole_shared_keymap.combos[0..],
-        &rollercole_shared_keymap.custom_functions,
-    ){
-        .input_matrix_changes = &matrix_change_queue,
-        .output_usb_commands = &usb_command_queue,
-    };
-
-    // USB events
-    const usb_command_executor = zigmkay.usb_command_executor.CreateAndInitUsbCommandExecutor();
-
-    while (true) {
-        const current_time = core.TimeSinceBoot{ .time_since_boot_us = time.get_time_since_boot().to_us() };
-
-        // Matrix scanning: detect which keys have been pressed since last time
-        try matrix_scanner.DetectKeyboardChanges(&matrix_change_queue, current_time);
-
-        // Processing: decide actions
-        try processor.Process(current_time);
-
-        // Execute actions: send usb commands to the host
-        try usb_command_executor.HouseKeepAndProcessCommands(&usb_command_queue, current_time);
-
-        // todo: put this logic inside usb command executor and make a keycode to trigger it
-
-    }
+        };
+    
 }
