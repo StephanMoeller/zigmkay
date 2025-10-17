@@ -20,7 +20,6 @@ pub fn run_primary(
     comptime side_definition: [dimensions.key_count]core.Side,
     uart_or_null: ?rp2xxx.uart.UART,
 ) !void {
-    _ = side_definition;
     // Data queues
     var matrix_change_queue = core.MatrixStateChangeQueue.Create();
     var usb_command_queue = core.OutputCommandQueue.Create();
@@ -33,6 +32,7 @@ pub fn run_primary(
     var processor = processing.CreateProcessorType(
         dimensions,
         keymap,
+        side_definition,
         combos,
         custom_functions,
     ){
