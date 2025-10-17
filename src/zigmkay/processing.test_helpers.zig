@@ -14,8 +14,8 @@ pub fn init_test_full(
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
     comptime combos: []const core.Combo2Def,
     comptime custom_functions: *const core.CustomFunctions,
+    comptime sides: [keymap_dimensions.key_count]core.Side,
 ) type {
-    const sides: [keymap_dimensions.key_count]core.Side = @splat(.X);
     const ProcessorType = zigmkay.processing.CreateProcessorType(
         keymap_dimensions,
         keymap,
@@ -50,13 +50,21 @@ pub fn init_test_with_combos(
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
     comptime combos: []const core.Combo2Def,
 ) type {
-    return init_test_full(keymap_dimensions, keymap, combos, &no_functions);
+    return init_test_full(keymap_dimensions, keymap, combos, &no_functions, @splat(.X));
 }
 pub fn init_test(
     comptime keymap_dimensions: core.KeymapDimensions,
     comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
 ) type {
-    return init_test_full(keymap_dimensions, keymap, no_combos[0..], &no_functions);
+    return init_test_full(keymap_dimensions, keymap, no_combos[0..], &no_functions, @splat(.X));
+}
+
+pub fn init_test_with_sides(
+    comptime keymap_dimensions: core.KeymapDimensions,
+    comptime keymap: *const [keymap_dimensions.layer_count][keymap_dimensions.key_count]core.KeyDef,
+    comptime sides: [keymap_dimensions.key_count]core.Side,
+) type {
+    return init_test_full(keymap_dimensions, keymap, no_combos[0..], &no_functions, sides);
 }
 
 pub fn ONE_SHOT_LAYER(layer: u8) core.TapDef {

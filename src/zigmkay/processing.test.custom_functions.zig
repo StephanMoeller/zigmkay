@@ -3,7 +3,6 @@ const zigmkay = @import("zigmkay.zig");
 const core = zigmkay.core;
 const generic_queue = @import("generic_queue.zig");
 const helpers = @import("processing.test_helpers.zig");
-const init_test_full = helpers.init_test_full;
 
 const a = 0x04;
 const b = 0x05;
@@ -77,11 +76,12 @@ test "custom code - tap events" {
     const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const base_layer = comptime [_]core.KeyDef{ a_with_shift_hold, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
-    var o = init_test_full(
+    var o = helpers.init_test_full(
         core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len },
         &keymap,
         &[_]core.Combo2Def{},
         &custom_functions,
+        @splat(.X),
     ){};
 
     // press B in the matrix
@@ -163,11 +163,12 @@ test "custom code - hold events" {
     var current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const base_layer = comptime [_]core.KeyDef{ a_with_shift_hold, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
-    var o = init_test_full(
+    var o = helpers.init_test_full(
         core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len },
         &keymap,
         &[_]core.Combo2Def{},
         &custom_functions,
+        @splat(.X),
     ){};
 
     // press B in the matrix
@@ -230,11 +231,12 @@ test "custom code - ensure tick event" {
     const current_time: core.TimeSinceBoot = core.TimeSinceBoot.from_absolute_us(100);
     const base_layer = comptime [_]core.KeyDef{ a_with_shift_hold, B, C, D };
     const keymap = comptime [_][base_layer.len]core.KeyDef{base_layer};
-    var o = init_test_full(
+    var o = helpers.init_test_full(
         core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len },
         &keymap,
         &[_]core.Combo2Def{},
         &custom_functions,
+        @splat(.X),
     ){};
     try o.process(current_time);
 

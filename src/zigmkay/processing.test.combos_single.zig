@@ -346,7 +346,7 @@ test "custom code activate another layer - ensure combo works" {
     const keymap = comptime [_][base_layer.len]core.KeyDef{ base_layer, layer_1, layer_2, layer_3 };
     const combos = comptime [_]core.Combo2Def{.{ .key_indexes = .{ 0, 3 }, .layer = 3, .timeout = combo_timeout, .key_def = G }};
 
-    var o = helpers.init_test_full(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos, &custom_functions){};
+    var o = helpers.init_test_full(core.KeymapDimensions{ .key_count = base_layer.len, .layer_count = keymap.len }, &keymap, &combos, &custom_functions, @splat(.X)){};
     try o.press_key(1, current_time);
     try o.press_key(2, current_time);
     try std.testing.expectEqual(false, MyFunctions.layer3_is_active);
