@@ -32,6 +32,7 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/processing.test.one_shot.zig",
         "src/zigmkay/processing.test.struct_sizes.zig",
         "src/zigmkay/processing.test.rolling_keys.zig",
+        "src/zigmkay/processing.test.sides.zig",
         "src/zigmkay/processing.test.combos_single.zig",
         "src/zigmkay/processing.test.custom_functions.zig",
         "src/zigmkay/processing.test.basics.multitap_same_keycode.zig",

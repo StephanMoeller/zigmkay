@@ -91,7 +91,8 @@ pub fn CreateProcessorType(
 
                             // Permissive hold?
                             for (tail[0..outer_idx]) |earlier_event| {
-                                if (earlier_event.key_index == ev.key_index and earlier_event.pressed) {
+                                const press_and_release_same_key_detected = earlier_event.key_index == ev.key_index and earlier_event.pressed;
+                                if (press_and_release_same_key_detected) {
                                     try on_hold_decided(self, tap_and_hold.hold, next_key_info.key_def, head_event);
                                     return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
                                 }
