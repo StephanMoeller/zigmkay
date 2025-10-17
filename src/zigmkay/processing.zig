@@ -9,7 +9,6 @@ pub fn CreateProcessorType(
     comptime combos: []const core.Combo2Def,
     comptime custom: *const core.CustomFunctions,
 ) type {
-    _ = sides;
     return struct {
         const Self = @This();
 
@@ -93,8 +92,14 @@ pub fn CreateProcessorType(
                             for (tail[0..outer_idx]) |earlier_event| {
                                 const press_and_release_same_key_detected = earlier_event.key_index == ev.key_index and earlier_event.pressed;
                                 if (press_and_release_same_key_detected) {
-                                    try on_hold_decided(self, tap_and_hold.hold, next_key_info.key_def, head_event);
-                                    return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
+                                    const tapped_key_same_side_as_first_key = sides[earlier_event.key_index] == sides[head_event.key_index] and sides[head_event.key_index] != .X;
+                                    if (!tapped_key_same_side_as_first_key) {
+                                        try on_hold_decided(self, tap_and_hold.hold, next_key_info.key_def, head_event);
+                                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
+                                    } else {
+                                        try on_tap_decided(self, tap_and_hold.tap, head_event, TapReleaseMode.AwaitKeyReleased);
+                                        return ProcessContinuation{ .DequeueAndRunAgain = .{ .dequeue_count = next_key_info.consumed_event_count } };
+                                    }
                                 }
                             }
 
