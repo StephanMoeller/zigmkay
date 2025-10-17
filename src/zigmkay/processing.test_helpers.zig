@@ -7,6 +7,7 @@ fn on_event(e: core.ProcessorEvent, layers: *core.LayerActivations, output_queue
     _ = layers;
     _ = output_queue;
 }
+
 const no_functions: core.CustomFunctions = .{ .on_event = on_event };
 pub fn init_test_full(
     comptime keymap_dimensions: core.KeymapDimensions,
@@ -14,9 +15,11 @@ pub fn init_test_full(
     comptime combos: []const core.Combo2Def,
     comptime custom_functions: *const core.CustomFunctions,
 ) type {
+    const sides: [keymap_dimensions.key_count]core.Side = @splat(.X);
     const ProcessorType = zigmkay.processing.CreateProcessorType(
         keymap_dimensions,
         keymap,
+        sides,
         combos,
         custom_functions,
     );
