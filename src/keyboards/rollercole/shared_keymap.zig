@@ -20,7 +20,12 @@ const L_WIN:usize = 5;
 const L_LEFT = L_NUM;
 const L_RIGHT = L_ARROWS;
 
-
+pub const sides = [key_count]core.Side{
+  .L,.L,.L,.L,.L,       .R,.R,.R,.R,.R,
+  .L,.L,.L,.L,.L,       .R,.R,.R,.R,.R,
+     .L,.L,.L,.L,       .R,.R,.R,.R,
+              .X,       .X
+};
 pub const keymap = [_][key_count]core.KeyDef{
     .{
          T(dk.Q),  AF(dk.W), GUI(dk.R),   T(dk.P), T(dk.B),                  T(dk.K),   T(dk.L),  GUI(dk.O),       T(dk.U), T(dk.QUOT),

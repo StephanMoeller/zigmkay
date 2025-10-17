@@ -40,6 +40,7 @@ pub const KeyDef = union(enum) {
     tap_with_autofire: AutoFireDef,
 };
 
+pub const Side = enum { L, R, X };
 pub const Combo2Def = struct {
     key_indexes: [2]KeyIndex,
     timeout: TimeSpan,

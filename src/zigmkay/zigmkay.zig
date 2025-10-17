@@ -17,9 +17,10 @@ pub fn run_primary(
     comptime custom_functions: *const core.CustomFunctions,
     comptime pin_mappings: [dimensions.key_count]?[2]usize,
     comptime keymap: *const [dimensions.layer_count][dimensions.key_count]core.KeyDef,
+    comptime side_definition: [dimensions.key_count]core.Side,
     uart_or_null: ?rp2xxx.uart.UART,
 ) !void {
-
+    _ = side_definition;
     // Data queues
     var matrix_change_queue = core.MatrixStateChangeQueue.Create();
     var usb_command_queue = core.OutputCommandQueue.Create();

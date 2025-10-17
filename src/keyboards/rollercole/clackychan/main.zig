@@ -78,6 +78,7 @@ pub fn main() !void {
             &rollercole_shared_keymap.custom_functions,
             pin_mappings_right,
             &rollercole_shared_keymap.keymap,
+            rollercole_shared_keymap.sides,
             uart,
         ) catch {
             blink_led(100000, 50);
