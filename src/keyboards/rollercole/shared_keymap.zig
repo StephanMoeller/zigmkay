@@ -120,6 +120,7 @@ pub const dimensions = core.KeymapDimensions{ .key_count = key_count, .layer_cou
 const PrintStats = core.KeyDef{ .tap_only = .{ .key_press = .{ .tap_keycode = us.KC_PRINT_STATS } } };
 const tapping_term = core.TimeSpan{ .ms = 250 };
 const combo_timeout = core.TimeSpan{ .ms = 40 };
+
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, L_BASE, dk.J),
     Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
@@ -270,13 +271,13 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
         .OnTapEnterBefore => |data| {
             if (data.tap.custom == ENABLE_GAMING) {
                 layers.set_layer_state(L_GAMING, true);
-
-                output_queue.tap_key(us.E) catch {};
             }
             if (data.tap.custom == DISABLE_GAMING) {
                 layers.set_layer_state(L_GAMING, false);
 
-                output_queue.tap_key(us.D) catch {};
+                output_queue.set_mods(.{.left_alt = true}) catch {};
+                output_queue.tap_key(us.F4) catch {};
+                output_queue.set_mods(.{.left_alt = false}) catch {};
             }
         },
        .OnTapExitAfter => |data| {
