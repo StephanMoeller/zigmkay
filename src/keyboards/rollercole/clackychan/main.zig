@@ -53,7 +53,7 @@ pub const pin_mappings_left = [rollercole_shared_keymap.key_count]?[2]usize{
 };
 
 pub const scanner_settings = zigmkay.matrix_scanning.ScannerSettings{
-    .debounce = .{ .ms = 25 },
+    .debounce = .{ .ms = 50 },
 };
 
 // zig fmt: on
