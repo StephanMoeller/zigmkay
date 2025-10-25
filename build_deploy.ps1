@@ -24,7 +24,5 @@ while ($true) {
 
     Start-Sleep -Seconds 1
 }
-
-# Continue with whatever you want to do next
-Write-Host "Performing next steps with drive $letter..." -ForegroundColor Yellow
+cWrite-Host "Done"
 
