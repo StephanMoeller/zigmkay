@@ -24,5 +24,5 @@ while ($true) {
 
     Start-Sleep -Seconds 1
 }
-cWrite-Host "Done"
+Write-Host "Done"
 
