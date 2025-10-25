@@ -274,6 +274,7 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
             }
             if (data.tap.custom == DISABLE_GAMING) {
                 layers.set_layer_state(L_GAMING, false);
+                output_queue.tap_key(us.ESC) catch {};
             }
         },
        .OnTapExitAfter => |data| {
