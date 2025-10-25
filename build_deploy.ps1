@@ -17,8 +17,8 @@ while ($true) {
 
     if ($drive) {
         $TARGET = $drive.DriveLetter + ":\zigmkay.uf2"
-        Write-Host "Rp2040 detected as drive $($drive.DriveLetter). Copying to $TARGET" -ForegroundColor Green
         cp "$FIRMWARE" "$TARGET"
+        Write-Host "Rp2040 detected as drive $($drive.DriveLetter). Copied to $TARGET successfully" -ForegroundColor Green
         break
     }
 
