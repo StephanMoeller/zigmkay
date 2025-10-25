@@ -16,6 +16,7 @@ const L_NUM:usize = 2;
 const L_EMPTY: usize = 3;
 const L_BOTH:usize = 4;
 const L_WIN:usize = 5;
+const L_GAMING:usize = 6;
 
 const L_LEFT = L_NUM;
 const L_RIGHT = L_ARROWS;
@@ -68,8 +69,17 @@ pub const keymap = [_][key_count]core.KeyDef{
                    _______, WinNav(dk.N3), WinNav(dk.N8), _______,             _______, _______, _______, _______,
                                                           _______,             _______
    },
-
+    // GAMING
+    .{
+           NONE,    NONE,    NONE,    NONE,    NONE,                   NONE,       NONE,   T(us.UP),        NONE,    NONE,
+           NONE,    NONE,    NONE,    NONE,    NONE,                   NONE, T(us.LEFT), T(us.DOWN), T(us.RIGHT),    NONE,
+           NONE,    NONE,    NONE,    NONE,                            NONE,       NONE,       NONE,        NONE,
+        LT(L_LEFT, us.ENTER),                  LT(L_RIGHT, us.SPACE)
+    },
 };
+
+
+
 // zig fmt: on
 const LEFT_THUMB = 1;
 const RIGHT_THUMB = 2;
@@ -140,6 +150,9 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 16, 17 }, L_ARROWS, dk.PIPE),
 
     Combo_Tap(.{ 20, 21 }, L_ARROWS, dk.BSLS),
+    
+    Combo_Custom(.{ 0, 9 }, L_BASE, ENABLE_GAMING),
+    Combo_Custom(.{ 0, 9 }, L_GAMING, DISABLE_GAMING),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
@@ -152,6 +165,16 @@ fn Combo_Tap(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode_fire
         .key_def = core.KeyDef{ .tap_only = .{ .key_press = keycode_fire } },
     };
 }
+
+fn Combo_Custom(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, custom: u8) core.Combo2Def {
+    return core.Combo2Def{
+        .key_indexes = key_indexes,
+        .layer = layer,
+        .timeout = combo_timeout,
+        .key_def = core.KeyDef{ .tap_only = .{ .custom = custom } },
+    };
+}
+
 fn Combo_Tap_HoldMod(key_indexes: [2]core.KeyIndex, layer: core.LayerIndex, keycode_fire: core.KeyCodeFire, mods: core.Modifiers) core.Combo2Def {
     return core.Combo2Def{
         .key_indexes = key_indexes,
@@ -233,6 +256,9 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
     };
 }
 
+const ENABLE_GAMING = 1;
+const DISABLE_GAMING = 2;
+
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
         .OnHoldEnterAfter => |_| {
@@ -241,12 +267,24 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
         .OnHoldExitAfter => |_| {
             layers.set_layer_state(L_BOTH, layers.is_layer_active(L_LEFT) and layers.is_layer_active(L_RIGHT));
         },
-        .OnTapExitAfter => |data| {
+        .OnTapEnterBefore => |data| {
+            if (data.tap.custom == ENABLE_GAMING) {
+                layers.set_layer_state(L_GAMING, true);
+
+                output_queue.tap_key(us.E) catch {};
+            }
+            if (data.tap.custom == DISABLE_GAMING) {
+                layers.set_layer_state(L_GAMING, false);
+
+                output_queue.tap_key(us.D) catch {};
+            }
+        },
+       .OnTapExitAfter => |data| {
             if (data.tap.key_press) |key_fire| {
                 if (key_fire.dead) {
                     output_queue.tap_key(us.SPACE) catch {};
                 }
-            }
+            } 
         },
         else => {},
     }
