@@ -74,7 +74,7 @@ pub const keymap = [_][key_count]core.KeyDef{
            NONE,    NONE,    NONE,    NONE,    NONE,                   NONE,       NONE,   T(us.UP),        NONE,    NONE,
            NONE, T(dk.A), T(dk.S), T(dk.T),    NONE,                   NONE, T(us.LEFT), T(us.DOWN), T(us.RIGHT),    NONE,
            NONE,    NONE,    NONE,    NONE,                            NONE,       NONE,       NONE,        NONE,
-        LT(L_LEFT, us.SPACE),                  LT(L_RIGHT, us.SPACE)
+                                        T(us.ENTER),                  NONE
     },
 };
 
