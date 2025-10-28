@@ -154,7 +154,7 @@ pub const combos = [_]core.Combo2Def{
     
     Combo_Custom(.{ 0, 9 }, L_BASE, ENABLE_GAMING),
     Combo_Custom(.{ 0, 9 }, L_GAMING, DISABLE_GAMING),
-    Combo_Custom(.{ 2, 3 }, L_ARROWS, EQ_COL),
+    Combo_Custom(.{ 1, 3 }, L_ARROWS, EQ_COL),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
