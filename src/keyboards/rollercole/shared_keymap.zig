@@ -154,6 +154,7 @@ pub const combos = [_]core.Combo2Def{
     
     Combo_Custom(.{ 0, 9 }, L_BASE, ENABLE_GAMING),
     Combo_Custom(.{ 0, 9 }, L_GAMING, DISABLE_GAMING),
+    Combo_Custom(.{ 2, 3 }, L_ARROWS, EQ_COL),
 };
 
 // For now, all these shortcuts are placed in the custom keymap to let the user know how they are defined
@@ -259,6 +260,7 @@ fn SFT(keycode_fire: core.KeyCodeFire) core.KeyDef {
 
 const ENABLE_GAMING = 1;
 const DISABLE_GAMING = 2;
+const EQ_COL = 3;
 
 fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_queue: *core.OutputCommandQueue) void {
     switch (event) {
@@ -276,6 +278,13 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
                 layers.set_layer_state(L_GAMING, false);
                 output_queue.tap_key(us.ESC) catch {};
             }
+            if (data.tap.custom == EQ_COL) {
+                output_queue.tap_key(us.SPACE) catch {};
+                output_queue.tap_key(dk.COLN) catch {};
+                output_queue.tap_key(dk.EQL) catch {};
+                output_queue.tap_key(us.SPACE) catch {};
+            }
+            
         },
        .OnTapExitAfter => |data| {
             if (data.tap.key_press) |key_fire| {
