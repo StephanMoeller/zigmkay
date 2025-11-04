@@ -123,7 +123,7 @@ const combo_timeout = core.TimeSpan{ .ms = 40 };
 
 pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 1, 2 }, L_BASE, dk.J),
-    Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true }),
+    Combo_Tap_HoldMod(.{ 11, 12 }, L_BASE, dk.Z, .{ .right_ctrl = true, .right_alt = true }),
 
     Combo_Tap_HoldMod(.{ 12, 13 }, L_BASE, dk.V, .{ .left_ctrl = true, .left_shift = true }),
     Combo_Tap_HoldMod(.{ 12, 13 }, L_NUM, _Ctl(dk.V), .{ .left_ctrl = true, .left_shift = true }),
