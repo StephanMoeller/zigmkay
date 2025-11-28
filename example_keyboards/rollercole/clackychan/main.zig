@@ -1,20 +1,20 @@
-const zigmkay = @import("../../../zigmkay/zigmkay.zig");
-const dk = @import("../../../keycodes/dk.zig");
-
-const core = zigmkay.core;
 const std = @import("std");
+
 const microzig = @import("microzig");
 const rp2xxx = microzig.hal;
 const time = rp2xxx.time;
-const us = @import("../../../keycodes/us.zig");
-// uart
-
 const gpio = rp2xxx.gpio;
+const rollercole_shared_keymap = @import("rollercole_shared_keymap");
+const zmk = @import("zigmkay");
+const zigmkay = zmk.zigmkay;
+const dk = zmk.keyycodes.dk;
+const core = zigmkay.core;
+const us = zmk.keyycodes.us;
+
+// uart
 
 const uart_tx_pin = gpio.num(0);
 const uart_rx_pin = gpio.num(1);
-
-const rollercole_shared_keymap = @import("../shared_keymap.zig");
 
 // zig fmt: off
 pub const pin_config = rp2xxx.pins.GlobalConfiguration{

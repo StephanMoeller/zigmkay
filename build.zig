@@ -1,4 +1,5 @@
 const std = @import("std");
+
 const microzig = @import("microzig");
 
 const MicroBuild = microzig.MicroBuild(.{
@@ -9,12 +10,35 @@ pub fn build(b: *std.Build) void {
     const mz_dep = b.dependency("microzig", .{});
     const mb = MicroBuild.init(b, mz_dep) orelse return;
 
+    const zigmkay_mod = b.addModule("zigmkay", .{
+        .root_source_file = .{
+            .src_path = .{ .owner = b, .sub_path = "src/root.zig" },
+        },
+    });
+
     const firmware = mb.add_firmware(.{
-        .name = "zigmkay",
+        .name = "clackychan",
         .target = mb.ports.rp2xxx.boards.raspberrypi.pico,
         .optimize = .ReleaseSafe,
-        .root_source_file = b.path("src/main.zig"),
+        .root_source_file = .{
+            .src_path = .{
+                .owner = b,
+                .sub_path = "example_keyboards/rollercole/clackychan/main.zig",
+            },
+        },
+        .imports = &.{
+            // TOOD: Move back to normal imports once working
+            // .{ .name = "zigmkay", .module = zigmkay_mod },
+            .{ .name = "rollercole_shared_keymap", .module = b.createModule(.{
+                .root_source_file = .{
+                    .src_path = .{ .owner = b, .sub_path = "example_keyboards/rollercole/shared_keymap.zig" },
+                },
+                .imports = &.{.{ .name = "zigmkay", .module = zigmkay_mod }},
+            }) },
+        },
     });
+
+    firmware.add_app_import("zigmkay", zigmkay_mod, .{ .depend_on_microzig = true });
 
     // We call this twice to demonstrate that the default binary output for
     // RP2040 is UF2, but we can also output other formats easily

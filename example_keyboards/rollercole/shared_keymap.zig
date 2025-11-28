@@ -1,15 +1,18 @@
-const dk = @import("../../keycodes/dk.zig");
-const us = @import("../../keycodes/us.zig");
 const std = @import("std");
-const core = @import("../../zigmkay/core.zig");
-const microzig = @import("microzig");
+
+const zmk = @import("zigmkay");
+const core = zmk.zigmkay.core;
+const NONE = core.KeyDef.none;
+const _______ = NONE;
+const microzig = zmk.microzig;
 const rp2xxx = microzig.hal;
+const dk = zmk.keyycodes.dk;
+const us = zmk.keyycodes.us;
 
 pub const key_count = 30;
 
 // zig fmt: off
-const NONE = core.KeyDef.none;
-const _______ = NONE;//core.KeyDef.transparent;
+//core.KeyDef.transparent;
 const L_BASE:usize = 0;
 const L_ARROWS:usize = 1;
 const L_NUM:usize = 2;
@@ -151,7 +154,7 @@ pub const combos = [_]core.Combo2Def{
     Combo_Tap(.{ 16, 17 }, L_ARROWS, dk.PIPE),
 
     Combo_Tap(.{ 20, 21 }, L_ARROWS, dk.BSLS),
-    
+
     Combo_Custom(.{ 0, 9 }, L_BASE, ENABLE_GAMING),
     Combo_Custom(.{ 0, 9 }, L_GAMING, DISABLE_GAMING),
     Combo_Custom(.{ 1, 3 }, L_ARROWS, EQ_COL),
@@ -284,14 +287,13 @@ fn on_event(event: core.ProcessorEvent, layers: *core.LayerActivations, output_q
                 output_queue.tap_key(dk.EQL) catch {};
                 output_queue.tap_key(us.SPACE) catch {};
             }
-            
         },
-       .OnTapExitAfter => |data| {
+        .OnTapExitAfter => |data| {
             if (data.tap.key_press) |key_fire| {
                 if (key_fire.dead) {
                     output_queue.tap_key(us.SPACE) catch {};
                 }
-            } 
+            }
         },
         else => {},
     }
