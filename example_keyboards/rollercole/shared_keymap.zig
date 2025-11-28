@@ -6,8 +6,8 @@ const NONE = core.KeyDef.none;
 const _______ = NONE;
 const microzig = zmk.microzig;
 const rp2xxx = microzig.hal;
-const dk = zmk.keyycodes.dk;
-const us = zmk.keyycodes.us;
+const dk = zmk.keycodes.dk;
+const us = zmk.keycodes.us;
 
 pub const key_count = 30;
 

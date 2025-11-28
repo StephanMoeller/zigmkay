@@ -1,4 +1,4 @@
-pub const keyycodes = struct {
+pub const keycodes = struct {
     pub const dk = @import("keycodes/dk.zig");
     pub const us = @import("keycodes/us.zig");
 };
