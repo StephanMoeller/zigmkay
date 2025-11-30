@@ -1,6 +1,7 @@
 pub const keycodes = struct {
-    pub const dk = @import("keycodes/dk.zig");
     pub const us = @import("keycodes/us.zig");
+    pub const dk = @import("keycodes/dk.zig");
+    pub const de = @import("keycodes/de.zig");
 };
 
 pub const microzig = @import("microzig");
