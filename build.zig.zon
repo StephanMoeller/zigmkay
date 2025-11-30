@@ -1,8 +1,8 @@
 .{
-    .name = .zig_firmware_brainstorming,
+    .name = .zigmkay,
     .version = "0.0.0",
-    .fingerprint = 0x4be986f33b002afe,
-    .minimum_zig_version = "0.15.0-dev.566+74a3ae492",
+    .fingerprint = 0x96c3db5c7cca4e4,
+    .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .microzig = .{
             .url = "https://github.com/ZigEmbeddedGroup/microzig/releases/download/0.15.0/microzig.tar.gz",
