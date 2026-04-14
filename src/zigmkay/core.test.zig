@@ -20,7 +20,7 @@ test "TimeSinceBoot add" {
     var time = core.TimeSinceBoot{ .time_since_boot_us = 100 };
     const diff = core.TimeSpan{ .ms = 30 };
     time = time.add(diff);
-    try std.testing.expectEqual(3010, time.time_since_boot_us);
+    try std.testing.expectEqual(30100, time.time_since_boot_us);
 }
 
 test "TimeSinceBoot diff_us" {
