@@ -42,6 +42,7 @@ pub fn build(b: *std.Build) void {
 
     const test_step = b.step("compile_and_run_test", "Run unit tests");
     const check_step = b.step("compile_test", "Compile tests without running");
+    const custom_test_step = b.step("custom-test", "Run unit tests with custom test runner");
     const target = b.standardTargetOptions(.{});
     for (test_files) |path| {
         const test_file_module = b.createModule(.{
@@ -54,5 +55,21 @@ pub fn build(b: *std.Build) void {
         const run = b.addRunArtifact(test_exe);
         test_step.dependOn(&run.step);
         check_step.dependOn(&test_exe.step);
+
+        const custom_test_exe = b.addTest(.{
+            .root_module = b.createModule(.{
+                .root_source_file = .{
+                    .src_path = .{ .owner = b, .sub_path = path },
+                },
+                .target = target,
+            }),
+            .test_runner = .{
+                .path = .{ .src_path = .{ .owner = b, .sub_path = "src/custom_test_runner.zig" } },
+                .mode = .simple,
+            },
+        });
+        const custom_run = b.addRunArtifact(custom_test_exe);
+        custom_run.has_side_effects = true;
+        custom_test_step.dependOn(&custom_run.step);
     }
 }
