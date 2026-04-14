@@ -40,7 +40,8 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/grazkb.test.zig",
     };
 
-    const test_step = b.step("test", "Run unit tests");
+    const test_step = b.step("compile_and_run_test", "Run unit tests");
+    const check_step = b.step("compile_test", "Compile tests without running");
     const target = b.standardTargetOptions(.{});
     for (test_files) |path| {
         const test_file_module = b.createModule(.{
@@ -52,5 +53,6 @@ pub fn build(b: *std.Build) void {
         const test_exe = b.addTest(.{ .root_module = test_file_module });
         const run = b.addRunArtifact(test_exe);
         test_step.dependOn(&run.step);
+        check_step.dependOn(&test_exe.step);
     }
 }

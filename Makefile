@@ -1,7 +1,7 @@
 
 build:
-	zig build
+	zig build compile_test
 
 run:
-	zig build test
+	zig build compile_and_run_test
 
