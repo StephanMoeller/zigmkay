@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
     const test_run_step = b.step("test_compile_run", "Run unit tests");
     const target = b.standardTargetOptions(.{});
 
-    // START: Create file iterator
+    // START: Create test file iterator
     const test_dir = "test";
     var src_dir = b.build_root.handle.openDir(test_dir, .{ .iterate = true }) catch |err|
         std.debug.panic("Failed to open '{s}': {}", .{ test_dir, err });
@@ -28,7 +28,7 @@ pub fn build(b: *std.Build) void {
     var walker = src_dir.walk(b.allocator) catch |err|
         std.debug.panic("Failed to walk '{s}': {}", .{ test_dir, err });
     defer walker.deinit();
-    // END: Create file iterator
+    // END: Create test file iterator
 
     while (walker.next() catch |err| std.debug.panic("Failed to iterate '{s}': {}", .{ test_dir, err })) |entry| {
         if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".test.") != null) {
