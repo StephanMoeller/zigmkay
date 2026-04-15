@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const fs = @import("fs");
+const mem = @import("mem");
 const microzig = @import("microzig");
 
 const MicroBuild = microzig.MicroBuild(.{
@@ -13,48 +15,37 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    const test_files = &[_][]const u8{
-        "src/zigmkay/core.test.zig",
-        "src/zigmkay/processing.test.retrotapping.zig",
-        "src/zigmkay/processing.test.permissive_hold.zig",
-        "src/zigmkay/processing.test.basics.tap_only.zig",
-        "src/zigmkay/processing.test.basics.hold_only.zig",
-        "src/zigmkay/processing.test.basics.trans_none.zig",
-        "src/zigmkay/processing.test.tap_hold.zig",
-        "src/zigmkay/processing.test.autofire.zig",
-        "src/zigmkay/processing.test.one_shot.zig",
-        "src/zigmkay/processing.test.struct_sizes.zig",
-        "src/zigmkay/processing.test.rolling_keys.zig",
-        "src/zigmkay/processing.test.sides.zig",
-        "src/zigmkay/processing.test.combos_single.zig",
-        "src/zigmkay/processing.test.custom_functions.zig",
-        "src/zigmkay/processing.test.basics.multitap_same_keycode.zig",
-        "src/zigmkay/processing.test.permissive_hold_and_combos.zig",
-        "src/zigmkay/processing.test.tap_hold.all_cases.zig",
-        "src/zigmkay/processing.test.boot_key.zig",
-        "src/zigmkay/processing.test.known_bugs.zig",
-        "src/zigmkay/output_command_queue.test.zig",
-        "src/zigmkay/generic_queue.test.zig",
-    };
-
     const test_compile_step = b.step("test_compile", "Compile unit tests");
     const test_run_step = b.step("test_compile_run", "Run unit tests");
-
     const target = b.standardTargetOptions(.{});
-    for (test_files) |path| {
-        const test_file_module = b.createModule(.{
-            .root_source_file = .{
-                .src_path = .{ .owner = b, .sub_path = path },
-            },
-            .target = target,
-        });
-        test_file_module.addImport("zigmkay", zigmkay_mod);
 
-        const test_exe = b.addTest(.{ .root_module = test_file_module });
+    // Iterate all test files
+    const test_dir = "src/zigmkay";
+    var src_dir = b.build_root.handle.openDir(test_dir, .{ .iterate = true }) catch |err|
+        std.debug.panic("Failed to open '{s}': {}", .{ test_dir, err });
+    defer src_dir.close();
 
-        const test_run = b.addRunArtifact(test_exe);
-        test_run_step.dependOn(&test_run.step);
-        test_compile_step.dependOn(&test_exe.step);
+    var walker = src_dir.walk(b.allocator) catch |err|
+        std.debug.panic("Failed to walk '{s}': {}", .{ test_dir, err });
+
+    defer walker.deinit();
+
+    while (walker.next() catch |err| std.debug.panic("Failed to iterate: {}", .{err})) |entry| {
+        if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".test.") != null) {
+            const test_file_path = std.fmt.allocPrint(b.allocator, "src/zigmkay/{s}", .{entry.path}) catch unreachable;
+            //std.debug.print("{s}\n", .{test_file_path});
+
+            const test_file_module = b.createModule(.{
+                .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = test_file_path } },
+                .target = target,
+            });
+            test_file_module.addImport("zigmkay", zigmkay_mod);
+
+            const test_exe = b.addTest(.{ .root_module = test_file_module });
+
+            const test_run = b.addRunArtifact(test_exe);
+            test_run_step.dependOn(&test_run.step);
+            test_compile_step.dependOn(&test_exe.step);
+        }
     }
 }
-
