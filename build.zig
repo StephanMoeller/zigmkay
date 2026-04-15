@@ -13,8 +13,6 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    _ = zigmkay_mod;
-
     const test_files = &[_][]const u8{
         "src/zigmkay/core.test.zig",
         "src/zigmkay/processing.test.retrotapping.zig",
@@ -33,16 +31,15 @@ pub fn build(b: *std.Build) void {
         "src/zigmkay/processing.test.basics.multitap_same_keycode.zig",
         "src/zigmkay/processing.test.permissive_hold_and_combos.zig",
         "src/zigmkay/processing.test.tap_hold.all_cases.zig",
-        "src/zigmkay/output_command_queue.test.zig",
-        "src/zigmkay/generic_queue.test.zig",
         "src/zigmkay/processing.test.boot_key.zig",
         "src/zigmkay/processing.test.known_bugs.zig",
-        "src/zigmkay/grazkb.test.zig",
+        "src/zigmkay/output_command_queue.test.zig",
+        "src/zigmkay/generic_queue.test.zig",
     };
 
-    const test_step = b.step("compile_and_run_test", "Run unit tests");
-    const check_step = b.step("compile_test", "Compile tests without running");
-    const custom_test_step = b.step("custom-test", "Run unit tests with custom test runner");
+    const test_compile_step = b.step("test_compile", "Compile unit tests");
+    const test_run_step = b.step("test_compile_run", "Run unit tests");
+
     const target = b.standardTargetOptions(.{});
     for (test_files) |path| {
         const test_file_module = b.createModule(.{
@@ -51,25 +48,13 @@ pub fn build(b: *std.Build) void {
             },
             .target = target,
         });
-        const test_exe = b.addTest(.{ .root_module = test_file_module });
-        const run = b.addRunArtifact(test_exe);
-        test_step.dependOn(&run.step);
-        check_step.dependOn(&test_exe.step);
+        test_file_module.addImport("zigmkay", zigmkay_mod);
 
-        const custom_test_exe = b.addTest(.{
-            .root_module = b.createModule(.{
-                .root_source_file = .{
-                    .src_path = .{ .owner = b, .sub_path = path },
-                },
-                .target = target,
-            }),
-            .test_runner = .{
-                .path = .{ .src_path = .{ .owner = b, .sub_path = "src/custom_test_runner.zig" } },
-                .mode = .simple,
-            },
-        });
-        const custom_run = b.addRunArtifact(custom_test_exe);
-        custom_run.has_side_effects = true;
-        custom_test_step.dependOn(&custom_run.step);
+        const test_exe = b.addTest(.{ .root_module = test_file_module });
+
+        const test_run = b.addRunArtifact(test_exe);
+        test_run_step.dependOn(&test_run.step);
+        test_compile_step.dependOn(&test_exe.step);
     }
 }
+

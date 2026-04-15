@@ -1,10 +1,10 @@
+.PHONY: build run test
 
 build:
-	zig build compile_test
+	zig build test_compile
 
 run:
-	zig build compile_and_run_test
+	zig build test_compile_run
 
 test:
-	zig build custom-test
-
+	zig build test_compile_run
