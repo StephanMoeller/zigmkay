@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
     const test_run_step = b.step("test_compile_run", "Run unit tests");
     const target = b.standardTargetOptions(.{});
 
-    // Iterate all test files
+    // START: Create file iterator
     const test_dir = "src/zigmkay";
     var src_dir = b.build_root.handle.openDir(test_dir, .{ .iterate = true }) catch |err|
         std.debug.panic("Failed to open '{s}': {}", .{ test_dir, err });
@@ -27,10 +27,10 @@ pub fn build(b: *std.Build) void {
 
     var walker = src_dir.walk(b.allocator) catch |err|
         std.debug.panic("Failed to walk '{s}': {}", .{ test_dir, err });
-
     defer walker.deinit();
+    // END: Create file iterator
 
-    while (walker.next() catch |err| std.debug.panic("Failed to iterate: {}", .{err})) |entry| {
+    while (walker.next() catch |err| std.debug.panic("Failed to iterate '{s}': {}", .{ test_dir, err })) |entry| {
         if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".test.") != null) {
             const test_file_path = std.fmt.allocPrint(b.allocator, "src/zigmkay/{s}", .{entry.path}) catch unreachable;
             //std.debug.print("{s}\n", .{test_file_path});
@@ -42,10 +42,10 @@ pub fn build(b: *std.Build) void {
             test_file_module.addImport("zigmkay", zigmkay_mod);
 
             const test_exe = b.addTest(.{ .root_module = test_file_module });
+            test_compile_step.dependOn(&test_exe.step);
 
             const test_run = b.addRunArtifact(test_exe);
             test_run_step.dependOn(&test_run.step);
-            test_compile_step.dependOn(&test_exe.step);
         }
     }
 }
