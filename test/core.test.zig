@@ -1,4 +1,6 @@
-const core = @import("core.zig");
+const zigmkay = @import("zigmkay").zigmkay;
+const core = zigmkay.core;
+
 const std = @import("std");
 test "TimeSinceBoot creation" {
     try std.testing.expectEqual(789, core.TimeSinceBoot.from_absolute_us(789).time_since_boot_us);
