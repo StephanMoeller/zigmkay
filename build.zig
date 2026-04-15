@@ -20,7 +20,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
 
     // START: Create file iterator
-    const test_dir = "src/zigmkay";
+    const test_dir = "test";
     var src_dir = b.build_root.handle.openDir(test_dir, .{ .iterate = true }) catch |err|
         std.debug.panic("Failed to open '{s}': {}", .{ test_dir, err });
     defer src_dir.close();
@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) void {
 
     while (walker.next() catch |err| std.debug.panic("Failed to iterate '{s}': {}", .{ test_dir, err })) |entry| {
         if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".test.") != null) {
-            const test_file_path = std.fmt.allocPrint(b.allocator, "src/zigmkay/{s}", .{entry.path}) catch unreachable;
+            const test_file_path = std.fmt.allocPrint(b.allocator, "{s}/{s}", .{ test_dir, entry.path }) catch unreachable;
             //std.debug.print("{s}\n", .{test_file_path});
 
             const test_file_module = b.createModule(.{

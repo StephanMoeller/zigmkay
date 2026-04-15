@@ -1,4 +1,4 @@
-const zigmkay = @import("zigmkay.zig");
+const zigmkay = @import("zigmkay").zigmkay;
 const core = zigmkay.core;
 
 const no_combos: [0]core.Combo2Def = [0]core.Combo2Def{};
