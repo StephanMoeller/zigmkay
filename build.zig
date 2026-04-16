@@ -37,7 +37,7 @@ pub fn add_test_steps(b: *std.Build, zigmkay_module: *std.Build.Module) void {
     while (walker.next() catch |err| std.debug.panic("Failed to iterate '{s}': {}", .{ test_dir, err })) |entry| {
         if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".zig") != null) {
             const current_test_file_path = std.fmt.allocPrint(b.allocator, "{s}/{s}", .{ test_dir, entry.path }) catch unreachable;
-            std.debug.print("{s}\n", .{current_test_file_path});
+            //std.debug.print("{s}\n", .{current_test_file_path});
 
             const current_test_file_module = b.createModule(.{
                 .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = current_test_file_path } },
