@@ -15,6 +15,10 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    add_test_steps(b, zigmkay_mod);
+}
+
+pub fn add_test_steps(b: *std.Build, zigmkay_module: *std.Build.Module) void {
     const global_test_compile_step = b.step("test_compile", "Compile unit tests");
     const global_test_run_step = b.step("test_compile_run", "Run unit tests");
     const target = b.standardTargetOptions(.{});
@@ -31,15 +35,15 @@ pub fn build(b: *std.Build) void {
     // END: Create test file iterator
 
     while (walker.next() catch |err| std.debug.panic("Failed to iterate '{s}': {}", .{ test_dir, err })) |entry| {
-        if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".test.") != null) {
+        if (entry.kind == .file and std.mem.indexOf(u8, entry.basename, ".zig") != null) {
             const current_test_file_path = std.fmt.allocPrint(b.allocator, "{s}/{s}", .{ test_dir, entry.path }) catch unreachable;
-            //std.debug.print("{s}\n", .{test_file_path});
+            std.debug.print("{s}\n", .{current_test_file_path});
 
             const current_test_file_module = b.createModule(.{
                 .root_source_file = .{ .src_path = .{ .owner = b, .sub_path = current_test_file_path } },
                 .target = target,
             });
-            current_test_file_module.addImport("zigmkay", zigmkay_mod);
+            current_test_file_module.addImport("zigmkay", zigmkay_module);
 
             const current_test_exe = b.addTest(.{ .root_module = current_test_file_module });
             global_test_compile_step.dependOn(&current_test_exe.step);
