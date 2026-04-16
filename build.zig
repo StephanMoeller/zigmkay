@@ -9,13 +9,13 @@ const MicroBuild = microzig.MicroBuild(.{
 });
 
 pub fn build(b: *std.Build) void {
-    const zigmkay_mod = b.addModule("zigmkay", .{
+    const zigmkay_module = b.addModule("zigmkay", .{
         .root_source_file = .{
             .src_path = .{ .owner = b, .sub_path = "src/root.zig" },
         },
     });
 
-    add_test_steps(b, zigmkay_mod);
+    add_test_steps(b, zigmkay_module);
 }
 
 pub fn add_test_steps(b: *std.Build, zigmkay_module: *std.Build.Module) void {
